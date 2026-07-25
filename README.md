@@ -37,6 +37,7 @@ Read the full vision: [docs/vision.md](docs/vision.md)
 ## Documentation
 
 - [Vision & Philosophy](docs/vision.md)
+- [Session Decisions](docs/decisions.md)
 - [Architecture Decisions](docs/architecture/index.md)
 - [RFCs](docs/rfcs/index.md)
 
