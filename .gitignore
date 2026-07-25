@@ -1,0 +1,45 @@
+# Dependencies
+node_modules/
+.pnpm-store/
+
+# Build output
+dist/
+build/
+target/
+out/
+*.tsbuildinfo
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Environment
+.env
+.env.local
+.env.*.local
+
+# Testing
+coverage/
+.nyc_output/
+
+# Debug
+*.log
+npm-debug.log*
+
+# Graph data (generated, not committed)
+.atlas/
+
+# Command Code (IDE agent metadata)
+.commandcode/
+
+# Temporary files
+tmp/
+temp/
+.cache/
