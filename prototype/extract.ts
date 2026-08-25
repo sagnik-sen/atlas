@@ -223,6 +223,22 @@ function extractFile(file: SourceFile) {
           }
         }
       } catch {}
+    } else if (Node.isPropertyAccessExpression(expr)) {
+      // Method/property calls (obj.method()) resolve through the type checker
+      // via the language service's go-to-definition on the property name node.
+      try {
+        const nameNode = expr.getNameNode();
+        const defs = nameNode.getDefinitions();
+        if (defs.length > 0) {
+          const defNode = defs[0].getDeclarationNode();
+          if (defNode) {
+            const defFile = np(defNode.getSourceFile().getFilePath());
+            calleeId = eid(defFile, expr.getName());
+            confidence = 0.8;
+            reason = "resolved_method";
+          }
+        }
+      } catch {}
     }
 
     facts.push({ kind: "calls", callerId, calleeName, calleeId, confidence, reason });

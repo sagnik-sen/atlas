@@ -2,6 +2,43 @@
 
 Analysis of whether Atlas's core hypothesis is true, based on a throwaway fact extraction prototype applied to the Zod (v4) TypeScript library.
 
+---
+
+## Correction (2026-08-21)
+
+**§3.1 and §6's "FATAL" method-call finding was a bug in the extractor, not a limitation of static analysis.**
+
+The original extractor (`extract.ts`) only resolved calls where `call.getExpression()` was a plain `Identifier`. Method calls (`obj.method()`) produce a `PropertyAccessExpression` instead, which hit no resolution branch at all — `calleeId` was never even attempted, not attempted-and-failed. The 0% method resolution rate reported below is an artifact of unwired code, not evidence that method dispatch is unresolvable without a custom type-based receiver resolver.
+
+**The fix is 10 lines**, using the same ts-morph language-service call already used for identifiers, applied to the property-access name node instead:
+
+```ts
+} else if (Node.isPropertyAccessExpression(expr)) {
+  const nameNode = expr.getNameNode();
+  const defs = nameNode.getDefinitions();
+  // ... same resolution as the identifier branch
+}
+```
+
+Rerun against a fresh clone of Zod (main branch, 132 source files — the `v4` tag used originally no longer exists upstream, so file counts differ from the original run):
+
+| Metric | Original report | Corrected |
+|---|---|---|
+| Total calls | 3,784 | 4,385 |
+| Function calls resolved | 629 / 629 (99%) | 923 / 929 (99%) |
+| **Method calls resolved** | **0 / 3,149 (0%)** | **3,313 / 3,456 (95.9%)** |
+| **Overall call resolution** | **16.6%** | **96.6%** |
+
+Blast-radius tracing — the exact use case §3.3 said was impossible — now works: `_parse` in `v4/core/parse.ts` resolves 8 transitive callers including `_decode`, `_encode`, and call sites in `classic/parse.ts` and `mini/schemas.ts`.
+
+**What still stands from the original report:** the "accidental dependency" and "unused import" heuristics (§2.2/§5 in the analysis output) still flag hundreds of imports with no call evidence even at 96.6% call resolution — that's a separate, real gap (likely type-only imports and instantiation via `new`, not call-graph incompleteness) worth investigating on its own, not evidence against the fact-based approach.
+
+**Revised bottom line:** the fact-based approach is not merely "sound but incomplete" — the corrected prototype answers the core blast-radius question this project exists to answer, using nothing but the TypeScript compiler's existing symbol resolution. No custom type checker, no `calls_method` schema split, no runtime tracing needed to hit >95% resolution on a real, method-heavy codebase. The schema distinction between resolved/unresolved calls (via `confidence`) is still useful, but was never blocking.
+
+The rest of this document is preserved as originally written, for the record.
+
+---
+
 - **Target**: colinhacks/zod v4, 116 source files (non-test), ~30k LOC TypeScript
 - **Extractor**: 300-line ts-morph script emitting typed facts
 - **Analysis**: Facts queried via Node.js scripts for architectural reasoning
