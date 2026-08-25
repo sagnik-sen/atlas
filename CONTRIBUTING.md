@@ -13,8 +13,8 @@ Significant design proposals follow the RFC process. See [docs/rfcs/index.md](do
 ### Architecture Decisions
 When a design decision has been debated and resolved, it should be captured as an Architecture Decision Record (ADR). See [docs/architecture/index.md](docs/architecture/index.md).
 
-### Code (Not Yet)
-We are not accepting code contributions at this stage. The implementation will begin once the core architecture is well-defined. This prevents wasted work from misaligned assumptions.
+### Code
+We're not accepting production code contributions yet — the core architecture (fact schema, symbol identity, query lenses) isn't settled. Throwaway validation prototypes like `prototype/` are in scope and encouraged: they exist to test hypotheses against real codebases before writing an ADR, not to ship. See [docs/thesis.md](docs/thesis.md) §7.2.
 
 ## Design Discussions
 

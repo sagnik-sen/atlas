@@ -24,11 +24,11 @@ Atlas builds a graph representation of a codebase where:
 
 This graph becomes the primary interface for understanding, navigating, and reasoning about a codebase — for both developers and AI coding assistants.
 
-Read the full vision: [docs/vision.md](docs/vision.md)
+Read the full vision: [docs/vision.md](docs/vision.md). Note: [docs/thesis.md](docs/thesis.md) supersedes the vision's "graph is primary" framing — the graph is now one query lens over a typed fact base, not the source of truth. See thesis.md for the current governing model and [docs/decisions.md](docs/decisions.md) for what that changes about next steps.
 
 ## Design Principles
 
-1. **Graph-first.** All analysis is expressed as graph operations. Text search is a secondary convenience, not the core abstraction.
+1. **Fact-first.** All analysis is expressed as typed, provenance-tracked facts. The graph is one query lens over the fact base, not the core abstraction — see [docs/thesis.md](docs/thesis.md).
 2. **Language-aware, not language-bound.** The graph model should be language-independent. Language-specific extractors map source code into the shared model.
 3. **Incremental and correct.** Changes to the codebase produce minimal graph updates, not full rebuilds.
 4. **Developer-first UX.** The graph exists to serve developers. If a feature doesn't make a developer more effective, it doesn't belong.
@@ -36,7 +36,8 @@ Read the full vision: [docs/vision.md](docs/vision.md)
 
 ## Documentation
 
-- [Vision & Philosophy](docs/vision.md)
+- [Vision & Philosophy](docs/vision.md) (superseded framing, see thesis)
+- [Thesis: Fact-Based Multi-Lens Index](docs/thesis.md) (current governing model)
 - [Session Decisions](docs/decisions.md)
 - [Architecture Decisions](docs/architecture/index.md)
 - [RFCs](docs/rfcs/index.md)

@@ -1,5 +1,7 @@
 # Vision
 
+> **Superseded (2026-08-21):** this document's central claim — "the graph is the primary representation" — is superseded by [docs/thesis.md](thesis.md), which argues the graph is one query-optimized lens over a fact base, not the source of truth. The problem framing and node/edge catalog below are still useful reference material; the "Graph is the Primary Representation" section is the part to discount. See thesis.md §6 for the point-by-point comparison and [decisions.md](decisions.md) for what this changes about next steps.
+
 Atlas is the knowledge layer for software engineering.
 
 ## The Problem
