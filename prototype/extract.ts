@@ -181,9 +181,12 @@ function resolveImport(fromFile: string, specifier: string): string | null {
       const full = path.resolve(dir, c);
       if (fs.existsSync(full)) return full;
     }
-    return specifier; // unresolved
+    return null; // relative but unresolvable
   }
-  return specifier; // external package
+  // ponytail: bare specifiers are treated as external. tsconfig `paths`
+  // aliases that point back into the repo (zod's own `zod/v3`) land here
+  // wrongly; read compilerOptions.paths if alias-heavy repos matter.
+  return null; // external package — has no path inside this repo
 }
 
 // JSDoc extraction (guarded)

@@ -34859,7 +34859,7 @@
   {
     "kind": "import",
     "importerFile": "v3/benchmarks/datetime.ts",
-    "exportedBy": "../../../../benchmark",
+    "exportedBy": "external:benchmark",
     "importedName": "Benchmark",
     "importType": "default"
   },
@@ -35402,14 +35402,14 @@
   {
     "kind": "import",
     "importerFile": "v3/benchmarks/discriminatedUnion.ts",
-    "exportedBy": "../../../../benchmark",
+    "exportedBy": "external:benchmark",
     "importedName": "Benchmark",
     "importType": "default"
   },
   {
     "kind": "import",
     "importerFile": "v3/benchmarks/discriminatedUnion.ts",
-    "exportedBy": "../../../../zod/v3",
+    "exportedBy": "external:zod/v3",
     "importedName": "z",
     "importType": "named"
   },
@@ -35682,7 +35682,7 @@
   {
     "kind": "import",
     "importerFile": "v3/benchmarks/index.ts",
-    "exportedBy": "../../../../benchmark",
+    "exportedBy": "external:benchmark",
     "importedName": "Benchmark",
     "importType": "type-default"
   },
@@ -36155,7 +36155,7 @@
   {
     "kind": "import",
     "importerFile": "v3/benchmarks/ipv4.ts",
-    "exportedBy": "../../../../benchmark",
+    "exportedBy": "external:benchmark",
     "importedName": "Benchmark",
     "importType": "default"
   },
@@ -36681,14 +36681,14 @@
   {
     "kind": "import",
     "importerFile": "v3/benchmarks/object.ts",
-    "exportedBy": "../../../../benchmark",
+    "exportedBy": "external:benchmark",
     "importedName": "Benchmark",
     "importType": "default"
   },
   {
     "kind": "import",
     "importerFile": "v3/benchmarks/object.ts",
-    "exportedBy": "../../../../zod/v3",
+    "exportedBy": "external:zod/v3",
     "importedName": "z",
     "importType": "named"
   },
@@ -37635,14 +37635,14 @@
   {
     "kind": "import",
     "importerFile": "v3/benchmarks/primitives.ts",
-    "exportedBy": "../../../../benchmark",
+    "exportedBy": "external:benchmark",
     "importedName": "Benchmark",
     "importType": "default"
   },
   {
     "kind": "import",
     "importerFile": "v3/benchmarks/primitives.ts",
-    "exportedBy": "../../../../zod/v3",
+    "exportedBy": "external:zod/v3",
     "importedName": "z",
     "importType": "named"
   },
@@ -38256,14 +38256,14 @@
   {
     "kind": "import",
     "importerFile": "v3/benchmarks/realworld.ts",
-    "exportedBy": "../../../../benchmark",
+    "exportedBy": "external:benchmark",
     "importedName": "Benchmark",
     "importType": "default"
   },
   {
     "kind": "import",
     "importerFile": "v3/benchmarks/realworld.ts",
-    "exportedBy": "../../../../zod/v3",
+    "exportedBy": "external:zod/v3",
     "importedName": "z",
     "importType": "named"
   },
@@ -38734,14 +38734,14 @@
   {
     "kind": "import",
     "importerFile": "v3/benchmarks/string.ts",
-    "exportedBy": "../../../../benchmark",
+    "exportedBy": "external:benchmark",
     "importedName": "Benchmark",
     "importType": "default"
   },
   {
     "kind": "import",
     "importerFile": "v3/benchmarks/string.ts",
-    "exportedBy": "../../../../zod/v3",
+    "exportedBy": "external:zod/v3",
     "importedName": "z",
     "importType": "named"
   },
@@ -39284,14 +39284,14 @@
   {
     "kind": "import",
     "importerFile": "v3/benchmarks/union.ts",
-    "exportedBy": "../../../../benchmark",
+    "exportedBy": "external:benchmark",
     "importedName": "Benchmark",
     "importType": "default"
   },
   {
     "kind": "import",
     "importerFile": "v3/benchmarks/union.ts",
-    "exportedBy": "../../../../zod/v3",
+    "exportedBy": "external:zod/v3",
     "importedName": "z",
     "importType": "named"
   },
