@@ -4,6 +4,115 @@ Analysis of whether Atlas's core hypothesis is true, based on a throwaway fact e
 
 ---
 
+## Update (2026-08-26): referential integrity
+
+**The 96.6% figure below measures the wrong thing.** It measures whether
+`getDefinitions()` landed somewhere. It does not measure whether the endpoint
+it landed on names an entity the fact base declares. Measuring that instead:
+
+| Metric | Value |
+|---|---|
+| Call edges with both endpoints declared | 735 / 4,385 = **16.8%** |
+
+Both numbers were true of the same fact base. Resolving an edge to an
+identifier nothing declares is worse than leaving it unresolved: the edge
+carries confidence 0.8–0.9 and is unusable. Three causes, all in the identity
+layer:
+
+| Cause | Edges affected |
+|---|---|
+| Caller ids synthesized as `anon_<line>` / `toplevel_<line>`, backed by no declaration | 3,025 |
+| Dependency paths forced through the `ts:` namespace (`ts:../../../../node_modules/typescript/lib/lib.es5.d.ts:isArray`) | 1,303 |
+| Declaration coverage stopped at top-level classes/interfaces/functions/type-aliases, so methods, constructors, accessors, nested functions, arrow-bound consts, callback parameters and object-literal members were never declared | 1,033 |
+| Callee id built from a different file than its declaration | 135 |
+
+### What changed
+
+`idOfNode()` is now the single source of entity ids; declaration emission and
+call resolution both route through it, so an endpoint is closed by
+construction rather than by two code paths agreeing on a string format.
+Dependency entities live in an `external:<origin>:<name>` namespace and are
+declared on first reference. Members are qualified by owner
+(`ZodString._parse`), because a bare method name is not unique within a
+module. Call sites with no callable ancestor are attributed to the module,
+which is now a declared entity. `calls` facts carry file and line per
+thesis.md §4.1 — deduplication had been silently collapsing repeat calls from
+one named function to one callee, and the line-numbered synthesized caller ids
+were accidentally masking it (944 call sites recovered).
+
+`new X()` parses as a NewExpression, not a CallExpression, and was producing
+no fact of any kind. Added as `instantiates`.
+
+**The invariant is now asserted at the end of every extraction run, and the
+run exits non-zero when it fails.** Verified by deliberately dropping method
+declarations: 21 violations reported, exit 1. This is the first mechanically
+checkable answer to decisions.md open tension #3.
+
+| Metric | Before | After |
+|---|---|---|
+| Declarations | 2,363 | 10,279 |
+| Call facts | 4,385 | 5,329 |
+| Instantiation facts | 0 | 557 |
+| Resolved calls | 4,236 | 5,169 |
+| **Closed edges (calls + instantiations)** | **735 (16.8%)** | **5,707 (97.0%)** |
+| Dangling endpoints | 3,650 | **0** |
+
+The residual 3.0% are honestly unresolved at confidence 0.3 — dynamic dispatch
+the extractor cannot see. That is the uncertainty thesis.md asks to be
+modelled rather than hidden.
+
+### The "accidental dependency" finding was an artifact
+
+§3.2 below reports that all 295 import edges had zero call evidence, and
+attributes it to the method-call resolution gap. The 2026-08-21 correction
+kept it open as a separate real gap. Neither diagnosis was right. The
+heuristic compared two key namespaces:
+
+```
+modImports  keyed by bare file path   "v3/types.ts"
+modCalls    keyed by module id        "module:v3/types.ts"
+```
+
+Every lookup missed, so every import edge was flagged regardless of how well
+calls resolved. A heuristic that reports 100% of its input is measuring
+itself. Fixing that and four further defects:
+
+| Fix | Rate |
+|---|---|
+| (baseline) | 345/345 = 100% |
+| Normalise module id namespace | 227/330 |
+| Exclude type-only imports — 24% of import facts, and `importType` has carried the distinction since the first run; nothing read it | 138/240 = 57.5% |
+| Count `new X()` as usage evidence | 134/240 = 55.8% |
+| Expand import targets through re-export closure (barrel indirection: the import names index.ts, the resolved call names core.ts) | 119/240 = 49.6% |
+| Map module ids to themselves, recovering 1,603 module-attributed calls (30% of all call facts) that were dropped from every module-level analysis | **113/240 = 47.1%** |
+
+report.md recommendation #5 ("add `imports_type` as a separate fact") asks for
+extractor work that was never needed — the field already existed.
+
+The remaining 113 are largely not false positives. They are imports used as
+values rather than called: `defaultErrorMap` assigned into a config, benchmark
+objects pushed into an array. The heuristic asks "is this import called?" and
+reports the answer as "is this import used?" Answering the second needs
+reference facts — every identifier occurrence resolved to its declaration —
+which the fact base does not model. **That is a schema question for ADR-0001,
+not more tuning.**
+
+### Also fixed
+
+`getToken()` returns a SyntaxKind enum value, not a node, so the original
+`h.getToken()?.getText?.() === "implements"` was permanently false — and
+neither of the two booleans it computed was ever read. Every heritage clause
+was emitted as `extends`, and heritage extraction ran only on exported
+declarations. Now 663 extends + 1 implements, the latter being the only
+`implements` clause in the corpus and previously invisible.
+
+`resolveImport` returned the raw specifier for bare package names, which the
+caller ran through `rel()`, turning `zod/v3` into the import edge
+`../../../../zod/v3`. It now returns null, making the `external:` fallback
+that had always been there reachable.
+
+---
+
 ## Correction (2026-08-21)
 
 **§3.1 and §6's "FATAL" method-call finding was a bug in the extractor, not a limitation of static analysis.**
