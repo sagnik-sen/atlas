@@ -47,8 +47,11 @@ const passThrough = new Set(reexports.map((r: any) => `${r.barrel}\u0000${r.sour
 // modCalls lookup miss, which is why the accidental-dependency heuristic
 // flagged 100% of import edges. Normalise to the bare path.
 const asFile = (moduleId: string) => moduleId.replace(/^module:/, "");
+const instantiates = F.filter((f: any) => f.kind === "instantiates");
 const modCalls = new Map<string, Set<string>>();
-for (const c of calls) {
+// An import used only via `new X()` is exercised just as much as one used via
+// a call; both are runtime dependencies.
+for (const c of [...calls, ...instantiates.map((i: any) => ({ callerId: i.callerId, calleeId: i.classId }))]) {
   if (!c.calleeId) continue;
   const cm = entMod.get(c.callerId);
   const dm = entMod.get(c.calleeId);

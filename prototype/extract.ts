@@ -2,7 +2,7 @@ import { Project, SyntaxKind, Node, type SourceFile } from "ts-morph";
 import * as path from "path";
 import * as fs from "fs";
 
-type Fact = DeclFact | ContainsFact | ImportFact | ReexportFact | CallsFact | HeritageFact;
+type Fact = DeclFact | ContainsFact | ImportFact | ReexportFact | CallsFact | HeritageFact | InstantiatesFact;
 
 interface DeclFact {
   kind: "declaration";
@@ -46,6 +46,18 @@ interface CallsFact {
   line: number;        // distinct call sites are distinct facts
 }
 
+interface InstantiatesFact {
+  kind: "instantiates";
+  callerId: string;
+  className: string;
+  classId?: string;
+  confidence: number;
+  reason: string;
+  callerKind: string;
+  file: string;
+  line: number;
+}
+
 interface HeritageFact {
   kind: "extends" | "implements";
   childId: string;
@@ -54,6 +66,10 @@ interface HeritageFact {
 
 const facts: Fact[] = [];
 let ROOT = "";
+// Files the walk actually visits. Resolution can land outside it — a benchmark
+// instantiating a class from the excluded tests/ tree — and such an entity is
+// real but never declared by the walk.
+const ANALYSED = new Set<string>();
 
 function mid(file: string) { return `module:${slug(path.relative(ROOT, file))}`; }
 
@@ -223,6 +239,48 @@ function emitHeritage(node: any, id: string) {
   } catch {}
 }
 
+// Attribute a node to the nearest enclosing declared entity, falling back to
+// the module. Shared by call and instantiation extraction so both sides of the
+// fact base use one notion of "where did this happen".
+function callSite(node: any, moduleId: string) {
+  for (let a = node.getParent(); a; a = a.getParent()) {
+    if (!isCallableContainer(a)) continue;
+    const id = idOfNode(a);
+    if (id) {
+      const t = typeOfNode(a);
+      return { callerId: id, callerKind: t === "unknown" ? a.getKindName() : t };
+    }
+  }
+  return { callerId: moduleId, callerKind: "module" };
+}
+
+// Resolve a name node to a declared entity id, declaring dependency entities
+// on first reference since the file walk never visits them.
+function resolveEntity(node: any): string | null {
+  try {
+    const defs = node.getDefinitions();
+    if (!defs.length) return null;
+    const defNode = defs[0].getDeclarationNode();
+    if (!defNode) return null;
+    const id = idOfNode(defNode);
+    if (!id) return null;
+    // Anything the walk never visits must be declared here or the edge
+    // resolves to an id the fact base does not contain.
+    const defFile = np(defNode.getSourceFile().getFilePath());
+    if (!ANALYSED.has(defFile)) {
+      const external = isExternalPath(defFile);
+      facts.push({
+        kind: "declaration", entityId: id,
+        entityType: external ? "external" : "out_of_scope",
+        name: declName(defNode)!,
+        file: external ? `external:${externalOrigin(defFile)}` : rel(defFile),
+        exported: true,
+      });
+    }
+    return id;
+  } catch { return null; }
+}
+
 function extractFile(file: SourceFile) {
   const fp = np(file.getFilePath());
 
@@ -303,42 +361,18 @@ function extractFile(file: SourceFile) {
     // ancestor and, failing that, synthesized `anon_<line>` / `toplevel_<line>`
     // ids that no declaration fact backed — 3,025 of 4,385 edges dangled at
     // their source as a result.
-    let callerId: string | undefined;
-    let callerKind = "module";
+    const site = callSite(call, moduleId);
+    let callerId = site.callerId;
+    let callerKind = site.callerKind;
     let confidence = 0.3;
     let reason = "unresolved";
-
-    for (let a = call.getParent(); a; a = a.getParent()) {
-      if (!isCallableContainer(a)) continue;
-      const id = idOfNode(a);
-      if (id) { callerId = id; callerKind = typeOfNode(a) === "unknown" ? a.getKindName() : typeOfNode(a); break; }
-    }
-    if (!callerId) { callerId = moduleId; callerKind = "module"; }
 
     // Try to resolve callee via TypeScript's symbol system
     let calleeId: string | undefined;
     const resolveVia = (node: any, conf: number, why: string) => {
-      try {
-        const defs = node.getDefinitions();
-        if (!defs.length) return;
-        const defNode = defs[0].getDeclarationNode();
-        if (!defNode) return;
-        const id = idOfNode(defNode);
-        if (!id) return;
-        calleeId = id;
-        confidence = conf;
-        reason = why;
-        // Dependency entities are never visited by the file walk, so nothing
-        // else would ever declare them. Without this the edge resolves to an
-        // id the fact base does not contain.
-        if (id.startsWith("external:")) {
-          facts.push({
-            kind: "declaration", entityId: id, entityType: "external",
-            name: declName(defNode)!, file: `external:${externalOrigin(np(defNode.getSourceFile().getFilePath()))}`,
-            exported: true,
-          });
-        }
-      } catch {}
+      const id = resolveEntity(node);
+      if (!id) return;
+      calleeId = id; confidence = conf; reason = why;
     };
 
     if (Node.isIdentifier(expr)) {
@@ -356,6 +390,24 @@ function extractFile(file: SourceFile) {
     facts.push({
       kind: "calls", callerId, calleeName, calleeId, confidence, reason, callerKind,
       file: rel(fp), line: call.getStartLineNumber(),
+    });
+  }
+
+  // ── Instantiations ──
+  // `new X()` is a NewExpression, not a CallExpression, so it produced no fact
+  // of any kind. Every dependency that exists only to be instantiated —
+  // `new ZodError(...)` in Zod — looked like an unused import.
+  for (const ne of file.getDescendantsOfKind(SyntaxKind.NewExpression)) {
+    const expr = ne.getExpression();
+    const className = extractCalleeName(expr);
+    if (!className) continue;
+    const nameNode = Node.isPropertyAccessExpression(expr) ? expr.getNameNode() : expr;
+    const classId = resolveEntity(nameNode) ?? undefined;
+    const site = callSite(ne, moduleId);
+    facts.push({
+      kind: "instantiates", callerId: site.callerId, className, classId,
+      confidence: classId ? 0.9 : 0.3, reason: classId ? "resolved" : "unresolved",
+      callerKind: site.callerKind, file: rel(fp), line: ne.getStartLineNumber(),
     });
   }
 
@@ -420,6 +472,8 @@ const sourceFiles = project.getSourceFiles().filter(f => {
     && !fp.includes(".test.");
 });
 
+for (const f of sourceFiles) ANALYSED.add(np(f.getFilePath()));
+
 log("info", `Found ${sourceFiles.length} source files`);
 
 for (const file of sourceFiles) {
@@ -471,19 +525,25 @@ log("info", `Resolved calls: ${calls.filter(c => c.calleeId).length} of ${calls.
 const declaredIds = new Set(
   unique.filter(f => f.kind === "declaration").map(f => (f as DeclFact).entityId)
 );
-const violations = calls.flatMap(c => {
+const instantiations = unique.filter(f => f.kind === "instantiates") as InstantiatesFact[];
+const edges: { callerId: string; targetId?: string; file: string; line: number }[] = [
+  ...calls.map(c => ({ callerId: c.callerId, targetId: c.calleeId, file: c.file, line: c.line })),
+  ...instantiations.map(i => ({ callerId: i.callerId, targetId: i.classId, file: i.file, line: i.line })),
+];
+const violations = edges.flatMap(e => {
   const bad: string[] = [];
-  if (!declaredIds.has(c.callerId)) bad.push(`caller ${c.callerId}`);
-  if (c.calleeId && !declaredIds.has(c.calleeId)) bad.push(`callee ${c.calleeId}`);
-  return bad.map(b => `${c.file}:${c.line} ${b}`);
+  if (!declaredIds.has(e.callerId)) bad.push(`caller ${e.callerId}`);
+  if (e.targetId && !declaredIds.has(e.targetId)) bad.push(`target ${e.targetId}`);
+  return bad.map(b => `${e.file}:${e.line} ${b}`);
 });
-const closed = calls.filter(c => c.calleeId && declaredIds.has(c.callerId) && declaredIds.has(c.calleeId));
-log("info", `Closed call edges: ${closed.length} of ${calls.length} (${(100 * closed.length / calls.length).toFixed(1)}%)`);
+const closed = edges.filter(e => e.targetId && declaredIds.has(e.callerId) && declaredIds.has(e.targetId));
+log("info", `Instantiations: ${instantiations.filter(i => i.classId).length} of ${instantiations.length} resolved`);
+log("info", `Closed edges (calls + instantiations): ${closed.length} of ${edges.length} (${(100 * closed.length / edges.length).toFixed(1)}%)`);
 
 if (violations.length > 0) {
-  log("error", `REFERENTIAL INTEGRITY: ${violations.length} call endpoints reference undeclared entities`);
+  log("error", `REFERENTIAL INTEGRITY: ${violations.length} edge endpoints reference undeclared entities`);
   for (const v of violations.slice(0, 20)) log("error", `  ${v}`);
   process.exitCode = 1;
 } else {
-  log("info", "Referential integrity: OK (every call endpoint is declared or explicitly unresolved)");
+  log("info", "Referential integrity: OK (every edge endpoint is declared or explicitly unresolved)");
 }
