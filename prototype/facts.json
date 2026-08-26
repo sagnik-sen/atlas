@@ -13501,6 +13501,11 @@
     "entityId": "ts:v3/types.ts:ParseInputLazyPath"
   },
   {
+    "kind": "implements",
+    "childId": "ts:v3/types.ts:ParseInputLazyPath",
+    "parentName": "ParseInput"
+  },
+  {
     "kind": "declaration",
     "entityId": "ts:v3/types.ts:Class",
     "entityType": "class",
@@ -39281,6 +39286,11 @@
     "entityId": "ts:v4/core/errors.ts:$ZodIssueInvalidUnionNoMatch"
   },
   {
+    "kind": "extends",
+    "childId": "ts:v4/core/errors.ts:$ZodIssueInvalidUnionNoMatch",
+    "parentName": "$ZodIssueBase"
+  },
+  {
     "kind": "declaration",
     "entityId": "ts:v4/core/errors.ts:$ZodIssueInvalidUnionMultipleMatch",
     "entityType": "interface",
@@ -39294,12 +39304,22 @@
     "entityId": "ts:v4/core/errors.ts:$ZodIssueInvalidUnionMultipleMatch"
   },
   {
+    "kind": "extends",
+    "childId": "ts:v4/core/errors.ts:$ZodIssueInvalidUnionMultipleMatch",
+    "parentName": "$ZodIssueBase"
+  },
+  {
     "kind": "declaration",
     "entityId": "ts:v4/core/errors.ts:$ZodRealError",
     "entityType": "interface",
     "name": "$ZodRealError",
     "file": "v4/core/errors.ts",
     "exported": false
+  },
+  {
+    "kind": "extends",
+    "childId": "ts:v4/core/errors.ts:$ZodRealError",
+    "parentName": "$ZodError<T>"
   },
   {
     "kind": "declaration",
@@ -47622,6 +47642,11 @@
     "entityId": "ts:v4/core/memoizer.ts:Memoizer"
   },
   {
+    "kind": "extends",
+    "childId": "ts:v4/core/memoizer.ts:Memoizer",
+    "parentName": "$ZodMemoizer"
+  },
+  {
     "kind": "declaration",
     "entityId": "ts:v4/core/memoizer.ts:cloneIssues",
     "entityType": "function",
@@ -49422,6 +49447,11 @@
     "entityId": "ts:v4/core/schemas.ts:SchemaPartInternals"
   },
   {
+    "kind": "extends",
+    "childId": "ts:v4/core/schemas.ts:SchemaPartInternals",
+    "parentName": "$ZodTypeInternals<LiteralPart, LiteralPart>"
+  },
+  {
     "kind": "declaration",
     "entityId": "ts:v4/core/schemas.ts:SchemaPart",
     "entityType": "interface",
@@ -49433,6 +49463,11 @@
     "kind": "contains",
     "containerId": "module:v4/core/schemas.ts",
     "entityId": "ts:v4/core/schemas.ts:SchemaPart"
+  },
+  {
+    "kind": "extends",
+    "childId": "ts:v4/core/schemas.ts:SchemaPart",
+    "parentName": "$ZodType"
   },
   {
     "kind": "declaration",
@@ -69464,6 +69499,11 @@
     "entityId": "ts:v4/mini/schemas.ts:_ZodMiniType"
   },
   {
+    "kind": "extends",
+    "childId": "ts:v4/mini/schemas.ts:_ZodMiniType",
+    "parentName": "ZodMiniType<any, any, Internals>"
+  },
+  {
     "kind": "declaration",
     "entityId": "ts:v4/mini/schemas.ts:_ZodMiniNumber",
     "entityType": "interface",
@@ -69475,6 +69515,16 @@
     "kind": "contains",
     "containerId": "module:v4/mini/schemas.ts",
     "entityId": "ts:v4/mini/schemas.ts:_ZodMiniNumber"
+  },
+  {
+    "kind": "extends",
+    "childId": "ts:v4/mini/schemas.ts:_ZodMiniNumber",
+    "parentName": "_ZodMiniType<T>"
+  },
+  {
+    "kind": "extends",
+    "childId": "ts:v4/mini/schemas.ts:_ZodMiniNumber",
+    "parentName": "core.$ZodNumber<T[\"input\"]>"
   },
   {
     "kind": "declaration",

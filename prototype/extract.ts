@@ -2,7 +2,7 @@ import { Project, SyntaxKind, Node, type SourceFile } from "ts-morph";
 import * as path from "path";
 import * as fs from "fs";
 
-type Fact = DeclFact | ContainsFact | ImportFact | ReexportFact | CallsFact | ExtendsFact;
+type Fact = DeclFact | ContainsFact | ImportFact | ReexportFact | CallsFact | HeritageFact;
 
 interface DeclFact {
   kind: "declaration";
@@ -43,8 +43,8 @@ interface CallsFact {
   reason: string;
 }
 
-interface ExtendsFact {
-  kind: "extends";
+interface HeritageFact {
+  kind: "extends" | "implements";
   childId: string;
   parentName: string;
 }
@@ -99,6 +99,24 @@ function extractCalleeName(expr: any): string | null {
   return null;
 }
 
+// Heritage clauses live on both exported and non-exported classes/interfaces.
+// Emitting them from one call site only silently drops the non-exported half.
+function emitHeritage(node: any, id: string) {
+  if (!Node.isClassDeclaration(node) && !Node.isInterfaceDeclaration(node)) return;
+  try {
+    for (const h of node.getHeritageClauses?.() || []) {
+      // `class C extends B implements I` yields two clauses; the token
+      // distinguishes them. Emitting both as "extends" merged two distinct
+      // relations into a single fact type. getToken() returns a SyntaxKind
+      // enum value, not a node — comparing its .getText() silently never matched.
+      const kind = h.getToken() === SyntaxKind.ImplementsKeyword ? "implements" as const : "extends" as const;
+      for (const t of h.getTypeNodes() || []) {
+        facts.push({ kind, childId: id, parentName: t.getText() });
+      }
+    }
+  } catch {}
+}
+
 function extractFile(file: SourceFile) {
   const fp = np(file.getFilePath());
 
@@ -124,25 +142,7 @@ function extractFile(file: SourceFile) {
         facts.push({ kind: "declaration", entityId: id, entityType: ty, name, file: rel(defFile), exported: true });
         facts.push({ kind: "contains", containerId: mid(defFile), entityId: id });
 
-        // Extends
-        if (Node.isClassDeclaration(node) || Node.isInterfaceDeclaration(node)) {
-          try {
-            const heritages = (node as any).getHeritageClauses?.();
-            if (heritages) {
-              for (const h of heritages) {
-                const isExtends = h.getToken()?.getText?.() === "extends";
-                const isImplements = h.getToken()?.getText?.() === "implements";
-                for (const t of h.getTypeNodes() || []) {
-                  facts.push({
-                    kind: "extends",
-                    childId: id,
-                    parentName: t.getText(),
-                  });
-                }
-              }
-            }
-          } catch {}
-        }
+        emitHeritage(node, id);
       }
     }
   } catch (e: any) {
@@ -158,6 +158,7 @@ function extractFile(file: SourceFile) {
       const id = eid(fp, name);
       facts.push({ kind: "declaration", entityId: id, entityType: type, name, file: rel(fp), exported: false });
       facts.push({ kind: "contains", containerId: moduleId, entityId: id });
+      emitHeritage(d, id);
     }
   };
   processDecls(file.getClasses(), "class");
