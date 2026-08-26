@@ -16,9 +16,14 @@ for (const c of contains) {
   modEnts.get(c.containerId)!.add(c.entityId);
 }
 
-// Entity-to-module
+// Entity-to-module.
+// `contains` never places a module inside itself, so a module id resolved
+// through this map alone comes back undefined — and 30% of call facts are
+// attributed to a module, because that is where top-level code lives. Those
+// edges were being dropped from every module-level analysis.
 const entMod = new Map<string, string>();
 for (const c of contains) entMod.set(c.entityId, c.containerId);
+for (const d of decls) if (d.entityType === "module") entMod.set(d.entityId, d.entityId);
 
 // Module imports
 const modImports = new Map<string, Set<string>>();
@@ -40,6 +45,30 @@ for (const imp of imports) {
 // call into it. Counting that as a missing call edge measures the barrel
 // pattern, not an accidental dependency.
 const passThrough = new Set(reexports.map((r: any) => `${r.barrel}\u0000${r.source}`));
+
+// Imports name the barrel they were written against; resolved calls name the
+// file the definition actually lives in. `import * as core from "core/index"`
+// followed by `core.$constructor()` yields an import edge to index.ts and a
+// call edge to core.ts, which can never match at module level. Expanding an
+// import target through its re-export closure is what report.md rec #4 means
+// by "trace through to the source declarations".
+const reexportEdges = new Map<string, Set<string>>();
+for (const r of reexports) {
+  if (!reexportEdges.has(r.barrel)) reexportEdges.set(r.barrel, new Set());
+  reexportEdges.get(r.barrel)!.add(r.source);
+}
+const closureCache = new Map<string, Set<string>>();
+function reexportClosure(mod: string): Set<string> {
+  const hit = closureCache.get(mod);
+  if (hit) return hit;
+  const out = new Set<string>([mod]);
+  closureCache.set(mod, out); // seed before recursing: barrels can cycle
+  for (const src of reexportEdges.get(mod) ?? []) {
+    if (out.has(src)) continue;
+    for (const t of reexportClosure(src)) out.add(t);
+  }
+  return out;
+}
 
 // Module call edges (from resolved calls only).
 // entMod yields module ids ("module:v3/types.ts") while modImports is keyed by
@@ -139,7 +168,9 @@ for (const [s, ds] of modValueImports) {
   for (const d of ds) {
     if (passThrough.has(`${s}\u0000${d}`)) continue;
     considered++;
-    if (!modCalls.get(s)?.has(d)) {
+    const evidence = modCalls.get(s);
+    const satisfied = !!evidence && [...reexportClosure(d)].some(t => evidence.has(t));
+    if (!satisfied) {
       acc++;
       if (accSamples.length < 10) accSamples.push(`${s} -> ${d}`);
     }
