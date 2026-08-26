@@ -22,21 +22,40 @@ for (const c of contains) entMod.set(c.entityId, c.containerId);
 
 // Module imports
 const modImports = new Map<string, Set<string>>();
+// Value imports only. A type-only import creates no call edge by construction,
+// so judging it against call evidence is a category error, not a finding —
+// this is 24% of Zod's import facts. The importType field has always carried
+// the distinction; nothing read it.
+const modValueImports = new Map<string, Set<string>>();
 for (const imp of imports) {
   if (imp.exportedBy.startsWith("external:")) continue;
   if (!modImports.has(imp.importerFile)) modImports.set(imp.importerFile, new Set());
   modImports.get(imp.importerFile)!.add(imp.exportedBy);
+  if (imp.importType.startsWith("type-")) continue;
+  if (!modValueImports.has(imp.importerFile)) modValueImports.set(imp.importerFile, new Set());
+  modValueImports.get(imp.importerFile)!.add(imp.exportedBy);
 }
 
-// Module call edges (from resolved calls only)
+// A barrel re-exporting from a module imports it to pass it through, not to
+// call into it. Counting that as a missing call edge measures the barrel
+// pattern, not an accidental dependency.
+const passThrough = new Set(reexports.map((r: any) => `${r.barrel}\u0000${r.source}`));
+
+// Module call edges (from resolved calls only).
+// entMod yields module ids ("module:v3/types.ts") while modImports is keyed by
+// bare file path ("v3/types.ts"). Comparing the two namespaces made every
+// modCalls lookup miss, which is why the accidental-dependency heuristic
+// flagged 100% of import edges. Normalise to the bare path.
+const asFile = (moduleId: string) => moduleId.replace(/^module:/, "");
 const modCalls = new Map<string, Set<string>>();
 for (const c of calls) {
   if (!c.calleeId) continue;
   const cm = entMod.get(c.callerId);
   const dm = entMod.get(c.calleeId);
   if (cm && dm && cm !== dm) {
-    if (!modCalls.has(cm)) modCalls.set(cm, new Set());
-    modCalls.get(cm)!.add(dm);
+    const [sf, df] = [asFile(cm), asFile(dm)];
+    if (!modCalls.has(sf)) modCalls.set(sf, new Set());
+    modCalls.get(sf)!.add(df);
   }
 }
 
@@ -112,21 +131,28 @@ for (const [m, s] of callFanIn.slice(0, 10)) console.log(`  ${m}: called by ${s}
 console.log("\n--- 4. Accidental dependencies ---\n");
 let acc = 0;
 const accSamples: string[] = [];
-for (const [s, ds] of modImports) {
+let considered = 0;
+for (const [s, ds] of modValueImports) {
   for (const d of ds) {
+    if (passThrough.has(`${s}\u0000${d}`)) continue;
+    considered++;
     if (!modCalls.get(s)?.has(d)) {
       acc++;
       if (accSamples.length < 10) accSamples.push(`${s} -> ${d}`);
     }
   }
 }
-console.log(`Import edges with no call evidence: ${acc} of ${[...modImports.values()].reduce((sum,s)=>sum+s.size,0)}`);
+const allEdges = [...modImports.values()].reduce((sum,s)=>sum+s.size,0);
+console.log(`Import edges: ${allEdges} total, ${considered} value imports that are not barrel pass-throughs`);
+console.log(`Of those, no call evidence: ${acc} (${(100*acc/considered).toFixed(1)}%)`);
 for (const s of accSamples) console.log(`  ${s}`);
 
 // 5. Barrel analysis
 console.log("\n--- 5. Barrel file analysis ---\n");
 const barrelSet = new Set(reexports.map((r: any) => r.barrel));
-const declFiles = new Set(decls.map((d: any) => d.file));
+// Every file now carries a "module" declaration fact, so counting those as
+// "own declarations" would make pure barrels unfindable.
+const declFiles = new Set(decls.filter((d: any) => d.entityType !== "module").map((d: any) => d.file));
 const pureBarrels = [...barrelSet].filter(f => !declFiles.has(f));
 console.log(`Barrel files (re-exports): ${barrelSet.size}`);
 console.log(`Pure barrels (no own declarations): ${pureBarrels.length}`);
@@ -165,7 +191,7 @@ console.log(`External package imports (unresolved): ${externalImports.length}`);
 console.log(`  Used packages: ${new Set(externalImports.map((i: any) => i.exportedBy.replace("external:", ""))).size}`);
 
 const methodCalls = calls.filter((c: any) => c.calleeName?.includes("."));
-console.log(`\nObject method calls (obj.method -> unresolved): ${methodCalls.length}`);
+console.log(`\nObject method calls (obj.method): ${methodCalls.length}, of which unresolved: ${methodCalls.filter((c: any) => !c.calleeId).length}`);
 
 const unresolved = calls.filter((c: any) => !c.calleeId);
 const reasons = new Map<string, number>();
