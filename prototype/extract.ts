@@ -165,7 +165,12 @@ function typeOfNode(node: any): string {
     return init && (Node.isArrowFunction(init) || Node.isFunctionExpression(init))
       ? "function" : "variable";
   }
-  return "unknown";
+  // Falling back to a bare "unknown" hid what these actually were: 32 of them,
+  // all namespace re-exports (`export * as z from ...`), which the export map
+  // yields as nodes none of the branches above match. Naming the syntax kind
+  // costs nothing and keeps the fallback auditable.
+  const kind = node.getKindName?.();
+  return kind ? kind.replace(/Declaration$|Expression$/, "").toLowerCase() : "unknown";
 }
 
 const isCallableContainer = (n: any) =>
@@ -539,6 +544,23 @@ const violations = edges.flatMap(e => {
 const closed = edges.filter(e => e.targetId && declaredIds.has(e.callerId) && declaredIds.has(e.targetId));
 log("info", `Instantiations: ${instantiations.filter(i => i.classId).length} of ${instantiations.length} resolved`);
 log("info", `Closed edges (calls + instantiations): ${closed.length} of ${edges.length} (${(100 * closed.length / edges.length).toFixed(1)}%)`);
+
+// Second integrity property: an entity id names exactly one entity. The check
+// above only asks whether an endpoint is declared, not whether the id is
+// unambiguous. Path-and-name ids collide two ways here — TypeScript
+// declaration merging (a `const` and a `type` of the same name, which is one
+// entity in two halves) and genuine collision (a type alias and a class
+// property both called `output` in one module, which is two entities sharing
+// an id). Reported, not enforced: which of those the schema should tolerate is
+// exactly the symbol-identity question thesis.md §4.4 leaves open.
+const typesById = new Map<string, Set<string>>();
+for (const d of unique.filter(f => f.kind === "declaration") as DeclFact[]) {
+  if (!typesById.has(d.entityId)) typesById.set(d.entityId, new Set());
+  typesById.get(d.entityId)!.add(d.entityType);
+}
+const ambiguous = [...typesById].filter(([, t]) => t.size > 1);
+log("info", `Ambiguous entity ids (one id, multiple entityTypes): ${ambiguous.length} of ${typesById.size}`);
+for (const [id, t] of ambiguous.slice(0, 5)) log("info", `  ${id} -> ${[...t].join(", ")}`);
 
 if (violations.length > 0) {
   log("error", `REFERENTIAL INTEGRITY: ${violations.length} edge endpoints reference undeclared entities`);

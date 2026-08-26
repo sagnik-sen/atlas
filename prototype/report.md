@@ -97,14 +97,50 @@ reference facts — every identifier occurrence resolved to its declaration —
 which the fact base does not model. **That is a schema question for ADR-0001,
 not more tuning.**
 
+### A second integrity property, and it does not hold
+
+Referential closure asks whether an endpoint is declared. It does not ask
+whether an entity id names exactly one entity. Measuring that:
+
+```
+Ambiguous entity ids (one id, multiple entityTypes): 710 of 9,467 (7.5%)
+  ts:v4/core/core.ts:output        -> type, property
+  ts:v4/core/registries.ts:$output -> variable, type
+  ts:v4/classic/in-out.ts:input    -> function, type
+```
+
+Two different causes are tangled here. TypeScript declaration merging — a
+`const` and a `type` of the same name — is one entity in two halves, and
+arguably should share an id. A type alias and a class property both named
+`output` in one module are two entities that collide on one id, which is a
+defect. `idOfNode()` cannot currently tell them apart.
+
+This is reported by the extractor, not enforced. Which case the schema should
+tolerate is precisely the symbol-identity question thesis.md §4.4 leaves open,
+and it now has a number attached: **owner qualification fixed intra-file
+collisions between class members; it did not fix collisions across
+declaration spaces.**
+
+Relatedly, `out_of_scope` has exactly one instance — `Mocker`, reached because
+resolution escaped the `tests/` file filter. One instance, but it poses a real
+scope-boundary question for ADR-0001: does the fact base model only what it
+walked, or everything it can reach?
+
+The 32 entities previously reported as entityType "unknown" were an
+unaudited fallback in the extractor's own type classifier. They are 14
+namespace re-exports (which the export map yields as SourceFile nodes), 10
+TypeScript `namespace` declarations, and 8 object literals. The fallback now
+names the syntax kind rather than discarding it.
+
 ### Also fixed
 
 `getToken()` returns a SyntaxKind enum value, not a node, so the original
 `h.getToken()?.getText?.() === "implements"` was permanently false — and
 neither of the two booleans it computed was ever read. Every heritage clause
 was emitted as `extends`, and heritage extraction ran only on exported
-declarations. Now 663 extends + 1 implements, the latter being the only
-`implements` clause in the corpus and previously invisible.
+declarations. Now 663 extends + 1 implements. The bug was three real defects, but note the
+evidence for the `implements` half is n=1: `ParseInputLazyPath` in
+`v3/types.ts` is the only `implements` clause in this corpus.
 
 `resolveImport` returned the raw specifier for bare package names, which the
 caller ran through `rel()`, turning `zod/v3` into the import edge
