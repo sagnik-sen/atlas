@@ -13,6 +13,7 @@ const reexports = byKind("reexport");
 const calls = byKind("calls");
 const contains = byKind("contains");
 const extends_ = byKind("extends");
+const implements_ = byKind("implements");
 
 const log = (...args: any[]) => console.log(...args);
 const sep = () => log("\n" + "=".repeat(70) + "\n");
@@ -24,14 +25,21 @@ const modEntities = new Map<string, Set<string>>();
 for (const c of contains) modEntities.set(c.containerId, (modEntities.get(c.containerId) || new Set()).add(c.entityId));
 
 /** Entity (function/class) -> its module */
+// Module ids map to themselves: `contains` never places a module inside
+// itself, so module-attributed calls (top-level code, 30% of call facts)
+// would otherwise drop out of every module-level rollup.
 const entityMod = new Map<string, string>();
 for (const c of contains) entityMod.set(c.entityId, c.containerId);
+for (const d of decls) if (d.entityType === "module") entityMod.set(d.entityId, d.entityId);
 
 /** File -> module id */
+// entityMod is already the index this needs; the original did a linear
+// contains.find() per declaration, which is ~95M comparisons at the current
+// fact-base size and does not terminate in reasonable time.
 const fileMod = new Map<string, string>();
 for (const d of decls) {
-  const m = contains.find((c: Fact) => c.entityId === d.entityId);
-  if (m) fileMod.set(d.file, m.containerId);
+  const m = entityMod.get(d.entityId);
+  if (m) fileMod.set(d.file, m);
 }
 
 /** Module -> set of imported modules */
@@ -139,6 +147,17 @@ const targetFns = decls.filter((d: Fact) =>
   (d.name === "parse" || d.name === "safeParse" || d.name === "_parse" || d.name === "_def")
 );
 
+// Reverse call index. The walk below used to rescan every call fact per
+// visited node, and look each one up with a linear decls.find — tolerable at
+// 735 closed edges, quadratic at 5,707. Build both indexes once.
+const callersOf = new Map<string, string[]>();
+for (const c of calls) {
+  if (!c.calleeId) continue;
+  if (!callersOf.has(c.calleeId)) callersOf.set(c.calleeId, []);
+  callersOf.get(c.calleeId)!.push(c.callerId);
+}
+const declById = new Map(decls.map((d: Fact) => [d.entityId, d]));
+
 for (const tf of targetFns.slice(0, 3)) {
   log(`\nTransitive callers of ${tf.name} in ${tf.file}:`);
   const visited = new Set<string>();
@@ -147,11 +166,8 @@ for (const tf of targetFns.slice(0, 3)) {
     const current = stack.pop()!;
     if (visited.has(current)) continue;
     visited.add(current);
-    // find all facts where this entity is the callee
-    for (const c of calls) {
-      if (c.calleeId === current && !visited.has(c.callerId)) {
-        stack.push(c.callerId);
-      }
+    for (const caller of callersOf.get(current) ?? []) {
+      if (!visited.has(caller)) stack.push(caller);
     }
   }
   visited.delete(tf.entityId);
@@ -162,7 +178,7 @@ for (const tf of targetFns.slice(0, 3)) {
     // Group by file
     const byFile = new Map<string, string[]>();
     for (const id of visited) {
-      const d = decls.find((d: Fact) => d.entityId === id);
+      const d = declById.get(id);
       if (d) {
         if (!byFile.has(d.file)) byFile.set(d.file, []);
         byFile.get(d.file)!.push(d.name);
@@ -210,19 +226,32 @@ log("4. ACCIDENTAL DEPENDENCIES");
 // - Module A imports Module B
 // - But no entity in A actually calls or references any entity from B
 
+// entity -> names it extends or implements
+const heritageParents = new Map<string, string[]>();
+for (const ex of [...extends_, ...implements_]) {
+  if (!heritageParents.has(ex.childId)) heritageParents.set(ex.childId, []);
+  heritageParents.get(ex.childId)!.push(ex.parentName);
+}
+// declared name -> modules declaring it
+const modulesDeclaringName = new Map<string, Set<string>>();
+for (const d of decls) {
+  const m = entityMod.get(d.entityId);
+  if (!m) continue;
+  if (!modulesDeclaringName.has(d.name)) modulesDeclaringName.set(d.name, new Set());
+  modulesDeclaringName.get(d.name)!.add(m);
+}
+
 log(`\nImports with no call evidence:`);
 let accidentalCount = 0;
 for (const [src, dsts] of modImports) {
   for (const dst of dsts) {
     const callsFromSrc = modCalls.get(src);
     if (!callsFromSrc?.has(dst)) {
-      const usedThroughExtends = [...modEntities.get(src) || []].some(eid => {
-        return extends_.some((ex: Fact) => {
-          // Check if this entity extends something from dst
-          const parentEnt = decls.find((d: Fact) => d.name === ex.parentName && entityMod.get(d.entityId) === dst);
-          return ex.childId === eid && parentEnt;
-        });
-      });
+      // Was: for each flagged edge, for each entity in src, for each heritage
+      // fact, a linear decls.find. Four nested scans over a fact base this size
+      // do not terminate. Both lookups are precomputed above.
+      const usedThroughExtends = [...modEntities.get(src) || []].some(eid =>
+        (heritageParents.get(eid) || []).some(p => modulesDeclaringName.get(p)?.has(dst)));
 
       if (!usedThroughExtends) {
         accidentalCount++;
@@ -348,7 +377,9 @@ sep();
 log("9. FAILURES / LIMITATIONS");
 
 log(`\n- Could not resolve: ${imports.filter((i: Fact) => i.exportedBy.startsWith("external:")).length} external package imports`);
-log(`- 84 entities classified as "unknown" type (could not determine declaration kind)`);
-log(`- 2120 call expressions could not be resolved at all (confidence 0.3)`);
+// These two were hardcoded literals frozen from an earlier run, printed as if
+// computed. They read as findings and were wrong by an order of magnitude.
+log(`- ${decls.filter((d: Fact) => d.entityType === "unknown").length} entities classified as "unknown" type (could not determine declaration kind)`);
+log(`- ${calls.filter((c: Fact) => !c.calleeId).length} call expressions could not be resolved at all`);
 
 log("\nDone.");
