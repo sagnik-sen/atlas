@@ -9,6 +9,12 @@
 //
 // The schemes under test are DATA: every `*Id` field present on declaration facts
 // (entityId, and contentId / structureId when the extractor emits them).
+//
+// Rerunning after the extractor's identity layer changes: delete $ATLAS_SCRATCH/log and /fp first
+// (the per-commit cache is keyed by sha alone and would reuse stale entityId-only records).
+// Setup: mkdir -p $ATLAS_SCRATCH/zodgit && cp -R <repo>/prototype/zod-repo/.git $ATLAS_SCRATCH/zodgit/.git
+// (a read-only copy; git runs only there, never against the shared zod-repo). ATLAS_SCRATCH
+// defaults to a session-specific path, so set it.
 import { Project, Node, ts } from "ts-morph";
 import * as fs from "fs";
 import * as path from "path";
@@ -96,8 +102,9 @@ const key = (r: { file: string; name: string; type: string }) => `${r.file}\0${r
 
 function buildRecords(checkout: string, facts: any[]): { recs: Rec[]; schemes: string[]; join: [number, number] } {
   const all = facts.filter(f => f.kind === "declaration");
-  const schemes = Object.keys(all[0] ?? {}).filter(k => /Id$/.test(k));
   const decls = all.filter(f => ORACLE_TYPES.has(f.entityType));
+  // Union over the declarations the oracle scores (not all[0], which may be a module fact).
+  const schemes = [...new Set(decls.flatMap(f => Object.keys(f).filter(k => /Id$/.test(k))))];
   const byKey = new Map<string, any[]>();
   for (const d of decls) { const k = key({ file: d.file, name: d.name, type: d.entityType }); (byKey.get(k) ?? byKey.set(k, []).get(k)!).push(d); }
   const root = path.join(checkout, SRC);
@@ -216,9 +223,9 @@ function oracle(A: Rec[], B: Rec[]): Row[] {
 // For added/removed (no counterpart): "reappear" = the id exists on the other side anyway,
 // i.e. the scheme claims continuity the oracle can't find. Includes type-change cases and
 // structural collisions.
-type Out = "survive" | "vanish" | "alias" | "reappear" | "none";
+type Out = "survive" | "vanish" | "alias" | "reappear" | "none" | "missing";
 interface Tally { n: number; byScheme: Record<string, Record<Out, number>> }
-const blank = (schemes: string[]): Tally => ({ n: 0, byScheme: Object.fromEntries(schemes.map(s => [s, { survive: 0, vanish: 0, alias: 0, reappear: 0, none: 0 }])) });
+const blank = (schemes: string[]): Tally => ({ n: 0, byScheme: Object.fromEntries(schemes.map(s => [s, { survive: 0, vanish: 0, alias: 0, reappear: 0, none: 0, missing: 0 }])) });
 
 function score(rows: Row[], A: Rec[], B: Rec[], schemes: string[], slice: (type: string) => boolean, into: Map<Cat, Tally>) {
   const idsA = Object.fromEntries(schemes.map(s => [s, new Set(A.map(r => r.ids[s]))]));
@@ -230,6 +237,8 @@ function score(rows: Row[], A: Rec[], B: Rec[], schemes: string[], slice: (type:
     for (const s of schemes) {
       const o = t.byScheme[s];
       if (row.cat === "ambiguous") continue;
+      // A scheme absent on a declaration is "missing", never a survival (undefined === undefined).
+      if ((row.a && row.a.ids[s] == null) || (row.b && row.b.ids[s] == null)) { o.missing++; continue; }
       if (row.a && row.b) {
         if (row.a.ids[s] === row.b.ids[s]) o.survive++;
         else if (idsB[s].has(row.a.ids[s])) o.alias++; else o.vanish++;
@@ -299,7 +308,8 @@ async function main() {
     for (const r of rows) if (r.cat === "removed") {
       blind.removed++;
       if (addedB.some(b => b.file === r.a!.file && b.type === r.a!.type)) blind.sameFileSibling++;
-      if (addedB.some(b => b.file !== r.a!.file && b.type === r.a!.type && b.name === r.a!.name)) blind.sameNameElsewhere++;
+      const mv = addedB.find(b => b.file !== r.a!.file && b.type === r.a!.type && b.name === r.a!.name);
+      if (mv) { blind.sameNameElsewhere++; if (!MEMBER_TYPES.has(r.a!.type)) (examples["candidate-edited-move (heuristic, NOT oracle-verified; non-member types)"] ??= []).push(`${p.child.slice(0, 7)} ${r.a!.file} -> ${mv.file}: ${r.a!.name} [${r.a!.type}, ${r.a!.n} -> ${mv.n} nodes]`); }
       if (!bFiles.has(r.a!.file)) blind.fileGone++;
     }
     for (const [k, f] of Object.entries(slices)) score(rows, A.recs, B.recs, schemes, f, agg[k]);
@@ -325,10 +335,12 @@ async function main() {
         if (c === "added" || c === "removed") console.log(`  ${c.padEnd(13)} ${String(t.n).padStart(7)}   ${"".padEnd(8)} ${"".padEnd(16)} ${"".padEnd(17)}  | ${o.reappear} (${pct(o.reappear, t.n)})`);
         else console.log(`  ${c.padEnd(13)} ${String(t.n).padStart(7)}   ${pct(o.survive, t.n).padStart(8)} ${(o.vanish + " " + pct(o.vanish, t.n)).padEnd(16)} ${(o.alias + " " + pct(o.alias, t.n)).padEnd(17)}  |`);
       }
-      const u = m.get("unchanged"); if (u && u.byScheme[s].survive !== u.n) console.log(`  !!! HARNESS BUG: ${s} kept only ${u.byScheme[s].survive}/${u.n} unchanged entities`);
+      const miss = CATS.reduce((a, c) => a + (m.get(c)?.byScheme[s].missing ?? 0), 0);
+      if (miss) console.log(`  note: ${miss} entities had no ${s} on their declaration fact and are excluded from the rows above`);
+      const u = m.get("unchanged"); if (u && u.byScheme[s].survive + u.byScheme[s].missing !== u.n) console.log(`  !!! HARNESS BUG: ${s} kept only ${u.byScheme[s].survive}/${u.n} unchanged entities`);
     }
   }
   console.log("\nexamples (first few per category):");
-  for (const [c, xs] of Object.entries(examples)) { console.log(` ${c}:`); for (const x of xs) console.log("   " + x); }
+  for (const [c, xs] of Object.entries(examples)) { console.log(` ${c}: (${xs.length})`); for (const x of xs.filter((x, i) => c.startsWith("candidate") ? !x.startsWith("d3355f7") || i < 2 : i < 8)) console.log("   " + x); }
 }
 main();
