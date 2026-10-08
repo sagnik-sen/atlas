@@ -4,7 +4,9 @@ Architecture Decision Records (ADRs) document significant design decisions, the 
 
 ## Active ADRs
 
-*None yet. Proposals welcome.*
+| ADR | Title | Status |
+|---|---|---|
+| [0001](0001-fact-schema.md) | The Fact Schema | Proposed |
 
 ## Template
 
@@ -15,13 +17,13 @@ See [template.md](template.md).
 1. **Propose.** Open a GitHub Discussion with the ADR template. Use the "RFCs" category.
 2. **Discuss.** The proposal is debated in the open. Minimum one week for comment.
 3. **Decide.** A maintainer accepts, rejects, or requests changes.
-4. **Record.** Accepted ADRs are committed here with a numeric prefix (`0001-use-sqlite.md`).
+4. **Record.** Accepted ADRs are committed here with a numeric prefix (`0002-query-substrate.md`). Proposed ADRs may be committed before acceptance, marked `Status: Proposed`.
 
 ## What Qualifies as an ADR?
 
 Anything that is:
-- Architecturally significant (affects the graph model, extraction pipeline, or query API)
-- Hard to reverse (database choice, serialization format, plugin architecture)
+- Architecturally significant (affects the fact schema, extraction pipeline, or query API)
+- Hard to reverse (symbol identity, serialization format, query substrate, plugin architecture)
 - Contested (there are multiple reasonable approaches)
 
 Not an ADR:

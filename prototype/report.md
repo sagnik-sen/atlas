@@ -14,6 +14,165 @@ no longer exists upstream, and upstream has since force-pushed `main` so
 `e516c3b` is not an ancestor of it. `prototype/zod-repo/` is gitignored, so a
 fresh clone does not reproduce the corpus either.
 
+## Update (2026-10-09): identity, references, and version history
+
+Three experiments. The headline: **content-addressed identity, which thesis.md
+§4.4 calls the foundation of everything else, does not survive contact with
+this corpus** — and the reason is not the one §4.4 anticipates.
+
+### 1. Content addressing collides
+
+Two content-addressed schemes were added alongside the existing path-and-name
+`entityId`, as extra fields on declaration facts:
+
+- `structureId` — hash of the AST structure only, with the entity's own name
+  masked and the path excluded. The literal reading of §4.4.
+- `contentId` — hash of (declared name + AST structure), path excluded.
+
+| scheme | distinct ids | colliding ids | entities sharing an id | worst cluster |
+|---|---|---|---|---|
+| `entityId` | 9,497 | 710 (7.5%) | 1,520 (14.7%) | 4x |
+| `contentId` | 9,792 | 818 (8.4%) | 3,542 (35.5%) | 62x |
+| `structureId` | 8,035 | 1,042 (13.0%) | **5,523 (55.3%)** | **256x** |
+
+The 256x cluster is one `structureId` shared by 256 parameters across 82 files
+under 96 different names (`iss`, `ctx`, `result`). `structureId` also merges
+`ZodInt`, `ZodFloat32`, `ZodFloat64` and `ZodInt32` — four distinct exported
+types with identical bodies — into a single id.
+
+Two caveats on that table, both pushing the same way:
+
+- The comparison is **biased in `entityId`'s favour**. Collision is measured
+  against (file, name, entityType) as ground truth, which is close to what
+  `entityId` encodes, so `entityId`'s own conflation is undercounted. 974
+  entity keys carry more than one content id — overloads and merged
+  declarations that `entityId` silently merges and the content schemes
+  correctly separate.
+- The content schemes' zero multi-type collisions come from **hashing the
+  declaration kind**, not from content addressing as such. The same gain is
+  available to a path-based id by splitting on declaration space.
+
+Where content addressing holds up: exported classes and interfaces. Zero
+`contentId` collisions on classes, 17 of 622 interfaces.
+
+### 2. What zod's history actually does
+
+A harness (`history.ts`) extracts fact bases across git history and classifies
+entity-level change with an oracle independent of any id scheme — matching on a
+normalized body fingerprint that excludes name and path. 389 commits extracted,
+297 adjacent pairs scored, every src-touching commit on first-parent history.
+
+| Category | Entities | Commits containing it |
+|---|---|---|
+| unchanged | 2,182,900 obs. | 297 |
+| **body edit** | **1,981** | **244** |
+| rename | 51 | **1 event** |
+| move | **0** | 0 |
+| rename + move | 0 | 0 |
+
+**This is the measured result, and it reframes the question.** Zod has zero
+clean unedited moves and essentially one rename event — commit `d3355f7`,
+`Nouns` to `FormatDictionary`, applied mechanically across 51 locale files, so
+n=1 commit rather than 51 independent observations. Body edits are the
+overwhelming change mode: a scheme that breaks on body edits loses identity
+roughly 40x more often here than one that breaks on renames.
+
+Note that git's own rename detection finds **zero file-level renames across all
+298 src-touching commits**, which is why the oracle had to work at entity level.
+
+### 3. Survival, and what is definitional in it
+
+| scheme | unchanged | body edit | rename (n=1 event) |
+|---|---|---|---|
+| `entityId` | 100% | **100%** | **0%** |
+| `structureId` | 100% | **0%** | **100%** |
+| `contentId` | 100% | **0%** | **0%** |
+
+**Most of this table is true by construction, not by measurement.** The oracle's
+fingerprint and `structureId` are near-identical functions — both a depth-first
+AST walk over syntax kinds plus identifier text, with the entity's own name
+masked and the path excluded. The oracle *defines* a rename as "same
+fingerprint, different name", so `structureId` surviving renames is a tautology,
+as is its breaking on body edits. `entityId` is path+name and the oracle's first
+stage pairs on path+name, so its 100% on unchanged and body-edit rows is also
+definitional. Reported for completeness, not as evidence.
+
+`contentId` is **strictly dominated**: it hashes the name, so renames break it,
+and it hashes the body, so edits break it. It survives only moves, of which this
+corpus has none.
+
+### 4. The non-definitional result: content hashes assert false identity
+
+The survival columns are tautological. These two are not.
+
+**False continuity.** For **45.3% of removed entities** (48 of 106 in the rename
+commit; 36.4% in a 24-pair sample), the `structureId` still exists in the child
+commit — attached to a *different* entity. A consumer tracking entities by
+content hash would conclude 48 deleted entities are still present.
+
+**Aliasing on edit.** Of 108 body edits in the 24-pair sample, **7 (6.5%) gave
+the edited entity a `structureId` that collides with an unrelated entity**
+(`contentId`: 6, 5.6%). So on a body edit a content hash does not merely lose
+identity — in about one case in sixteen it silently reassigns that identity to
+something else.
+
+This is the 55% collision rate reappearing across versions, and it is the
+decisive argument. A lost id is a visible failure: the consumer sees an entity
+disappear and can fall back. A **wrongly reused id is silent**, and every
+downstream consumer inherits it.
+
+### 5. Reference facts, and the fourth artifact in one heuristic
+
+`references` facts were added for identifier occurrences not already covered by
+`calls` or `instantiates`, reusing `idOfNode()` and `resolveEntity()` so
+closure holds by construction. 9,284 facts, 9,213 closed; the integrity check
+was verified to bite (disabling the type-parameter skip yields 1,817 violations
+and exit 1).
+
+**7,206 of 9,284 are type-position references** — the type graph is 3.7x the
+value graph by reference count, in a library whose entire purpose is types.
+
+Fact base 26,732 to 40,737 facts (+52%); `facts.json` 5.26 MB to 8.17 MB.
+Emitting function-local references too would give 48,968 facts and 12.1 MB, so
+they are skipped by default: 58% of all occurrences are locals that never leave
+their function. Growth is linear in LOC (~1.2 facts per line, from ~0.9), so
+thesis §5.4's "millions of facts for a large monorepo" still holds.
+
+The accidental-dependency residue decomposed as follows, and the conclusion
+recorded in the 2026-08-26 section below — that the residue was largely genuine
+signal — **was wrong**:
+
+| Part of the 113 | Count | What it was |
+|---|---|---|
+| Extractor bug | **86** | `mkImport` hardcoded `importType: "namespace"`, ignoring `isTypeOnly()`, and ignored the per-specifier `type` in `import { type X, Y }`. 94 such statements in the corpus. Two-line fix. |
+| Genuinely needed reference facts | 15 | imports used as values, never called |
+| Identity-layer gaps | 12 | 11 anonymous `export default` (no entity id) plus `out_of_scope` `Mocker` |
+| **Genuinely unused imports** | **0** | |
+
+Current rate: **12 of 148 (8.1%)**, from 27 of 148 (18.2%) on calls alone. The
+old 113/240 reproduces only at `55f28bf`, and the stage row "exclude type-only
+imports: 138/240" below was under-excluding.
+
+That is the **fourth** artifact found in this single heuristic, after the
+key-namespace mismatch, barrel indirection, and dropped module-level callers.
+Each previous diagnosis — including the one in the 2026-08-26 section —
+attributed the residue to something real about static analysis. None of them
+were.
+
+### Caveats
+
+- One corpus, one language, one library. Zod is type-heavy and does not move
+  files; a service codebase would almost certainly show moves.
+- The rename direction rests on a single commit. The move direction has no data.
+- Rename-or-move combined with a body edit is invisible to the oracle: it lands
+  in removed-plus-added. Bounded at 383 removed entities, of which 58
+  non-member candidates were hand-inspected; one clear case (`dfd8766`, ISO
+  schemas moved with small edits).
+- The heuristic remains module-granular: "0 unused imports" says nothing about
+  unused specifiers inside a used module.
+
+---
+
 ## Update (2026-08-26): referential integrity
 
 **The 96.6% figure below measures the wrong thing.** It measures whether
