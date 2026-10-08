@@ -270,29 +270,44 @@ log("5. UNUSED IMPORTS (named imports never referenced in calls/extends)");
 // For each named import, check if anything in the file references that name
 const importedNames = new Map<string, Set<string>>(); // file -> { names }
 for (const imp of imports) {
-  if (imp.importType === "default" || imp.importType === "named" || imp.importType === "type-named" || imp.importType === "type-default") {
+  // Type-only imports are excluded: a `import type` binding produces no call,
+  // instantiation or heritage fact by construction, so judging it against
+  // usage evidence is a category error rather than a finding. Same fix as
+  // analyze2.ts's accidental-dependency heuristic.
+  if (imp.importType === "default" || imp.importType === "named") {
     if (!importedNames.has(imp.importerFile)) importedNames.set(imp.importerFile, new Set());
     importedNames.get(imp.importerFile)!.add(imp.importedName);
   }
 }
 
+// Usage evidence per file, indexed once. The original rebuilt both lists per
+// file with a nested decls.find, and counted only `calls` and `extends` as
+// evidence — so an import used solely via `new X()` or `implements X` was
+// reported as unused. `calls` and `instantiates` facts carry `file` directly,
+// so the caller lookup was never needed.
+const instantiates_ = byKind("instantiates");
+const usedNamesByFile = new Map<string, Set<string>>();
+const addUse = (file: string, name: string | undefined) => {
+  if (!file || !name) return;
+  if (!usedNamesByFile.has(file)) usedNamesByFile.set(file, new Set());
+  const set = usedNamesByFile.get(file)!;
+  set.add(name);
+  // `util.assertNever` is evidence for the import named `util`.
+  const root = name.split(".")[0];
+  if (root) set.add(root);
+};
+for (const c of calls) addUse(c.file, c.calleeName);
+for (const i of instantiates_) addUse(i.file, i.className);
+const declFile = new Map(decls.map((d: Fact) => [d.entityId, d.file]));
+for (const ex of [...extends_, ...implements_]) {
+  addUse(declFile.get(ex.childId)!, ex.parentName);
+}
+
 let unusedCount = 0;
 for (const [file, names] of importedNames) {
-  const fileDecls = decls.filter((d: Fact) => d.file === file);
-  const fileCallExprs = calls.filter((c: Fact) => {
-    const caller = decls.find((d: Fact) => d.entityId === c.callerId);
-    return caller?.file === file;
-  });
-
+  const used = usedNamesByFile.get(file) ?? new Set<string>();
   for (const name of names) {
-    // Check if any call references this name
-    const usedInCall = fileCallExprs.some((c: Fact) => c.calleeName === name || c.calleeName?.startsWith(name + "."));
-    // Check if any declaration has this as extends parent
-    const usedInExtends = fileDecls.some((d: Fact) =>
-      extends_.some((ex: Fact) => ex.childId === d.entityId && (ex.parentName === name || ex.parentName.startsWith(name)))
-    );
-
-    if (!usedInCall && !usedInExtends) {
+    if (!used.has(name)) {
       unusedCount++;
       if (unusedCount <= 15) log(`  ${file}: '${name}' — imported but no usage detected`);
     }
