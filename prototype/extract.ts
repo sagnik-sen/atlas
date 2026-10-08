@@ -124,22 +124,86 @@ function eid(file: string, name: string) {
 // The class or interface a member belongs to. Members are qualified by owner
 // because a bare method name is not unique within a file — Zod declares
 // `_parse` on many types in one module.
-function ownerName(node: any): string | null {
-  const owner = node.getFirstAncestor?.((a: any) =>
-    Node.isClassDeclaration(a) || Node.isInterfaceDeclaration(a) || Node.isClassExpression(a));
-  return owner?.getName?.() || null;
-}
-
 const isMember = (node: any) =>
   Node.isMethodDeclaration(node) || Node.isMethodSignature(node)
   || Node.isPropertyDeclaration(node) || Node.isPropertySignature(node)
   || Node.isGetAccessorDeclaration(node) || Node.isSetAccessorDeclaration(node);
 
-function declName(node: any): string | null {
-  if (Node.isConstructorDeclaration(node)) {
-    const o = ownerName(node);
-    return o ? `${o}.constructor` : null;
+// An anonymous function that is not bound to a name — a callback passed
+// straight into a call, as in `$constructor("ZodString", (inst, def) => {...})`.
+// Its parameters and locals need some disambiguator or they collide with every
+// other callback's `inst` in the same file.
+// shortcut: positional index among same-kind siblings of the parent node. Shifts
+// if a sibling callback is inserted before it; a stable scheme would need the
+// enclosing call's callee name, which is not always resolvable at this point.
+function anonSegment(node: any): string {
+  const p = node.getParent?.();
+  if (!p) return "@anon";
+  const sibs = p.getChildren?.().filter((c: any) => c.getKind?.() === node.getKind()) ?? [];
+  const i = sibs.findIndex((c: any) => c === node);
+  return `@${node.getKindName().replace(/Expression$|Declaration$/, "").toLowerCase()}${i < 0 ? 0 : i}`;
+}
+
+// One segment of the lexical scope path, for ancestors that introduce a scope.
+// Previously only classes and interfaces were consulted, via an `ownerName`
+// that walked to the NEAREST class or interface. That produced three defects:
+// members of object literals got a bare name, members of nested type literals
+// got the enclosing interface's name (so `interface Foo { x: { y: T } }` yielded
+// `Foo.y`, colliding with a real `Foo.y`), and parameters, bindings and locals
+// were never qualified at all. 438 ids collided within value space as a result.
+function scopeSegment(a: any): string | null {
+  if (Node.isClassDeclaration(a) || Node.isInterfaceDeclaration(a) || Node.isClassExpression(a)
+      || Node.isFunctionDeclaration(a) || Node.isMethodDeclaration(a) || Node.isMethodSignature(a)
+      || Node.isGetAccessorDeclaration(a) || Node.isSetAccessorDeclaration(a)
+      || Node.isTypeAliasDeclaration(a) || Node.isEnumDeclaration(a)
+      || Node.isVariableDeclaration(a) || Node.isPropertyAssignment(a)
+      || Node.isPropertyDeclaration(a) || Node.isPropertySignature(a)
+      || Node.isModuleDeclaration(a)) {
+    return a.getName?.() || null;
   }
+  if (Node.isConstructorDeclaration(a)) return "constructor";
+  // A bound construct contributes nothing of its own: its binding is the
+  // VariableDeclaration or PropertyAssignment above, already a segment.
+  const bound = (n: any) => {
+    const p = n.getParent?.();
+    return !!p && (Node.isVariableDeclaration(p) || Node.isPropertyAssignment(p)
+      || Node.isPropertyDeclaration(p) || Node.isPropertySignature(p)
+      || Node.isTypeAliasDeclaration(p));
+  };
+  if (Node.isArrowFunction(a) || Node.isFunctionExpression(a)) {
+    return bound(a) ? null : anonSegment(a);
+  }
+  // An unbound type or object literal — a return-type annotation such as
+  // `_getCached(): { shape: T; keys: string[] }`, or a literal in a return
+  // statement. Without a segment its members share the enclosing named scope
+  // with that scope's own locals, so `{ shape: T }` collided with `const shape`.
+  if (Node.isTypeLiteral(a) || Node.isObjectLiteralExpression(a)) {
+    return bound(a) ? null : anonSegment(a);
+  }
+  return null;
+}
+
+function scopePath(node: any): string[] {
+  const out: string[] = [];
+  for (let a = node.getParent?.(); a; a = a.getParent?.()) {
+    if (Node.isSourceFile(a)) break;
+    const seg = scopeSegment(a);
+    if (seg) out.unshift(seg);
+  }
+  return out;
+}
+
+// `export default function () {}` and `export default {...}` have no name.
+// 11 of the 12 remaining flagged imports and 3 unresolved calls traced to this.
+function isDefaultExport(node: any): boolean {
+  try {
+    if (node.hasModifier?.(SyntaxKind.DefaultKeyword)) return true;
+    const p = node.getParent?.();
+    return !!p && Node.isExportAssignment(p);
+  } catch { return false; }
+}
+
+function declName(node: any): string | null {
   // An arrow or function expression has no name of its own; it borrows the
   // binding it is assigned to. `const x = () => {}` is the dominant idiom in
   // this corpus, so without this the call site has no nameable container.
@@ -147,15 +211,16 @@ function declName(node: any): string | null {
     const p = node.getParent();
     if (p && (Node.isVariableDeclaration(p) || Node.isPropertyAssignment(p)
               || Node.isPropertyDeclaration(p))) return declName(p);
+    if (isDefaultExport(node) || (p && Node.isExportAssignment(p))) {
+      return [...scopePath(node), "default"].join(".");
+    }
     return null;
   }
-  const n = node.getName?.();
-  if (!n) return null;
-  if (isMember(node)) {
-    const o = ownerName(node);
-    return o ? `${o}.${n}` : n;
-  }
-  return n;
+  const own = Node.isConstructorDeclaration(node)
+    ? "constructor"
+    : (node.getName?.() || (isDefaultExport(node) ? "default" : null));
+  if (!own) return null;
+  return [...scopePath(node), own].join(".");
 }
 
 // THE invariant: declaration emission and call resolution both route entity
@@ -520,7 +585,11 @@ function extractFile(file: SourceFile) {
     // (`safeParse`, `toJSONSchema`). Calls target these directly, so without
     // them the edge resolves to an id nothing declares.
     SyntaxKind.Parameter, SyntaxKind.PropertyAssignment,
-    SyntaxKind.ShorthandPropertyAssignment, SyntaxKind.BindingElement,
+    // ShorthandPropertyAssignment is deliberately NOT a declaration: `{ shape }`
+    // means `{ shape: shape }`, so it is a reference to an existing binding, not
+    // a new entity. Declaring it made `const shape` and the shorthand collide on
+    // one id in the same scope. The reference pass already covers the use.
+    SyntaxKind.BindingElement,
   ];
   for (const k of DECL_KINDS) {
     for (const node of file.getDescendantsOfKind(k)) emitDecl(node);
@@ -745,9 +814,27 @@ for (const d of unique.filter(f => f.kind === "declaration") as DeclFact[]) {
   if (!typesById.has(d.entityId)) typesById.set(d.entityId, new Set());
   typesById.get(d.entityId)!.add(d.entityType);
 }
+// Split by TypeScript declaration space. A merged symbol (`interface X` plus
+// `const X`) is ONE entity declared twice, which ADR-0001 decision 2 holds to
+// be correct, so counting it as ambiguity over-reports. Two declarations in the
+// SAME space sharing an id are genuinely two entities and a real defect.
+const SPACE: Record<string, string> = {
+  interface: "type", type: "type", class: "both", enum: "both",
+  module: "ns", sourcefile: "ns",
+};
+const space = (t: string) => SPACE[t] ?? "value";
 const ambiguous = [...typesById].filter(([, t]) => t.size > 1);
-log("info", `Ambiguous entity ids (one id, multiple entityTypes): ${ambiguous.length} of ${typesById.size}`);
-for (const [id, t] of ambiguous.slice(0, 5)) log("info", `  ${id} -> ${[...t].join(", ")}`);
+const withinSpace = ambiguous.filter(([, t]) => {
+  const sp = new Set([...t].map(space));
+  return sp.size === 1 && !sp.has("both");
+});
+log("info", `Entity ids with multiple entityTypes: ${ambiguous.length} of ${typesById.size}`);
+log("info", `  cross-space (declaration merges, expected): ${ambiguous.length - withinSpace.length}`);
+log("info", `  within one space (genuine collisions): ${withinSpace.length}`);
+for (const [id, t] of withinSpace.slice(0, 4)) log("info", `    ${id} -> ${[...t].join(", ")}`);
+// shortcut: block scopes (if/for/try bodies) contribute no path segment, so a
+// parameter and a local of the same name in sibling blocks of one function still
+// collide. That is the whole of the residual. Enforce once blocks are segmented.
 
 // Collision measure per id scheme. An "entity" is a distinct (file, name,
 // entityType); an id collides when it is shared by 2+ entities. Ids are

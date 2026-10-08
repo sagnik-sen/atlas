@@ -45,20 +45,61 @@ const git = (...a: string[]) => execFileSync("git", ["-C", GITDIR, ...a], { enco
 // ─── Entity enumeration (independent of extract.ts's id layer) ──────────
 // Mirrors extract.ts's declName/typeOfNode naming because the join to declaration facts is on
 // (file, name, entityType). Drift shows up as a low join rate, which the report prints.
-const ownerName = (n: any): string | null =>
-  n.getFirstAncestor?.((a: any) => Node.isClassDeclaration(a) || Node.isInterfaceDeclaration(a) || Node.isClassExpression(a))
-    ?.getName?.() || null;
-const isMember = (n: any) => Node.isMethodDeclaration(n) || Node.isMethodSignature(n) || Node.isPropertyDeclaration(n)
-  || Node.isPropertySignature(n) || Node.isGetAccessorDeclaration(n) || Node.isSetAccessorDeclaration(n);
+// Ported from extract.ts's identity layer. The join below is on
+// (file, name, entityType), so any drift from extract.ts's declName shows up as
+// a falling join rate, which this harness prints. Keep the two in step.
+const bound = (n: any) => {
+  const p = n.getParent?.();
+  return !!p && (Node.isVariableDeclaration(p) || Node.isPropertyAssignment(p)
+    || Node.isPropertyDeclaration(p) || Node.isPropertySignature(p) || Node.isTypeAliasDeclaration(p));
+};
+function anonSegment(node: any): string {
+  const p = node.getParent?.();
+  if (!p) return "@anon";
+  const sibs = p.getChildren?.().filter((c: any) => c.getKind?.() === node.getKind()) ?? [];
+  const i = sibs.findIndex((c: any) => c === node);
+  return `@${node.getKindName().replace(/Expression$|Declaration$/, "").toLowerCase()}${i < 0 ? 0 : i}`;
+}
+function scopeSegment(a: any): string | null {
+  if (Node.isClassDeclaration(a) || Node.isInterfaceDeclaration(a) || Node.isClassExpression(a)
+      || Node.isFunctionDeclaration(a) || Node.isMethodDeclaration(a) || Node.isMethodSignature(a)
+      || Node.isGetAccessorDeclaration(a) || Node.isSetAccessorDeclaration(a)
+      || Node.isTypeAliasDeclaration(a) || Node.isEnumDeclaration(a)
+      || Node.isVariableDeclaration(a) || Node.isPropertyAssignment(a)
+      || Node.isPropertyDeclaration(a) || Node.isPropertySignature(a)
+      || Node.isModuleDeclaration(a)) return a.getName?.() || null;
+  if (Node.isConstructorDeclaration(a)) return "constructor";
+  if (Node.isArrowFunction(a) || Node.isFunctionExpression(a)) return bound(a) ? null : anonSegment(a);
+  if (Node.isTypeLiteral(a) || Node.isObjectLiteralExpression(a)) return bound(a) ? null : anonSegment(a);
+  return null;
+}
+function scopePath(n: any): string[] {
+  const out: string[] = [];
+  for (let a = n.getParent?.(); a; a = a.getParent?.()) {
+    if (Node.isSourceFile(a)) break;
+    const seg = scopeSegment(a);
+    if (seg) out.unshift(seg);
+  }
+  return out;
+}
+function isDefaultExport(n: any): boolean {
+  try {
+    if (n.hasModifier?.(SyntaxKind.DefaultKeyword)) return true;
+    const p = n.getParent?.();
+    return !!p && Node.isExportAssignment(p);
+  } catch { return false; }
+}
 function declName(n: any): string | null {
-  if (Node.isConstructorDeclaration(n)) { const o = ownerName(n); return o ? `${o}.constructor` : null; }
   if (Node.isArrowFunction(n) || Node.isFunctionExpression(n)) {
     const p = n.getParent();
-    return p && (Node.isVariableDeclaration(p) || Node.isPropertyAssignment(p) || Node.isPropertyDeclaration(p)) ? declName(p) : null;
+    if (p && (Node.isVariableDeclaration(p) || Node.isPropertyAssignment(p) || Node.isPropertyDeclaration(p))) return declName(p);
+    if (isDefaultExport(n)) return [...scopePath(n), "default"].join(".");
+    return null;
   }
-  const nm = n.getName?.(); if (!nm) return null;
-  if (isMember(n)) { const o = ownerName(n); return o ? `${o}.${nm}` : nm; }
-  return nm;
+  const own = Node.isConstructorDeclaration(n) ? "constructor"
+    : (n.getName?.() || (isDefaultExport(n) ? "default" : null));
+  if (!own) return null;
+  return [...scopePath(n), own].join(".");
 }
 function entityType(n: any): string | null {
   if (Node.isClassDeclaration(n)) return "class";
