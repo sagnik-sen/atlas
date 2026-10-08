@@ -44,9 +44,20 @@ These need debate before ADR-0001 is finalized:
 
 The prototype's call graph was measured at 16.8% edge closure — 83% of resolved edges named entities the fact base did not declare. That is now 97.0% with zero dangling endpoints, and the invariant ("every edge endpoint is declared or explicitly unresolved") is asserted on every extraction run, exiting non-zero on violation. This is the first mechanically checkable property the extractor asserts about itself, which open tension #3 below had been waiting for since the founding session. It is a weak form of correctness: it proves every edge endpoint names a declared entity, not that the edge is right. Entity-id ambiguity is reported but not enforced.
 
-The `accidental dependency` heuristic flagged 100% of its input (345 of 345); it now flags 113 of 240 value imports (47.1%). Note 47.1% is the share still flagged, not a false-positive rate — the earlier 100% was entirely artifact, whereas the residue appears to be largely genuine signal about imports used as values rather than called. How much of it is genuine has not been measured, only sampled.
+The `accidental dependency` heuristic flagged 100% of its input (345 of 345). It now flags **12 of 148 value imports (8.1%)**, and the 113/240 figure recorded earlier reproduces only at commit `55f28bf`.
 
-**Next milestone: ADR-0001, scoped to the fact schema.** There is now real data to ground it in, and the open questions are specific rather than architectural taste:
+The 113 has since been decomposed, and the guess recorded here — that the residue was "largely genuine signal about imports used as values" — was wrong:
+
+| Part of the 113 | Count | What it was |
+|---|---|---|
+| Extractor bug | **86** | `mkImport` hardcoded `importType: "namespace"`, ignoring `isTypeOnly()`, and ignored the per-specifier `type` modifier in `import { type X, Y }`. 94 such statements in the corpus. A two-line fix. |
+| Genuinely needed reference facts | 15 | imports used as values, never called |
+| Identity-layer gaps | 12 | 11 imports of an anonymous `export default`, which has no entity id, plus the `out_of_scope` `Mocker` |
+| **Genuinely unused imports** | **0** | |
+
+That makes four separate artifacts found in this one heuristic — the key-namespace mismatch, barrel indirection, dropped module-level callers, and now import-type misclassification. Each previous diagnosis attributed the residue to something real about static analysis. None of them were. It also means the report.md stage row "exclude type-only imports: 138/240" was under-excluding.
+
+**ADR-0001 is written** ([docs/architecture/0001-fact-schema.md](architecture/0001-fact-schema.md), Status: Proposed, 2026-10-09). It decides identity, invariants, uncertainty, scope and edge kinds against measurement. The questions below are what it answers or explicitly defers:
 
 1. **Do non-entity call sites get facts, or get dropped?** Currently a call with no callable ancestor is attributed to its module. That is defensible but it makes "module" both a container and a caller.
 2. **What namespace do external entities live in, and how stable is it?** `external:<origin>:<name>` works, but `origin` is derived from a path, so a dependency moving inside node_modules changes ids. tsconfig `paths` aliases that point back into the repo are currently misclassified as external (marked `ponytail:` in extract.ts).
