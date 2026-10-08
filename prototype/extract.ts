@@ -598,10 +598,10 @@ function extractFile(file: SourceFile) {
       facts.push({ kind: "import", importerFile: rel(fp), exportedBy, importedName: defaultImport.getText(), importType: isType ? "type-default" : "default" });
     }
     if (namespaceImport) {
-      facts.push({ kind: "import", importerFile: rel(fp), exportedBy, importedName: namespaceImport.getText(), importType: "namespace" });
+      facts.push({ kind: "import", importerFile: rel(fp), exportedBy, importedName: namespaceImport.getText(), importType: isType ? "type-namespace" : "namespace" });
     }
     for (const ni of namedImports) {
-      facts.push({ kind: "import", importerFile: rel(fp), exportedBy, importedName: ni.getName(), importType: isType ? "type-named" : "named" });
+      facts.push({ kind: "import", importerFile: rel(fp), exportedBy, importedName: ni.getName(), importType: isType || ni.isTypeOnly() ? "type-named" : "named" });
     }
   };
 

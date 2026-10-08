@@ -233,6 +233,15 @@ for (const e of typeOnly) {
   }
   tgtTypes[key] = (tgtTypes[key] || 0) + 1;
 }
+if (process.env.ATLAS_LIST_CLEARED) {
+  for (const e of tiers[0].flagged) {
+    if (stillAtTier(1).has(e)) continue;
+    const [s, d] = e.split(" -> ");
+    const ex = references.find((r: any) => r.file === s && r.targetId && REF_TIERS.value.includes(r.ctx)
+      && entMod.get(r.targetId) && [...reexportClosure(d)].includes(asFile(entMod.get(r.targetId)!)));
+    console.log(`  value-ref: ${e}  ${ex?.file}:${ex?.line} ${ex?.name} (${ex?.ctx})`);
+  }
+}
 console.log(`Cleared only by type-position references: ${typeOnly.length}; entity types referenced: ${JSON.stringify(tgtTypes)}`);
 for (const s of tiers[tiers.length - 1].flagged) console.log(`  still flagged: ${s}`);
 
