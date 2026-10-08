@@ -1,6 +1,7 @@
 import { Project, SyntaxKind, Node, ts, type SourceFile } from "ts-morph";
 import * as path from "path";
 import * as fs from "fs";
+import { fingerprint } from "./fingerprint";
 
 type Fact = DeclFact | ContainsFact | ImportFact | ReexportFact | CallsFact | HeritageFact | InstantiatesFact | ReferencesFact;
 
@@ -11,6 +12,10 @@ interface DeclFact {
   name: string;
   file: string;
   exported: boolean;
+  // Content-addressed alternatives to entityId; see fingerprint.ts. Absent
+  // when the node is not fingerprintable (modules, stubs, namespace re-exports).
+  structureId?: string; // structure only: survives rename and move
+  contentId?: string;   // name + structure: survives move, not rename
 }
 
 interface ContainsFact {
@@ -468,7 +473,8 @@ function extractFile(file: SourceFile) {
         // The export map keys by exported name; idOfNode keys by declared name.
         // They differ under `export { a as b }`, so record both when they do.
         const id = idOfNode(node) ?? eid(defFile, name);
-        facts.push({ kind: "declaration", entityId: id, entityType: typeOfNode(node), name: declName(node) ?? name, file: rel(defFile), exported: true });
+        const dn = declName(node) ?? name;
+        facts.push({ kind: "declaration", entityId: id, entityType: typeOfNode(node), name: dn, file: rel(defFile), exported: true, ...fingerprint(node, dn) });
         facts.push({ kind: "contains", containerId: mid(defFile), entityId: id });
         emitHeritage(node, id);
       }
@@ -495,6 +501,7 @@ function extractFile(file: SourceFile) {
     facts.push({
       kind: "declaration", entityId: id, entityType: typeOfNode(node),
       name: declName(node)!, file: rel(declFile), exported: !!node.isExported?.(),
+      ...fingerprint(node, declName(node)!),
     });
     facts.push({ kind: "contains", containerId: mid(declFile), entityId: id });
     emitHeritage(node, id);
@@ -739,6 +746,26 @@ for (const d of unique.filter(f => f.kind === "declaration") as DeclFact[]) {
 const ambiguous = [...typesById].filter(([, t]) => t.size > 1);
 log("info", `Ambiguous entity ids (one id, multiple entityTypes): ${ambiguous.length} of ${typesById.size}`);
 for (const [id, t] of ambiguous.slice(0, 5)) log("info", `  ${id} -> ${[...t].join(", ")}`);
+
+// Collision measure per id scheme. An "entity" is a distinct (file, name,
+// entityType); an id collides when it is shared by 2+ entities. Ids are
+// compared only over facts that carry that scheme (module/stub facts have no
+// content ids). entityId collisions are by construction the ambiguity above.
+for (const scheme of ["entityId", "contentId", "structureId"] as const) {
+  const byId = new Map<string, { ents: Set<string>; types: Set<string> }>();
+  for (const d of decls) {
+    const id = d[scheme];
+    if (!id) continue;
+    const e = byId.get(id) ?? { ents: new Set(), types: new Set() };
+    e.ents.add(`${d.file}|${d.name}|${d.entityType}`); e.types.add(d.entityType);
+    byId.set(id, e);
+  }
+  const coll = [...byId].filter(([, e]) => e.ents.size > 1);
+  const ents = new Set<string>(); for (const [, e] of byId) for (const x of e.ents) ents.add(x);
+  const inColl = coll.reduce((n, [, e]) => n + e.ents.size, 0);
+  const worst = coll.sort((a, b) => b[1].ents.size - a[1].ents.size)[0];
+  log("info", `${scheme}: ${byId.size} ids / ${ents.size} entities; colliding ids ${coll.length} (${(100 * coll.length / byId.size).toFixed(1)}%), entities in them ${inColl} (${(100 * inColl / ents.size).toFixed(1)}%); multi-type ids ${[...byId].filter(([, e]) => e.types.size > 1).length}; worst ${worst ? worst[1].ents.size + "x " + worst[0] : "-"}`);
+}
 
 if (violations.length > 0) {
   log("error", `REFERENTIAL INTEGRITY: ${violations.length} edge endpoints reference undeclared entities`);
