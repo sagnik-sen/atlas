@@ -4,6 +4,16 @@ Analysis of whether Atlas's core hypothesis is true, based on a throwaway fact e
 
 ---
 
+## Corpus
+
+All numbers in the 2026-08-26 update below were measured against
+**colinhacks/zod at commit `e516c3b`**, 132 non-test source files under
+`packages/zod/src`. Nothing in this repository recorded that commit until now,
+which made every figure unreproducible: the original run used a `v4` tag that
+no longer exists upstream, and upstream has since force-pushed `main` so
+`e516c3b` is not an ancestor of it. `prototype/zod-repo/` is gitignored, so a
+fresh clone does not reproduce the corpus either.
+
 ## Update (2026-08-26): referential integrity
 
 **The 96.6% figure below measures the wrong thing.** It measures whether
@@ -25,6 +35,10 @@ layer:
 | Dependency paths forced through the `ts:` namespace (`ts:../../../../node_modules/typescript/lib/lib.es5.d.ts:isArray`) | 1,303 |
 | Declaration coverage stopped at top-level classes/interfaces/functions/type-aliases, so methods, constructors, accessors, nested functions, arrow-bound consts, callback parameters and object-literal members were never declared | 1,033 |
 | Callee id built from a different file than its declaration | 135 |
+
+These four sum to 5,496 against 3,650 non-closed edges, because the count is
+per *endpoint*: an edge with a synthesized caller and an undeclared callee is
+counted in two rows.
 
 ### What changed
 
@@ -181,6 +195,36 @@ Blast-radius tracing — the exact use case §3.3 said was impossible — now wo
 **Revised bottom line:** the fact-based approach is not merely "sound but incomplete" — the corrected prototype answers the core blast-radius question this project exists to answer, using nothing but the TypeScript compiler's existing symbol resolution. No custom type checker, no `calls_method` schema split, no runtime tracing needed to hit >95% resolution on a real, method-heavy codebase. The schema distinction between resolved/unresolved calls (via `confidence`) is still useful, but was never blocking.
 
 The rest of this document is preserved as originally written, for the record.
+
+**Reading note.** The preserved body below was written against a 116-file run
+of an extractor with known defects, and the corrections above reverse several
+of its conclusions without editing them in place. Specifically, in the body:
+
+- §3.1's "(FATAL)" heading and its 0% method resolution are an extractor bug,
+  not a finding. §5's "3,149 (83%)" is likewise the bug's footprint.
+- §6's "Atlas can analyze 100%" and §8's "the call graph doesn't, because 83%
+  of calls are method dispatches" are both superseded. Measured closure is
+  97.0% with zero dangling endpoints, and 179 edges remain honestly
+  unresolved — not 0.
+- §7 #7's "the symbol identity layer is working but fragile" understates it.
+  710 of 9,467 ids (7.5%) are ambiguous, and identity is the project's
+  highest-risk open assumption.
+- §4.1's "only 32 of 2,161 declarations couldn't be classified" is not a
+  classification rate. The 2,161 omitted whole declaration classes, and the 32
+  were an unaudited fallback. Declarations are now 10,279.
+- §4.3's and §6's "99% accuracy" measure how often `getDefinitions()` returned
+  something, not whether it returned the right thing. Correctness has never
+  been measured.
+- §5's "import type semantics lost (~40%)" is wrong in both directions: the
+  share is 24%, and the distinction was never lost — `importType` carried it
+  from the first run and nothing read it.
+- §5's "arrow function naming ~50% anonymous" and "external packages: all
+  unresolvable" are both fixed. §2.1's hub counts and all body fact counts are
+  from the 116-file run; the corpus is now 132 files.
+- §3.2's "295 import edges" and the corrected baseline of 345 are never
+  reconciled. 345 is the correct figure for this corpus.
+- §4.2's "Variables (464) == functions (595)" is internally inconsistent as
+  written.
 
 ---
 

@@ -42,9 +42,9 @@ These need debate before ADR-0001 is finalized:
 
 ## Where things stand (2026-08-26)
 
-The prototype's call graph was measured at 16.8% edge closure — 83% of resolved edges named entities the fact base did not declare. That is now 97.0% with zero dangling endpoints, and the invariant ("every edge endpoint is declared or explicitly unresolved") is asserted on every extraction run, exiting non-zero on violation. This is the first mechanically checkable answer to open tension #3 below, which had been unaddressed since the founding session.
+The prototype's call graph was measured at 16.8% edge closure — 83% of resolved edges named entities the fact base did not declare. That is now 97.0% with zero dangling endpoints, and the invariant ("every edge endpoint is declared or explicitly unresolved") is asserted on every extraction run, exiting non-zero on violation. This is the first mechanically checkable property the extractor asserts about itself, which open tension #3 below had been waiting for since the founding session. It is a weak form of correctness: it proves every edge endpoint names a declared entity, not that the edge is right. Entity-id ambiguity is reported but not enforced.
 
-The `accidental dependency` false-positive rate went from 100% to 47.1%, and the residue is no longer a bug: those are imports used as values rather than called.
+The `accidental dependency` heuristic flagged 100% of its input (345 of 345); it now flags 113 of 240 value imports (47.1%). Note 47.1% is the share still flagged, not a false-positive rate — the earlier 100% was entirely artifact, whereas the residue appears to be largely genuine signal about imports used as values rather than called. How much of it is genuine has not been measured, only sampled.
 
 **Next milestone: ADR-0001, scoped to the fact schema.** There is now real data to ground it in, and the open questions are specific rather than architectural taste:
 
