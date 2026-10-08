@@ -91,6 +91,31 @@ for (const c of [...calls, ...instantiates.map((i: any) => ({ callerId: i.caller
   }
 }
 
+// Reference evidence, tiered by what kind of use it is. Value-space references
+// (assigned, passed, exported, spread into an array) are runtime uses; `typeof`
+// and type-position references are compile-time only.
+const references = F.filter((f: any) => f.kind === "references");
+const REF_TIERS: Record<string, string[]> = {
+  value: ["value", "shorthand", "export", "jsx"],
+  typeof: ["typeof"],
+  type: ["type"],
+};
+const refEdges = (ctxs: string[]) => {
+  const m = new Map<string, Set<string>>();
+  for (const r of references) {
+    if (!r.targetId || !ctxs.includes(r.ctx)) continue;
+    const cm = entMod.get(r.callerId), dm = entMod.get(r.targetId);
+    if (!cm || !dm || cm === dm) continue;
+    const [sf, df] = [asFile(cm), asFile(dm)];
+    if (!m.has(sf)) m.set(sf, new Set());
+    m.get(sf)!.add(df);
+  }
+  return m;
+};
+const modRefsValue = refEdges(REF_TIERS.value);
+const modRefsTypeof = refEdges(REF_TIERS.typeof);
+const modRefsType = refEdges(REF_TIERS.type);
+
 const modules = [...modEnts.keys()];
 
 console.log("=".repeat(70));
@@ -161,25 +186,55 @@ for (const [m, s] of callFanIn.slice(0, 10)) console.log(`  ${m}: called by ${s}
 
 // 4. Accidental dependencies (imported but no call evidence)
 console.log("\n--- 4. Accidental dependencies ---\n");
-let acc = 0;
-const accSamples: string[] = [];
+const hasEvidence = (s: string, d: string, ...maps: Map<string, Set<string>>[]) =>
+  maps.some(m => { const ev = m.get(s); return !!ev && [...reexportClosure(d)].some(t => ev.has(t)); });
 let considered = 0;
+// Cumulative tiers: each adds one kind of evidence to the previous.
+const tiers = [
+  { label: "calls + instantiations (baseline)", maps: [modCalls], flagged: [] as string[] },
+  { label: "+ value-position references", maps: [modCalls, modRefsValue], flagged: [] as string[] },
+  { label: "+ typeof references", maps: [modCalls, modRefsValue, modRefsTypeof], flagged: [] as string[] },
+  { label: "+ type-position references", maps: [modCalls, modRefsValue, modRefsTypeof, modRefsType], flagged: [] as string[] },
+];
 for (const [s, ds] of modValueImports) {
   for (const d of ds) {
     if (passThrough.has(`${s}\u0000${d}`)) continue;
     considered++;
-    const evidence = modCalls.get(s);
-    const satisfied = !!evidence && [...reexportClosure(d)].some(t => evidence.has(t));
-    if (!satisfied) {
-      acc++;
-      if (accSamples.length < 10) accSamples.push(`${s} -> ${d}`);
-    }
+    for (const t of tiers) if (!hasEvidence(s, d, ...t.maps)) t.flagged.push(`${s} -> ${d}`);
   }
 }
 const allEdges = [...modImports.values()].reduce((sum,s)=>sum+s.size,0);
 console.log(`Import edges: ${allEdges} total, ${considered} value imports that are not barrel pass-throughs`);
-console.log(`Of those, no call evidence: ${acc} (${(100*acc/considered).toFixed(1)}%)`);
-for (const s of accSamples) console.log(`  ${s}`);
+for (const t of tiers) {
+  console.log(`No evidence with ${t.label}: ${t.flagged.length} of ${considered} (${(100*t.flagged.length/considered).toFixed(1)}%)`);
+}
+const acc = tiers[0].flagged.length;
+// What did the type-position evidence point at? If the targets are interfaces
+// and aliases, the import is type-only in substance (just not written `import
+// type`); if they are classes or variables, it is a value that happens to be
+// used only in type annotations. Either way it is erased at runtime.
+const declType = new Map<string, string>(decls.map((d: any) => [d.entityId, d.entityType]));
+const stillAtTier = (i: number) => new Set(tiers[i].flagged);
+const typeOnly = tiers[0].flagged.filter(e => stillAtTier(2).has(e) && !stillAtTier(3).has(e));
+const tgtTypes: Record<string, number> = {};
+for (const e of typeOnly) {
+  const [s, d] = e.split(" -> ");
+  const targets = new Set<string>();
+  for (const r of references) {
+    if (r.ctx !== "type" || !r.targetId) continue;
+    const cm = entMod.get(r.callerId), dm = entMod.get(r.targetId);
+    if (cm && dm && asFile(cm) === s && [...reexportClosure(d)].includes(asFile(dm))) targets.add(declType.get(r.targetId) ?? "?");
+  }
+  const key = [...targets].sort().join("+");
+  if (process.env.ATLAS_LIST_CLEARED) {
+    const ex = references.find((r: any) => r.file === s && r.targetId && r.ctx === "type"
+      && entMod.get(r.targetId) && [...reexportClosure(d)].includes(asFile(entMod.get(r.targetId)!)));
+    console.log(`  type-only: ${e}  [${key}]  ${ex?.file}:${ex?.line} ${ex?.name}`);
+  }
+  tgtTypes[key] = (tgtTypes[key] || 0) + 1;
+}
+console.log(`Cleared only by type-position references: ${typeOnly.length}; entity types referenced: ${JSON.stringify(tgtTypes)}`);
+for (const s of tiers[tiers.length - 1].flagged) console.log(`  still flagged: ${s}`);
 
 // 5. Barrel analysis
 console.log("\n--- 5. Barrel file analysis ---\n");
