@@ -635,9 +635,11 @@ function extractFile(file: SourceFile) {
 
 // ─── Main ──────────────────────────────────────────────────────────────
 
-const TARGET = path.resolve(__dirname, "zod-repo/packages/zod/src");
+// ATLAS_TARGET / ATLAS_TSCONFIG / ATLAS_OUT let history runs point at another checkout
+// without overwriting the committed facts.json; defaults are the baseline run.
+const TARGET = path.resolve(process.env.ATLAS_TARGET ?? path.resolve(__dirname, "zod-repo/packages/zod/src"));
 ROOT = TARGET;
-const TSCONFIG = path.resolve(__dirname, "zod-repo/packages/zod/tsconfig.json");
+const TSCONFIG = path.resolve(process.env.ATLAS_TSCONFIG ?? path.resolve(__dirname, "zod-repo/packages/zod/tsconfig.json"));
 
 const project = new Project({
   tsConfigFilePath: TSCONFIG,
@@ -672,7 +674,7 @@ for (const f of facts) {
 }
 
 // Write
-const OUT = path.resolve(__dirname, "facts.json");
+const OUT = path.resolve(process.env.ATLAS_OUT ?? path.resolve(__dirname, "facts.json"));
 fs.writeFileSync(OUT, JSON.stringify(unique, null, 2));
 log("info", `Wrote ${unique.length} facts to ${OUT}`);
 
