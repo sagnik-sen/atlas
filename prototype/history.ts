@@ -1,6 +1,6 @@
 // Does an entity-id scheme survive refactoring? Tests thesis.md §4.4 against real history.
 //
-//   npx tsx history.ts [--max N] [--jobs J] [--min-nodes K]
+//   npx tsx history.ts [--max N] [--jobs J] [--min-nodes K] [--commits sha,sha,...]
 //
 // Pipeline per commit: materialize tree (git archive from a SCRATCH COPY of the corpus's
 // .git, never the shared zod-repo) -> run extract.ts with ATLAS_* env -> fingerprint every
@@ -22,9 +22,19 @@ import * as zlib from "zlib";
 import { createHash } from "crypto";
 import { execFileSync, execSync, spawn } from "child_process";
 
-const SCRATCH = process.env.ATLAS_SCRATCH
-  ?? "/private/tmp/claude-501/-Users-sagniksen-Personal-projects-atlas/b0522474-dd68-4789-971f-40a9564b2976/scratchpad";
-const GITDIR = process.env.ATLAS_GITDIR ?? path.join(SCRATCH, "zodgit"); // copy of zod-repo/.git; run git only here
+// Defaults to a repo-relative directory rather than a session-specific
+// /private/tmp path, so a rerun does not depend on one machine's scratchpad.
+// ATLAS_SCRATCH overrides it.
+const SCRATCH = process.env.ATLAS_SCRATCH ?? path.resolve(__dirname, ".history-cache");
+// A read-only COPY of zod-repo/.git. git is never run against the shared
+// corpus, whose working tree is pinned at e516c3b and underpins every
+// measured number in the repo. Create it before the first run:
+//   cp -R prototype/zod-repo/.git <SCRATCH>/zodgit
+// It needs origin/main fetched to depth >= 500 for the 298 src-touching commits.
+// The log/ and fp/ caches are keyed by commit sha ALONE, so any change to
+// extract.ts's fact schema invalidates them: delete both before rerunning, or
+// the harness silently reports the old schema's results.
+const GITDIR = process.env.ATLAS_GITDIR ?? path.join(SCRATCH, "zodgit");
 const arg = (n: string, d: number) => { const i = process.argv.indexOf(`--${n}`); return i > 0 ? +process.argv[i + 1] : d; };
 const MAX = arg("max", 1e9), JOBS = arg("jobs", 4), MIN_NODES = arg("min-nodes", 12);
 const SRC = "packages/zod/src";
@@ -253,7 +263,14 @@ async function main() {
   // Linear first-parent history: pair = (parent, commit) for each commit touching the src tree.
   const lines = git("log", "--first-parent", "--format=%H %P", "origin/main", "--", SRC).trim().split("\n").map(l => l.split(" "));
   const pairs = lines.filter(l => l.length === 2).map(l => ({ child: l[0], parent: l[1] })).reverse(); // oldest first
-  const sel = pairs.length <= MAX ? pairs : Array.from({ length: MAX }, (_, i) => pairs[Math.floor(i * pairs.length / MAX)]);
+  // --commits <sha,sha,...> scores only the pairs whose child is listed. The
+  // fact cache is keyed by sha alone, so a schema change to extract.ts
+  // invalidates all 389 cached fact bases and a full rerun costs ~40min. This
+  // targets the commits that actually carry a category under test.
+  const only = (() => { const i = process.argv.indexOf("--commits"); return i > 0 ? new Set(process.argv[i + 1].split(",")) : null; })();
+  const picked = only ? pairs.filter(p => [...only].some(s => p.child.startsWith(s))) : pairs;
+  if (only) console.log(`--commits matched ${picked.length} of ${pairs.length} pairs`);
+  const sel = picked.length <= MAX ? picked : Array.from({ length: MAX }, (_, i) => picked[Math.floor(i * picked.length / MAX)]);
   console.log(`src-touching commits: ${lines.length}; with a parent: ${pairs.length}; sampling ${sel.length} pairs`);
   const shas = [...new Set(sel.flatMap(p => [p.parent, p.child]))];
   let next = 0, done = 0;

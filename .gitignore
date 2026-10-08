@@ -47,3 +47,6 @@ prototype/zod-repo/
 
 # Agent worktrees (session-local)
 .claude/worktrees/
+
+# History harness caches (regenerable, large)
+prototype/.history-cache/
