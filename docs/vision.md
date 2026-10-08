@@ -1,6 +1,6 @@
 # Vision
 
-> **Superseded (2026-08-21):** this document's central claim — "the graph is the primary representation" — is superseded by [docs/thesis.md](thesis.md), which argues the graph is one query-optimized lens over a fact base, not the source of truth. The problem framing and node/edge catalog below are still useful reference material; the "Graph is the Primary Representation" section is the part to discount. See thesis.md §6 for the point-by-point comparison and [decisions.md](decisions.md) for what this changes about next steps.
+> **Superseded (2026-08-21):** this document's central claim — "the graph is the primary representation" — is superseded by [docs/thesis.md](thesis.md), which argues the graph is one query-optimized lens over a fact base, not the source of truth. The problem framing and node/edge catalog below are still useful reference material. Discount the "Graph is the Primary Representation" section and, for the same reason, "What Atlas Is Not" ("the graph is the foundation"), the V1 scope's "static structural graph", and the "Graph database choice" tension — storage is an implementation choice per thesis.md §2.5, and the prototype simply writes JSON. The edge table also omits `REQUIRES`, which the Contract-enforcement bullet references. See thesis.md §6 for the point-by-point comparison and [decisions.md](decisions.md) for what this changes about next steps.
 
 Atlas is the knowledge layer for software engineering.
 
