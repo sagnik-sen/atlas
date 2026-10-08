@@ -44,3 +44,6 @@ tmp/
 temp/
 .cache/
 prototype/zod-repo/
+
+# Agent worktrees (session-local)
+.claude/worktrees/
