@@ -44,11 +44,9 @@ Two caveats on that table, both pushing the same way:
 
 - The 710 `entityId` collisions split 272 cross-declaration-space (genuine
   TypeScript merges, 247 of them the `interface X` + `const X` pattern) and
-  **438 within value space** — `email` as both `function` and `method`, 116
-  `parameter`/`property` pairs. The second group is an owner-qualification gap:
-  `ownerName()` returns null inside anonymous type and object literals, so
-  those members get unqualified names. Declaration-space qualification fixes
-  only the 272.
+  438 within value space. **The 438 have since been fixed** by lexical scope
+  qualification — see the section below — leaving 20. The table's `entityId`
+  row predates that fix.
 - The comparison is **biased in `entityId`'s favour**. Collision is measured
   against (file, name, entityType) as ground truth, which is close to what
   `entityId` encodes, so `entityId`'s own conflation is undercounted. 974
@@ -169,6 +167,60 @@ key-namespace mismatch, barrel indirection, and dropped module-level callers.
 Each previous diagnosis — including the one in the 2026-08-26 section —
 attributed the residue to something real about static analysis. None of them
 were.
+
+### 6. Lexical scope qualification
+
+The 438 within-value-space collisions were diagnosed in ADR-0001 as
+`ownerName()` returning null inside anonymous literals. Bucketing the
+contributing declarations by naming mechanism showed otherwise:
+
+| mechanism | declarations |
+|---|---|
+| parameter | 2,103 |
+| object-literal property | 1,217 |
+| function-local variable | 560 |
+| literal member, no owner | 304 |
+| named-owner member colliding with an unqualified twin | 294 |
+| binding element | 93 |
+| literal member, **wrong** owner | 61 |
+
+The scheme had no notion of lexical scope. `ownerName()` consulted only classes
+and interfaces, and only the nearest one — so object-literal members got a bare
+name, nested type-literal members inherited the enclosing interface's name
+(`interface Foo { x: { y: T } }` yielding `Foo.y`, colliding with a real
+`Foo.y`), and parameters, bindings and locals were never qualified at all.
+Anything below top level collided by name within its file.
+
+Ids now carry a scope path. Three further fixes came out of chasing the
+residual:
+
+| step | within-space collisions |
+|---|---|
+| baseline | 438 |
+| drop `ShorthandPropertyAssignment` as a declaration (`{ shape }` is a reference to an existing binding, not a new entity) | 318 |
+| scope path from all enclosing named constructs | 163 |
+| positional segment for unbound type and object literals (a return-type annotation otherwise shares the method's scope with its locals) | **20** |
+
+20 of 15,822 ids (0.13%). The residual is a parameter and a local of the same
+name in sibling *block* scopes, which the path does not segment — marked with a
+`shortcut:` comment rather than fixed, since block paths would lengthen every
+id for a 0.13% gain.
+
+Anonymous default exports also get ids now: `export default function () {}` and
+`export default {...}` previously had no name and so no entity. 80 entities
+identified. This was expected to clear the 12 remaining flagged imports and did
+not — they are used via `datetimeBenchmarks.suites`, a field read on a
+non-namespace, which the reference pass excludes by design. A different schema
+gap than the one predicted.
+
+Closure is unchanged throughout (5,707/5,886 and 9,213/9,284, integrity OK),
+because declaration emission and resolution both route through `idOfNode()`:
+changing the id format moves both ends together. Declarations rose 12,840 to
+16,547 as scope qualification separated entities previously merged by name.
+
+The ambiguity check is now split by declaration space — 267 cross-space merges
+reported as expected, 20 within-space as genuine — so it no longer counts
+correct declaration merges as defects.
 
 ### Caveats
 

@@ -91,21 +91,44 @@ this decision. Split by TypeScript declaration space:
 | Cross-space (type vs value vs namespace) | 272 | 38% |
 | **Within value space** | **438** | **62%** |
 
-Declaration-space qualification — the obvious fix, and the one this ADR first
-proposed for all 710 — resolves at most the 272. The majority are collisions
-*inside* value space: `ts:v4/classic/schemas.ts:email` is both a `function` and
-a `method`, and 116 cases pair a `parameter` with a `property`. No
-declaration-space scheme separates those. They are an **owner-qualification
-gap** — `ownerName()` returns null for members of anonymous type literals and
-object literals, so those members get unqualified names.
+Declaration-space qualification resolves at most the 272. The 438 were not an
+"anonymous literal owner" gap, as an earlier draft of this ADR claimed before
+measuring. Bucketing the contributing declarations:
 
-- **Within value space (438):** qualify by lexical scope, not only by owning
-  class or interface. A parameter of `f` becomes `ts:<file>:f.<param>`. This is
-  the larger fix and it was missed.
-- **Cross-space (272):** genuine TypeScript declaration merges — 247 are the
+| mechanism | declarations |
+|---|---|
+| parameter | 2,103 |
+| object-literal property | 1,217 |
+| function-local variable | 560 |
+| literal member, no owner | 304 |
+| named-owner member colliding with an unqualified twin | 294 |
+| binding element | 93 |
+| literal member, **wrong** owner | 61 |
+
+The id scheme had **no notion of lexical scope**. `ownerName()` consulted only
+classes and interfaces, and only the nearest one, so object-literal members got
+a bare name, members of a nested type literal inherited the enclosing
+interface's name (`interface Foo { x: { y: T } }` → `Foo.y`, colliding with a
+real `Foo.y`), and parameters, bindings and locals were never qualified. Any
+non-top-level declaration collided by name within its file.
+
+**Decided and implemented:**
+
+- **Within one space:** ids carry a lexical scope path. Every enclosing
+  construct that introduces a scope contributes a segment; the class/interface
+  case is one segment type among many. Unbound type and object literals get a
+  positional segment, since a return-type annotation otherwise shares the
+  method's scope with its locals. `ShorthandPropertyAssignment` is not a
+  declaration — `{ shape }` is a reference to an existing binding. Result:
+  **438 → 20 collisions** (0.13% of 15,822 ids). The residual 20 are a
+  parameter and a local of the same name in sibling *block* scopes, which the
+  path does not segment.
+- **Cross-space (267):** genuine TypeScript declaration merges — 247 are the
   `interface X` + `const X` pattern this corpus uses pervasively. **One
   TypeScript symbol is one entity**, so these keep one id and carry multiple
   declaration facts.
+- **Anonymous `export default` gets an id.** 80 entities previously had no
+  name and therefore no identity.
 
 **3. Content hashes are facts about an entity, not its identity.** `contentId`
 and `structureId` remain as fields on declaration facts, for cross-version
@@ -117,11 +140,11 @@ are defined now:
 - *Closure*: every edge endpoint names a declared entity or is explicitly
   unresolved with confidence ≤ 0.3. Enforced; exits non-zero.
 - *Unambiguous identity*: one entity id names one entity, where merged
-  declarations of a single TypeScript symbol count as one entity. The current
-  check approximates this as "one id, one entityType", which over-reports — it
-  flags all 272 cross-space merges that decision 2 holds to be correct.
-  Reported, not enforced; enforceable once scope qualification lands and the
-  check is restated per-symbol.
+  declarations of a single TypeScript symbol count as one entity. The check is
+  split by declaration space accordingly: 267 cross-space merges are reported
+  as expected, and 20 within-space collisions as genuine. Reported, not yet
+  enforced — enforcing requires segmenting block scopes, which is the whole of
+  the residual 20.
 
 Given the four artifacts above, this is not a quality-of-implementation detail.
 It is the schema's primary defence.
@@ -166,12 +189,16 @@ detection without being load-bearing.
 
 **Harder.** Ids remain unstable under rename and move — accepted, and the cost
 is visible rather than silent. Scope qualification is a breaking change to
-every member and parameter id, which is most of the fact base. Per-occurrence references grow the fact base ~52%.
+every member and parameter id — most of the fact base — and makes ids longer
+and path-shaped (`ZodObject._getCached.@typeliteral0.shape`). Per-occurrence references grow the fact base ~52%.
 
 **Unresolved, and deliberately out of scope.**
-- **Anonymous `export default` has no entity id.** This is a schema gap, not an
-  implementation gap: 11 of the 12 remaining flagged imports and 3 unresolved
-  calls trace to it. It needs an id form before V1.
+- **Field reads are not modelled.** The 12 remaining flagged imports are used
+  via `datetimeBenchmarks.suites` — a property read on a non-namespace, which
+  the reference pass excludes because such reads dispatch on a runtime type.
+  Giving anonymous default exports ids was expected to clear these and did not;
+  clearing them needs a field-read edge kind, which is a schema decision this
+  ADR does not make.
 - **Query substrate → ADR-0002.** thesis §7.3 calls Datalog the
   highest-reward decision in the project. This ADR deliberately does not decide
   it: the fact base is defined independently of what queries it.
