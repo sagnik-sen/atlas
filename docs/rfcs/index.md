@@ -16,7 +16,7 @@ RFCs (Request for Comments) are the mechanism for proposing and discussing signi
 ## When to Write an RFC
 
 Write an RFC when the change:
-- Changes the graph model (new node/edge types, new semantics)
+- Changes the fact schema (new fact kinds or entity id form, new semantics)
 - Introduces or changes a public API
 - Changes the extraction or query pipeline architecture
 - Has significant performance or correctness implications

@@ -5,7 +5,7 @@ Atlas is in early design. The most valuable contributions right now are ideas, d
 ## Ways to Contribute
 
 ### Design & Vision
-Read [docs/vision.md](docs/vision.md). If you have thoughts on the graph model, the query interface, the extraction approach, or the scope, open a discussion. The most impactful conversations we can have right now are about what *not* to build.
+Read [docs/thesis.md](docs/thesis.md) first — it is the governing model; [docs/vision.md](docs/vision.md) is kept for its problem framing but its graph-first claim is superseded. If you have thoughts on the fact schema, the query interface, the extraction approach, or the scope, open a discussion. The most impactful conversations we can have right now are about what *not* to build.
 
 ### RFCs
 Significant design proposals follow the RFC process. See [docs/rfcs/index.md](docs/rfcs/index.md) for the process and [docs/rfcs/template.md](docs/rfcs/template.md) for the template.
@@ -20,7 +20,7 @@ We're not accepting production code contributions yet — the core architecture 
 
 - **Be concrete.** Show examples, sketch APIs, write pseudo-code.
 - **Compare alternatives.** Every proposal should include the options you rejected and why.
-- **Think about the graph.** Does your idea express naturally as graph operations? If not, why?
+- **Think about the facts.** What typed facts does your idea need, and can both endpoints of every edge it implies be resolved to a declared entity? A graph is one lens over the fact base, not the model.
 - **Consider incremental adoption.** Can a developer use this without rewiring their entire workflow?
 
 ## Communication
@@ -31,7 +31,7 @@ We're not accepting production code contributions yet — the core architecture 
 
 ## Values
 
-- **Depth over breadth.** A graph model that correctly handles 3 languages is better than a shallow model for 20.
-- **Correctness over speed.** The graph must be trustworthy. Fast-but-wrong is worse than slow-but-right.
+- **Depth over breadth.** A fact schema that correctly handles 3 languages is better than a shallow model for 20.
+- **Correctness over speed.** The fact base must be trustworthy, and every extraction run asserts its own invariants. Fast-but-wrong is worse than slow-but-right — four findings in this project's record turned out to be extractor bugs rather than facts about static analysis.
 - **Composable over monolithic.** Extensions and language support should be pluggable, not baked in.
 - **Honest about limitations.** Documenting what Atlas *cannot* do is as important as documenting what it can.
