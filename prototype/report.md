@@ -42,6 +42,13 @@ types with identical bodies — into a single id.
 
 Two caveats on that table, both pushing the same way:
 
+- The 710 `entityId` collisions split 272 cross-declaration-space (genuine
+  TypeScript merges, 247 of them the `interface X` + `const X` pattern) and
+  **438 within value space** — `email` as both `function` and `method`, 116
+  `parameter`/`property` pairs. The second group is an owner-qualification gap:
+  `ownerName()` returns null inside anonymous type and object literals, so
+  those members get unqualified names. Declaration-space qualification fixes
+  only the 272.
 - The comparison is **biased in `entityId`'s favour**. Collision is measured
   against (file, name, entityType) as ground truth, which is close to what
   `entityId` encodes, so `entityId`'s own conflation is undercounted. 974
@@ -105,10 +112,14 @@ corpus has none.
 
 The survival columns are tautological. These two are not.
 
-**False continuity.** For **45.3% of removed entities** (48 of 106 in the rename
-commit; 36.4% in a 24-pair sample), the `structureId` still exists in the child
-commit — attached to a *different* entity. A consumer tracking entities by
-content hash would conclude 48 deleted entities are still present.
+**False continuity.** In the rename commit, 95 of 153 removed entities have
+their `structureId` still present in the child commit, attached to a
+*different* entity. Counted as distinct events that is **49**, cluster sizes
+`[47, 1, 1, 1, ...]`: one mass event — 47 locale copies of an identical helper,
+deduplicated into `core/util.ts` — plus 48 independent singletons. The raw
+percentage is inflated by that cluster, the same n=1-as-n=47 trap as the rename
+count, so **48 independent events** is the honest figure. A consumer tracking
+entities by content hash would conclude those entities still exist.
 
 **Aliasing on edit.** Of 108 body edits in the 24-pair sample, **7 (6.5%) gave
 the edited entity a `structureId` that collides with an unrelated entity**
@@ -116,10 +127,10 @@ the edited entity a `structureId` that collides with an unrelated entity**
 identity — in about one case in sixteen it silently reassigns that identity to
 something else.
 
-This is the 55% collision rate reappearing across versions, and it is the
-decisive argument. A lost id is a visible failure: the consumer sees an entity
-disappear and can fall back. A **wrongly reused id is silent**, and every
-downstream consumer inherits it.
+This is the 55% collision rate reappearing across versions — not evidence
+independent of it, but the form in which the cost is actually paid. A lost id
+is a visible failure: the consumer sees an entity disappear and can fall back.
+A **wrongly reused id is silent**, and every downstream consumer inherits it.
 
 ### 5. Reference facts, and the fourth artifact in one heuristic
 
