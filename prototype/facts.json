@@ -50175,21 +50175,21 @@
     "importerFile": "v3/types.ts",
     "exportedBy": "v3/ZodError.ts",
     "importedName": "IssueData",
-    "importType": "named"
+    "importType": "type-named"
   },
   {
     "kind": "import",
     "importerFile": "v3/types.ts",
     "exportedBy": "v3/ZodError.ts",
     "importedName": "StringValidation",
-    "importType": "named"
+    "importType": "type-named"
   },
   {
     "kind": "import",
     "importerFile": "v3/types.ts",
     "exportedBy": "v3/ZodError.ts",
     "importedName": "ZodCustomIssue",
-    "importType": "named"
+    "importType": "type-named"
   },
   {
     "kind": "import",
@@ -50203,14 +50203,14 @@
     "importerFile": "v3/types.ts",
     "exportedBy": "v3/ZodError.ts",
     "importedName": "ZodErrorMap",
-    "importType": "named"
+    "importType": "type-named"
   },
   {
     "kind": "import",
     "importerFile": "v3/types.ts",
     "exportedBy": "v3/ZodError.ts",
     "importedName": "ZodIssue",
-    "importType": "named"
+    "importType": "type-named"
   },
   {
     "kind": "import",
@@ -50252,7 +50252,7 @@
     "importerFile": "v3/types.ts",
     "exportedBy": "v3/helpers/parseUtil.ts",
     "importedName": "AsyncParseReturnType",
-    "importType": "named"
+    "importType": "type-named"
   },
   {
     "kind": "import",
@@ -50280,35 +50280,35 @@
     "importerFile": "v3/types.ts",
     "exportedBy": "v3/helpers/parseUtil.ts",
     "importedName": "ParseContext",
-    "importType": "named"
+    "importType": "type-named"
   },
   {
     "kind": "import",
     "importerFile": "v3/types.ts",
     "exportedBy": "v3/helpers/parseUtil.ts",
     "importedName": "ParseInput",
-    "importType": "named"
+    "importType": "type-named"
   },
   {
     "kind": "import",
     "importerFile": "v3/types.ts",
     "exportedBy": "v3/helpers/parseUtil.ts",
     "importedName": "ParseParams",
-    "importType": "named"
+    "importType": "type-named"
   },
   {
     "kind": "import",
     "importerFile": "v3/types.ts",
     "exportedBy": "v3/helpers/parseUtil.ts",
     "importedName": "ParsePath",
-    "importType": "named"
+    "importType": "type-named"
   },
   {
     "kind": "import",
     "importerFile": "v3/types.ts",
     "exportedBy": "v3/helpers/parseUtil.ts",
     "importedName": "ParseReturnType",
-    "importType": "named"
+    "importType": "type-named"
   },
   {
     "kind": "import",
@@ -50322,7 +50322,7 @@
     "importerFile": "v3/types.ts",
     "exportedBy": "v3/helpers/parseUtil.ts",
     "importedName": "SyncParseReturnType",
-    "importType": "named"
+    "importType": "type-named"
   },
   {
     "kind": "import",
@@ -50406,7 +50406,7 @@
     "importerFile": "v3/types.ts",
     "exportedBy": "v3/helpers/util.ts",
     "importedName": "objectUtil",
-    "importType": "named"
+    "importType": "type-named"
   },
   {
     "kind": "import",
@@ -53169,7 +53169,7 @@
     "importerFile": "v3/ZodError.ts",
     "exportedBy": "v3/helpers/util.ts",
     "importedName": "ZodParsedType",
-    "importType": "named"
+    "importType": "type-named"
   },
   {
     "kind": "import",
@@ -66046,7 +66046,7 @@
     "importerFile": "v3/locales/en.ts",
     "exportedBy": "v3/ZodError.ts",
     "importedName": "ZodErrorMap",
-    "importType": "named"
+    "importType": "type-named"
   },
   {
     "kind": "import",
@@ -68316,7 +68316,7 @@
     "importerFile": "v4/classic/deep-partial.ts",
     "exportedBy": "v4/core/index.ts",
     "importedName": "core",
-    "importType": "namespace"
+    "importType": "type-namespace"
   },
   {
     "kind": "import",
@@ -75623,14 +75623,14 @@
     "importerFile": "v4/classic/from-json-schema.ts",
     "exportedBy": "v4/core/json-schema.ts",
     "importedName": "JSONSchema",
-    "importType": "namespace"
+    "importType": "type-namespace"
   },
   {
     "kind": "import",
     "importerFile": "v4/classic/from-json-schema.ts",
     "exportedBy": "v4/core/registries.ts",
     "importedName": "$ZodRegistry",
-    "importType": "named"
+    "importType": "type-named"
   },
   {
     "kind": "import",
@@ -75913,7 +75913,7 @@
     "importerFile": "v4/classic/in-out.ts",
     "exportedBy": "v4/core/index.ts",
     "importedName": "core",
-    "importType": "namespace"
+    "importType": "type-namespace"
   },
   {
     "kind": "import",
@@ -75927,7 +75927,7 @@
     "importerFile": "v4/classic/in-out.ts",
     "exportedBy": "v4/classic/schemas.ts",
     "importedName": "schemas",
-    "importType": "namespace"
+    "importType": "type-namespace"
   },
   {
     "kind": "declaration",
@@ -77690,7 +77690,7 @@
     "importerFile": "v4/classic/parse.ts",
     "exportedBy": "v4/classic/errors.ts",
     "importedName": "ZodError",
-    "importType": "named"
+    "importType": "type-named"
   },
   {
     "kind": "import",
@@ -125248,14 +125248,14 @@
     "importerFile": "v4/core/api.ts",
     "exportedBy": "v4/core/core.ts",
     "importedName": "core",
-    "importType": "namespace"
+    "importType": "type-namespace"
   },
   {
     "kind": "import",
     "importerFile": "v4/core/api.ts",
     "exportedBy": "v4/core/errors.ts",
     "importedName": "errors",
-    "importType": "namespace"
+    "importType": "type-namespace"
   },
   {
     "kind": "import",
@@ -133662,7 +133662,7 @@
     "importerFile": "v4/core/checks.ts",
     "exportedBy": "v4/core/errors.ts",
     "importedName": "errors",
-    "importType": "namespace"
+    "importType": "type-namespace"
   },
   {
     "kind": "import",
@@ -133676,7 +133676,7 @@
     "importerFile": "v4/core/checks.ts",
     "exportedBy": "v4/core/schemas.ts",
     "importedName": "schemas",
-    "importType": "namespace"
+    "importType": "type-namespace"
   },
   {
     "kind": "import",
@@ -148495,14 +148495,14 @@
     "importerFile": "v4/core/compile.ts",
     "exportedBy": "v4/core/checks.ts",
     "importedName": "checks",
-    "importType": "namespace"
+    "importType": "type-namespace"
   },
   {
     "kind": "import",
     "importerFile": "v4/core/compile.ts",
     "exportedBy": "v4/core/core.ts",
     "importedName": "core",
-    "importType": "namespace"
+    "importType": "type-namespace"
   },
   {
     "kind": "import",
@@ -148845,7 +148845,7 @@
     "importerFile": "v4/core/config.ts",
     "exportedBy": "v4/core/errors.ts",
     "importedName": "errors",
-    "importType": "namespace"
+    "importType": "type-namespace"
   },
   {
     "kind": "declaration",
@@ -150227,14 +150227,14 @@
     "importerFile": "v4/core/core.ts",
     "exportedBy": "v4/core/errors.ts",
     "importedName": "errors",
-    "importType": "namespace"
+    "importType": "type-namespace"
   },
   {
     "kind": "import",
     "importerFile": "v4/core/core.ts",
     "exportedBy": "v4/core/schemas.ts",
     "importedName": "schemas",
-    "importType": "namespace"
+    "importType": "type-namespace"
   },
   {
     "kind": "import",
@@ -162761,7 +162761,7 @@
     "importerFile": "v4/core/json-schema-generator.ts",
     "exportedBy": "v4/core/json-schema.ts",
     "importedName": "JSONSchema",
-    "importType": "namespace"
+    "importType": "type-namespace"
   },
   {
     "kind": "import",
@@ -162775,35 +162775,35 @@
     "importerFile": "v4/core/json-schema-generator.ts",
     "exportedBy": "v4/core/schemas.ts",
     "importedName": "schemas",
-    "importType": "namespace"
+    "importType": "type-namespace"
   },
   {
     "kind": "import",
     "importerFile": "v4/core/json-schema-generator.ts",
     "exportedBy": "v4/core/to-json-schema.ts",
     "importedName": "JSONSchemaGeneratorParams",
-    "importType": "named"
+    "importType": "type-named"
   },
   {
     "kind": "import",
     "importerFile": "v4/core/json-schema-generator.ts",
     "exportedBy": "v4/core/to-json-schema.ts",
     "importedName": "ProcessParams",
-    "importType": "named"
+    "importType": "type-named"
   },
   {
     "kind": "import",
     "importerFile": "v4/core/json-schema-generator.ts",
     "exportedBy": "v4/core/to-json-schema.ts",
     "importedName": "Seen",
-    "importType": "named"
+    "importType": "type-named"
   },
   {
     "kind": "import",
     "importerFile": "v4/core/json-schema-generator.ts",
     "exportedBy": "v4/core/to-json-schema.ts",
     "importedName": "ToJSONSchemaContext",
-    "importType": "named"
+    "importType": "type-named"
   },
   {
     "kind": "import",
@@ -168781,14 +168781,14 @@
     "importerFile": "v4/core/json-schema-processors.ts",
     "exportedBy": "v4/core/checks.ts",
     "importedName": "checks",
-    "importType": "namespace"
+    "importType": "type-namespace"
   },
   {
     "kind": "import",
     "importerFile": "v4/core/json-schema-processors.ts",
     "exportedBy": "v4/core/json-schema.ts",
     "importedName": "JSONSchema",
-    "importType": "namespace"
+    "importType": "type-namespace"
   },
   {
     "kind": "import",
@@ -168802,49 +168802,49 @@
     "importerFile": "v4/core/json-schema-processors.ts",
     "exportedBy": "v4/core/schemas.ts",
     "importedName": "schemas",
-    "importType": "namespace"
+    "importType": "type-namespace"
   },
   {
     "kind": "import",
     "importerFile": "v4/core/json-schema-processors.ts",
     "exportedBy": "v4/core/to-json-schema.ts",
     "importedName": "ProcessParams",
-    "importType": "named"
+    "importType": "type-named"
   },
   {
     "kind": "import",
     "importerFile": "v4/core/json-schema-processors.ts",
     "exportedBy": "v4/core/to-json-schema.ts",
     "importedName": "Processor",
-    "importType": "named"
+    "importType": "type-named"
   },
   {
     "kind": "import",
     "importerFile": "v4/core/json-schema-processors.ts",
     "exportedBy": "v4/core/to-json-schema.ts",
     "importedName": "RegistryToJSONSchemaParams",
-    "importType": "named"
+    "importType": "type-named"
   },
   {
     "kind": "import",
     "importerFile": "v4/core/json-schema-processors.ts",
     "exportedBy": "v4/core/to-json-schema.ts",
     "importedName": "ToJSONSchemaContext",
-    "importType": "named"
+    "importType": "type-named"
   },
   {
     "kind": "import",
     "importerFile": "v4/core/json-schema-processors.ts",
     "exportedBy": "v4/core/to-json-schema.ts",
     "importedName": "ToJSONSchemaParams",
-    "importType": "named"
+    "importType": "type-named"
   },
   {
     "kind": "import",
     "importerFile": "v4/core/json-schema-processors.ts",
     "exportedBy": "v4/core/to-json-schema.ts",
     "importedName": "ZodStandardJSONSchemaPayload",
-    "importType": "named"
+    "importType": "type-named"
   },
   {
     "kind": "import",
@@ -172287,7 +172287,7 @@
     "importerFile": "v4/core/memoizer.ts",
     "exportedBy": "v4/core/errors.ts",
     "importedName": "errors",
-    "importType": "namespace"
+    "importType": "type-namespace"
   },
   {
     "kind": "import",
@@ -172322,7 +172322,7 @@
     "importerFile": "v4/core/memoizer.ts",
     "exportedBy": "v4/core/util.ts",
     "importedName": "util",
-    "importType": "namespace"
+    "importType": "type-namespace"
   },
   {
     "kind": "declaration",
@@ -174943,7 +174943,7 @@
     "importerFile": "v4/core/parse.ts",
     "exportedBy": "v4/core/schemas.ts",
     "importedName": "schemas",
-    "importType": "namespace"
+    "importType": "type-namespace"
   },
   {
     "kind": "import",
@@ -178088,7 +178088,7 @@
     "importerFile": "v4/core/registries.ts",
     "exportedBy": "v4/core/core.ts",
     "importedName": "core",
-    "importType": "namespace"
+    "importType": "type-namespace"
   },
   {
     "kind": "import",
@@ -213449,14 +213449,14 @@
     "importerFile": "v4/core/schemas.ts",
     "exportedBy": "v4/core/errors.ts",
     "importedName": "errors",
-    "importType": "namespace"
+    "importType": "type-namespace"
   },
   {
     "kind": "import",
     "importerFile": "v4/core/schemas.ts",
     "exportedBy": "v4/core/json-schema.ts",
     "importedName": "JSONSchema",
-    "importType": "namespace"
+    "importType": "type-namespace"
   },
   {
     "kind": "import",
@@ -218924,21 +218924,21 @@
     "importerFile": "v4/core/to-json-schema.ts",
     "exportedBy": "v4/core/index.ts",
     "importedName": "core",
-    "importType": "namespace"
+    "importType": "type-namespace"
   },
   {
     "kind": "import",
     "importerFile": "v4/core/to-json-schema.ts",
     "exportedBy": "v4/core/json-schema.ts",
     "importedName": "JSONSchema",
-    "importType": "namespace"
+    "importType": "type-namespace"
   },
   {
     "kind": "import",
     "importerFile": "v4/core/to-json-schema.ts",
     "exportedBy": "v4/core/registries.ts",
     "importedName": "$ZodRegistry",
-    "importType": "named"
+    "importType": "type-named"
   },
   {
     "kind": "import",
@@ -218952,7 +218952,7 @@
     "importerFile": "v4/core/to-json-schema.ts",
     "exportedBy": "v4/core/schemas.ts",
     "importedName": "schemas",
-    "importType": "namespace"
+    "importType": "type-namespace"
   },
   {
     "kind": "import",
@@ -228501,7 +228501,7 @@
     "importerFile": "v4/core/util.ts",
     "exportedBy": "v4/core/checks.ts",
     "importedName": "checks",
-    "importType": "namespace"
+    "importType": "type-namespace"
   },
   {
     "kind": "import",
@@ -228522,14 +228522,14 @@
     "importerFile": "v4/core/util.ts",
     "exportedBy": "v4/core/errors.ts",
     "importedName": "errors",
-    "importType": "namespace"
+    "importType": "type-namespace"
   },
   {
     "kind": "import",
     "importerFile": "v4/core/util.ts",
     "exportedBy": "v4/core/schemas.ts",
     "importedName": "schemas",
-    "importType": "namespace"
+    "importType": "type-namespace"
   },
   {
     "kind": "declaration",
@@ -232618,7 +232618,7 @@
     "importerFile": "v4/locales/ar.ts",
     "exportedBy": "v4/core/errors.ts",
     "importedName": "errors",
-    "importType": "namespace"
+    "importType": "type-namespace"
   },
   {
     "kind": "import",
@@ -233540,7 +233540,7 @@
     "importerFile": "v4/locales/az.ts",
     "exportedBy": "v4/core/errors.ts",
     "importedName": "errors",
-    "importType": "namespace"
+    "importType": "type-namespace"
   },
   {
     "kind": "import",
@@ -234806,7 +234806,7 @@
     "importerFile": "v4/locales/be.ts",
     "exportedBy": "v4/core/errors.ts",
     "importedName": "errors",
-    "importType": "namespace"
+    "importType": "type-namespace"
   },
   {
     "kind": "import",
@@ -235754,7 +235754,7 @@
     "importerFile": "v4/locales/bg.ts",
     "exportedBy": "v4/core/errors.ts",
     "importedName": "errors",
-    "importType": "namespace"
+    "importType": "type-namespace"
   },
   {
     "kind": "import",
@@ -236736,7 +236736,7 @@
     "importerFile": "v4/locales/bn.ts",
     "exportedBy": "v4/core/errors.ts",
     "importedName": "errors",
-    "importType": "namespace"
+    "importType": "type-namespace"
   },
   {
     "kind": "import",
@@ -237658,7 +237658,7 @@
     "importerFile": "v4/locales/ca.ts",
     "exportedBy": "v4/core/errors.ts",
     "importedName": "errors",
-    "importType": "namespace"
+    "importType": "type-namespace"
   },
   {
     "kind": "import",
@@ -238868,7 +238868,7 @@
     "importerFile": "v4/locales/ckb.ts",
     "exportedBy": "v4/core/errors.ts",
     "importedName": "errors",
-    "importType": "namespace"
+    "importType": "type-namespace"
   },
   {
     "kind": "import",
@@ -239816,7 +239816,7 @@
     "importerFile": "v4/locales/cs.ts",
     "exportedBy": "v4/core/errors.ts",
     "importedName": "errors",
-    "importType": "namespace"
+    "importType": "type-namespace"
   },
   {
     "kind": "import",
@@ -240785,7 +240785,7 @@
     "importerFile": "v4/locales/da.ts",
     "exportedBy": "v4/core/errors.ts",
     "importedName": "errors",
-    "importType": "namespace"
+    "importType": "type-namespace"
   },
   {
     "kind": "import",
@@ -241720,7 +241720,7 @@
     "importerFile": "v4/locales/de.ts",
     "exportedBy": "v4/core/errors.ts",
     "importedName": "errors",
-    "importType": "namespace"
+    "importType": "type-namespace"
   },
   {
     "kind": "import",
@@ -242642,7 +242642,7 @@
     "importerFile": "v4/locales/el.ts",
     "exportedBy": "v4/core/errors.ts",
     "importedName": "errors",
-    "importType": "namespace"
+    "importType": "type-namespace"
   },
   {
     "kind": "import",
@@ -243731,7 +243731,7 @@
     "importerFile": "v4/locales/en.ts",
     "exportedBy": "v4/core/errors.ts",
     "importedName": "errors",
-    "importType": "namespace"
+    "importType": "type-namespace"
   },
   {
     "kind": "import",
@@ -244679,7 +244679,7 @@
     "importerFile": "v4/locales/eo.ts",
     "exportedBy": "v4/core/errors.ts",
     "importedName": "errors",
-    "importType": "namespace"
+    "importType": "type-namespace"
   },
   {
     "kind": "import",
@@ -245843,7 +245843,7 @@
     "importerFile": "v4/locales/es.ts",
     "exportedBy": "v4/core/errors.ts",
     "importedName": "errors",
-    "importType": "namespace"
+    "importType": "type-namespace"
   },
   {
     "kind": "import",
@@ -246778,7 +246778,7 @@
     "importerFile": "v4/locales/fa.ts",
     "exportedBy": "v4/core/errors.ts",
     "importedName": "errors",
-    "importType": "namespace"
+    "importType": "type-namespace"
   },
   {
     "kind": "import",
@@ -247761,7 +247761,7 @@
     "importerFile": "v4/locales/fi.ts",
     "exportedBy": "v4/core/errors.ts",
     "importedName": "errors",
-    "importType": "namespace"
+    "importType": "type-namespace"
   },
   {
     "kind": "import",
@@ -248683,7 +248683,7 @@
     "importerFile": "v4/locales/fr-CA.ts",
     "exportedBy": "v4/core/errors.ts",
     "importedName": "errors",
-    "importType": "namespace"
+    "importType": "type-namespace"
   },
   {
     "kind": "import",
@@ -249787,7 +249787,7 @@
     "importerFile": "v4/locales/fr.ts",
     "exportedBy": "v4/core/errors.ts",
     "importedName": "errors",
-    "importType": "namespace"
+    "importType": "type-namespace"
   },
   {
     "kind": "import",
@@ -251460,7 +251460,7 @@
     "importerFile": "v4/locales/he.ts",
     "exportedBy": "v4/core/errors.ts",
     "importedName": "errors",
-    "importType": "namespace"
+    "importType": "type-namespace"
   },
   {
     "kind": "import",
@@ -252398,7 +252398,7 @@
     "importerFile": "v4/locales/hi.ts",
     "exportedBy": "v4/core/errors.ts",
     "importedName": "errors",
-    "importType": "namespace"
+    "importType": "type-namespace"
   },
   {
     "kind": "import",
@@ -253432,7 +253432,7 @@
     "importerFile": "v4/locales/hr.ts",
     "exportedBy": "v4/core/errors.ts",
     "importedName": "errors",
-    "importType": "namespace"
+    "importType": "type-namespace"
   },
   {
     "kind": "import",
@@ -254367,7 +254367,7 @@
     "importerFile": "v4/locales/hu.ts",
     "exportedBy": "v4/core/errors.ts",
     "importedName": "errors",
-    "importType": "namespace"
+    "importType": "type-namespace"
   },
   {
     "kind": "import",
@@ -255689,7 +255689,7 @@
     "importerFile": "v4/locales/hy.ts",
     "exportedBy": "v4/core/errors.ts",
     "importedName": "errors",
-    "importType": "namespace"
+    "importType": "type-namespace"
   },
   {
     "kind": "import",
@@ -256611,7 +256611,7 @@
     "importerFile": "v4/locales/id.ts",
     "exportedBy": "v4/core/errors.ts",
     "importedName": "errors",
-    "importType": "namespace"
+    "importType": "type-namespace"
   },
   {
     "kind": "import",
@@ -257914,7 +257914,7 @@
     "importerFile": "v4/locales/is.ts",
     "exportedBy": "v4/core/errors.ts",
     "importedName": "errors",
-    "importType": "namespace"
+    "importType": "type-namespace"
   },
   {
     "kind": "import",
@@ -258849,7 +258849,7 @@
     "importerFile": "v4/locales/it.ts",
     "exportedBy": "v4/core/errors.ts",
     "importedName": "errors",
-    "importType": "namespace"
+    "importType": "type-namespace"
   },
   {
     "kind": "import",
@@ -259784,7 +259784,7 @@
     "importerFile": "v4/locales/ja.ts",
     "exportedBy": "v4/core/errors.ts",
     "importedName": "errors",
-    "importType": "namespace"
+    "importType": "type-namespace"
   },
   {
     "kind": "import",
@@ -260745,7 +260745,7 @@
     "importerFile": "v4/locales/ka.ts",
     "exportedBy": "v4/core/errors.ts",
     "importedName": "errors",
-    "importType": "namespace"
+    "importType": "type-namespace"
   },
   {
     "kind": "import",
@@ -260815,7 +260815,7 @@
     "importerFile": "v4/locales/kh.ts",
     "exportedBy": "v4/core/errors.ts",
     "importedName": "errors",
-    "importType": "namespace"
+    "importType": "type-namespace"
   },
   {
     "kind": "import",
@@ -261763,7 +261763,7 @@
     "importerFile": "v4/locales/km.ts",
     "exportedBy": "v4/core/errors.ts",
     "importedName": "errors",
-    "importType": "namespace"
+    "importType": "type-namespace"
   },
   {
     "kind": "import",
@@ -262745,7 +262745,7 @@
     "importerFile": "v4/locales/kn.ts",
     "exportedBy": "v4/core/errors.ts",
     "importedName": "errors",
-    "importType": "namespace"
+    "importType": "type-namespace"
   },
   {
     "kind": "import",
@@ -263688,7 +263688,7 @@
     "importerFile": "v4/locales/ko.ts",
     "exportedBy": "v4/core/errors.ts",
     "importedName": "errors",
-    "importType": "namespace"
+    "importType": "type-namespace"
   },
   {
     "kind": "import",
@@ -265206,7 +265206,7 @@
     "importerFile": "v4/locales/lt.ts",
     "exportedBy": "v4/core/errors.ts",
     "importedName": "errors",
-    "importType": "namespace"
+    "importType": "type-namespace"
   },
   {
     "kind": "import",
@@ -266141,7 +266141,7 @@
     "importerFile": "v4/locales/mk.ts",
     "exportedBy": "v4/core/errors.ts",
     "importedName": "errors",
-    "importType": "namespace"
+    "importType": "type-namespace"
   },
   {
     "kind": "import",
@@ -267076,7 +267076,7 @@
     "importerFile": "v4/locales/ms.ts",
     "exportedBy": "v4/core/errors.ts",
     "importedName": "errors",
-    "importType": "namespace"
+    "importType": "type-namespace"
   },
   {
     "kind": "import",
@@ -268037,7 +268037,7 @@
     "importerFile": "v4/locales/nl.ts",
     "exportedBy": "v4/core/errors.ts",
     "importedName": "errors",
-    "importType": "namespace"
+    "importType": "type-namespace"
   },
   {
     "kind": "import",
@@ -268972,7 +268972,7 @@
     "importerFile": "v4/locales/nn.ts",
     "exportedBy": "v4/core/errors.ts",
     "importedName": "errors",
-    "importType": "namespace"
+    "importType": "type-namespace"
   },
   {
     "kind": "import",
@@ -269907,7 +269907,7 @@
     "importerFile": "v4/locales/no.ts",
     "exportedBy": "v4/core/errors.ts",
     "importedName": "errors",
-    "importType": "namespace"
+    "importType": "type-namespace"
   },
   {
     "kind": "import",
@@ -270855,7 +270855,7 @@
     "importerFile": "v4/locales/ota.ts",
     "exportedBy": "v4/core/errors.ts",
     "importedName": "errors",
-    "importType": "namespace"
+    "importType": "type-namespace"
   },
   {
     "kind": "import",
@@ -271790,7 +271790,7 @@
     "importerFile": "v4/locales/pl.ts",
     "exportedBy": "v4/core/errors.ts",
     "importedName": "errors",
-    "importType": "namespace"
+    "importType": "type-namespace"
   },
   {
     "kind": "import",
@@ -272725,7 +272725,7 @@
     "importerFile": "v4/locales/ps.ts",
     "exportedBy": "v4/core/errors.ts",
     "importedName": "errors",
-    "importType": "namespace"
+    "importType": "type-namespace"
   },
   {
     "kind": "import",
@@ -274145,7 +274145,7 @@
     "importerFile": "v4/locales/pt-BR.ts",
     "exportedBy": "v4/core/errors.ts",
     "importedName": "errors",
-    "importType": "namespace"
+    "importType": "type-namespace"
   },
   {
     "kind": "import",
@@ -275572,7 +275572,7 @@
     "importerFile": "v4/locales/pt.ts",
     "exportedBy": "v4/core/errors.ts",
     "importedName": "errors",
-    "importType": "namespace"
+    "importType": "type-namespace"
   },
   {
     "kind": "import",
@@ -276607,7 +276607,7 @@
     "importerFile": "v4/locales/ro.ts",
     "exportedBy": "v4/core/errors.ts",
     "importedName": "errors",
-    "importType": "namespace"
+    "importType": "type-namespace"
   },
   {
     "kind": "import",
@@ -277873,7 +277873,7 @@
     "importerFile": "v4/locales/ru.ts",
     "exportedBy": "v4/core/errors.ts",
     "importedName": "errors",
-    "importType": "namespace"
+    "importType": "type-namespace"
   },
   {
     "kind": "import",
@@ -278821,7 +278821,7 @@
     "importerFile": "v4/locales/sk.ts",
     "exportedBy": "v4/core/errors.ts",
     "importedName": "errors",
-    "importType": "namespace"
+    "importType": "type-namespace"
   },
   {
     "kind": "import",
@@ -279756,7 +279756,7 @@
     "importerFile": "v4/locales/sl.ts",
     "exportedBy": "v4/core/errors.ts",
     "importedName": "errors",
-    "importType": "namespace"
+    "importType": "type-namespace"
   },
   {
     "kind": "import",
@@ -280691,7 +280691,7 @@
     "importerFile": "v4/locales/sv.ts",
     "exportedBy": "v4/core/errors.ts",
     "importedName": "errors",
-    "importType": "namespace"
+    "importType": "type-namespace"
   },
   {
     "kind": "import",
@@ -281639,7 +281639,7 @@
     "importerFile": "v4/locales/ta.ts",
     "exportedBy": "v4/core/errors.ts",
     "importedName": "errors",
-    "importType": "namespace"
+    "importType": "type-namespace"
   },
   {
     "kind": "import",
@@ -282587,7 +282587,7 @@
     "importerFile": "v4/locales/th.ts",
     "exportedBy": "v4/core/errors.ts",
     "importedName": "errors",
-    "importType": "namespace"
+    "importType": "type-namespace"
   },
   {
     "kind": "import",
@@ -283498,7 +283498,7 @@
     "importerFile": "v4/locales/tk.ts",
     "exportedBy": "v4/core/errors.ts",
     "importedName": "errors",
-    "importType": "namespace"
+    "importType": "type-namespace"
   },
   {
     "kind": "import",
@@ -284420,7 +284420,7 @@
     "importerFile": "v4/locales/tr.ts",
     "exportedBy": "v4/core/errors.ts",
     "importedName": "errors",
-    "importType": "namespace"
+    "importType": "type-namespace"
   },
   {
     "kind": "import",
@@ -284490,7 +284490,7 @@
     "importerFile": "v4/locales/ua.ts",
     "exportedBy": "v4/core/errors.ts",
     "importedName": "errors",
-    "importType": "namespace"
+    "importType": "type-namespace"
   },
   {
     "kind": "import",
@@ -285425,7 +285425,7 @@
     "importerFile": "v4/locales/uk.ts",
     "exportedBy": "v4/core/errors.ts",
     "importedName": "errors",
-    "importType": "namespace"
+    "importType": "type-namespace"
   },
   {
     "kind": "import",
@@ -286373,7 +286373,7 @@
     "importerFile": "v4/locales/ur.ts",
     "exportedBy": "v4/core/errors.ts",
     "importedName": "errors",
-    "importType": "namespace"
+    "importType": "type-namespace"
   },
   {
     "kind": "import",
@@ -287308,7 +287308,7 @@
     "importerFile": "v4/locales/uz.ts",
     "exportedBy": "v4/core/errors.ts",
     "importedName": "errors",
-    "importType": "namespace"
+    "importType": "type-namespace"
   },
   {
     "kind": "import",
@@ -288243,7 +288243,7 @@
     "importerFile": "v4/locales/vi.ts",
     "exportedBy": "v4/core/errors.ts",
     "importedName": "errors",
-    "importType": "namespace"
+    "importType": "type-namespace"
   },
   {
     "kind": "import",
@@ -289134,7 +289134,7 @@
     "importerFile": "v4/locales/yo.ts",
     "exportedBy": "v4/core/errors.ts",
     "importedName": "errors",
-    "importType": "namespace"
+    "importType": "type-namespace"
   },
   {
     "kind": "import",
@@ -290082,7 +290082,7 @@
     "importerFile": "v4/locales/zh-CN.ts",
     "exportedBy": "v4/core/errors.ts",
     "importedName": "errors",
-    "importType": "namespace"
+    "importType": "type-namespace"
   },
   {
     "kind": "import",
@@ -291004,7 +291004,7 @@
     "importerFile": "v4/locales/zh-TW.ts",
     "exportedBy": "v4/core/errors.ts",
     "importedName": "errors",
-    "importType": "namespace"
+    "importType": "type-namespace"
   },
   {
     "kind": "import",
@@ -292626,7 +292626,7 @@
     "importerFile": "v4/mini/deep-partial.ts",
     "exportedBy": "v4/core/index.ts",
     "importedName": "core",
-    "importType": "namespace"
+    "importType": "type-namespace"
   },
   {
     "kind": "import",
@@ -293083,7 +293083,7 @@
     "importerFile": "v4/mini/in-out.ts",
     "exportedBy": "v4/core/index.ts",
     "importedName": "core",
-    "importType": "namespace"
+    "importType": "type-namespace"
   },
   {
     "kind": "import",
@@ -293097,7 +293097,7 @@
     "importerFile": "v4/mini/in-out.ts",
     "exportedBy": "v4/mini/schemas.ts",
     "importedName": "schemas",
-    "importType": "namespace"
+    "importType": "type-namespace"
   },
   {
     "kind": "declaration",
