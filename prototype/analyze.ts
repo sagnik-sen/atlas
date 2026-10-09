@@ -142,9 +142,12 @@ sep();
 log("2. BLAST RADIUS (transitive callers)");
 
 // Pick a function with known importance
+// entityType === "function" excluded the parse family almost entirely: the
+// public entry points are `variable` (arrow-bound consts) and `method`. Only
+// core/parse.ts:_parse survived the old filter.
+const PARSE_NAMES = new Set(["parse", "safeParse", "_parse", "_def"]);
 const targetFns = decls.filter((d: Fact) =>
-  d.entityType === "function" &&
-  (d.name === "parse" || d.name === "safeParse" || d.name === "_parse" || d.name === "_def")
+  PARSE_NAMES.has(d.name.slice(d.name.lastIndexOf(".") + 1))
 );
 
 // Reverse call index. The walk below used to rescan every call fact per
