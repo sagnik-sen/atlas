@@ -151,6 +151,13 @@ h1(6, "Which call edges look trustworthy but lead nowhere?");
 {
   // A resolved, high-confidence edge terminating at an entity that cannot have
   // a body. Closure passes; the edge is useless to any consumer.
+  //
+  // This is an UPPER bound and overstates the problem: it blacklists
+  // entityTypes rather than testing for a body, so a function-valued property
+  // (`"~standard": (self) => ...`) counts as non-executable, and it includes
+  // targets outside the analysed scope, which may well execute. A per-id body
+  // test puts the real figure at 11.4% of resolved edges (15.9% of in-repo
+  // resolved). See ADR-0001 "Correctness beyond closure" for the bucket split.
   const NO_BODY = new Set(["parameter", "binding", "type-method", "type-property", "type", "interface", "module"]);
   const bad = calls.filter((c) => {
     const d = c.calleeId && declById.get(c.calleeId);
@@ -163,7 +170,7 @@ h1(6, "Which call edges look trustworthy but lead nowhere?");
   const hi = bad.filter((c) => c.confidence >= 0.8).length;
   console.log(`  of those, ${hi} carry confidence >= 0.8`);
   for (const c of bad.slice(0, 3)) console.log(`    ${c.file}:${c.line}  ${c.calleeName} -> ${c.calleeId}`);
-  verdict(true, "but only as a diagnostic: Atlas can find these, and currently cannot re-resolve them. Confidence does not encode usefulness");
+  verdict(true, "but as a loose upper bound and a diagnostic only: Atlas can find these and cannot re-resolve them. Confidence does not encode usefulness — a resolved edge is only ever 0.8 or 0.9");
 }
 
 console.log(`\n${"=".repeat(74)}`);
