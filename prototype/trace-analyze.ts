@@ -3,7 +3,7 @@
 import * as fs from "fs";
 
 const S: any[] = JSON.parse(fs.readFileSync("facts.json", "utf-8"));
-const R: any[] = JSON.parse(fs.readFileSync("facts.runtime.json", "utf-8"));
+const R: any[] = JSON.parse(fs.readFileSync(process.env.RUNTIME_FACTS ?? "facts.runtime.json", "utf-8"));
 const TOTAL_RUNS = Math.max(...R.map((e) => e.runs ?? 1));
 const pct = (a: number, b: number) => `${a}/${b} (${b ? ((100 * a) / b).toFixed(1) : "-"}%)`;
 
@@ -31,11 +31,30 @@ const ft: Record<string, number> = {}; for (const t of frames.values()) ft[t] = 
 console.log(`  distinct frames: ${frames.size} ${JSON.stringify(ft)}`);
 
 // ── novelty ───────────────────────────────────────────────────────────────
+// Distinct (callerId, calleeId) pairs, not profile records: several frame pairs
+// can resolve onto one id pair (inner callbacks collapse onto their enclosing fn).
 const joined = internal.filter(both);
-const inStatic = joined.filter((e) => sPairs.has(`${e.callerId}\u0000${e.calleeId}`));
-const novel = joined.filter((e) => !sPairs.has(`${e.callerId}\u0000${e.calleeId}`));
-console.log(`\nNOVELTY (joined edges): in static facts ${pct(inStatic.length, joined.length)}; NOT in static ${novel.length}`);
-console.log(`  of the novel ones, both endpoints exact: ${novel.filter(exactBoth).length}; self-loops: ${novel.filter((e) => e.callerId === e.calleeId).length}; via a native frame: ${novel.filter((e) => e.viaNative).length}`);
+const pk = (e: any) => `${e.callerId}\u0000${e.calleeId}`;
+const distinct = new Map<string, any>();
+for (const e of joined) { const p = distinct.get(pk(e)); if (p) { p.samples += e.samples; p.exact ||= exactBoth(e); p.viaNative ||= e.viaNative; } else distinct.set(pk(e), { ...e, exact: exactBoth(e) }); }
+const dj = [...distinct.values()];
+const novel = dj.filter((e) => !sPairs.has(pk(e)));
+const inStatic = dj.length - novel.length;
+console.log(`\nNOVELTY (distinct id pairs among joined edges): ${dj.length} pairs; in static facts ${pct(inStatic, dj.length)}; NOT in static ${novel.length}`);
+const selfLoop = novel.filter((e) => e.callerId === e.calleeId);
+const modCallee = novel.filter((e) => e.callerId !== e.calleeId && e.calleeId.startsWith("module:"));
+const modCaller = novel.filter((e) => e.callerId !== e.calleeId && !e.calleeId.startsWith("module:") && e.callerId.startsWith("module:"));
+const rest = novel.filter((e) => e.callerId !== e.calleeId && !e.calleeId.startsWith("module:") && !e.callerId.startsWith("module:"));
+console.log(`  breakdown of the ${novel.length}: self-loops ${selfLoop.length} (callback attributed to its enclosing fn); callee is a module (module-init, not a call static would emit) ${modCallee.length}; caller is a module ${modCaller.length}; function->function ${rest.length}`);
+const strict = rest.filter((e) => e.exact);
+console.log(`  function->function with BOTH endpoints exact (defensible "genuinely new"): ${strict.length}`);
+// Shortcuts: A->B where the runtime graph also has A->X->B (profiler dropped the middle frame).
+const out = new Map<string, Set<string>>();
+for (const e of dj) (out.get(e.callerId) ?? out.set(e.callerId, new Set()).get(e.callerId)!).add(e.calleeId);
+const isShortcut = (e: any) => [...(out.get(e.callerId) ?? [])].some((x) => x !== e.callerId && x !== e.calleeId && out.get(x)?.has(e.calleeId));
+console.log(`  of those ${rest.length} function->function pairs, ${rest.filter(isShortcut).length} are shortcuts of a longer runtime chain A->X->B; ${strict.filter((e) => !isShortcut(e)).length} exact-exact non-shortcut`);
+const viaNativeN = novel.filter((e) => e.viaNative).length;
+console.log(`  (via a native frame: ${viaNativeN})`);
 // Alias-aware: `const parse = core._parse(Err)` is a variable bound to the closure `_parse.fn`.
 // A runtime edge into `_parse.fn` is the static edge into `parse` seen through a different name.
 const alias = new Map<string, Set<string>>(); // closure entity -> variable that holds it
@@ -45,7 +64,7 @@ for (const f of sCalls) if (f.callerKind === "variable" && declared.has(f.callee
 const viaAlias = novel.filter((e) => [...(alias.get(e.calleeId) ?? [])].some((v) => sPairs.has(`${e.callerId}\u0000${v}`)));
 console.log(`  of the novel ones, already in static under the factory-closure alias (callee id differs, same edge): ${viaAlias.length}`);
 // Static completeness the other way round: static edges between declared ids seen at runtime.
-const rPairs = new Set(joined.map((e) => `${e.callerId}\u0000${e.calleeId}`));
+const rPairs = new Set(dj.map(pk));
 console.log(`  static call pairs also observed at runtime: ${pct([...sPairs].filter((p) => rPairs.has(p)).length, sPairs.size)} (workload exercises a small slice of Zod)`);
 
 // ── closure ───────────────────────────────────────────────────────────────
@@ -67,6 +86,9 @@ const mStatic = rev([]);
 const mBoth = rev(R.filter((e) => e.callerTier !== "external" && both(e)));
 const mExact = rev(R.filter((e) => e.callerTier !== "external" && exactBoth(e)));
 // the workload driver is one pseudo-caller, not 70
+const real = dj.filter((e) => !isShortcut(e));            // drop A->B when the runtime graph has A->X->B
+const mReal = rev(real);
+const mRealExact = rev(real.filter((e) => e.exact));
 const mWithDriver = rev(R.filter((e) => e.calleeResolved && (both(e) || e.callerTier === "external")));
 
 const PUBLIC_PARSE = "ts:v4/classic/parse.ts:parse";
@@ -75,6 +97,14 @@ const PUBLIC_PARSE = "ts:v4/classic/parse.ts:parse";
 const factory = sCalls.find((f) => f.callerId === PUBLIC_PARSE && /core\/parse\.ts:_parse$/.test(f.calleeId))?.calleeId;
 const aliases = factory ? [...declared].filter((d) => d.startsWith(factory + ".") && d.split(".").length === factory.split(".").length + 1) : [];
 
+// Implementation endpoints only resolve at the enclosing tier (`inst._zod.parse = ...` has no id), so
+// allow ANY joined edge into the seed, then climb over exact-tier, non-shortcut edges only. This avoids the
+// hub that makes the all-joined closure meaningless.
+function scoped(seed: string) {
+  const c0 = [...(mReal.get(seed) ?? [])].filter((x) => x !== seed);
+  const up = closure(mRealExact, c0);
+  return new Set([...c0, ...up]);
+}
 const seeds: [string, string[]][] = [
   ["public parse, classic/parse.ts:parse (the report's 1)", [PUBLIC_PARSE]],
   ["  + factory alias (parse := _parse.fn)", [PUBLIC_PARSE, ...aliases]],
@@ -85,13 +115,14 @@ const seeds: [string, string[]][] = [
   ["$ZodNumber", ["ts:v4/core/schemas.ts:$ZodNumber"]],
   ["_zodTypeParseProps.parse factory (installed via installLazyProps)", ["ts:v4/classic/schemas.ts:_zodTypeParseProps.@objectliteral0.parse"]],
 ];
-console.log(`\nTRANSITIVE CALLERS (distinct entities, seeds excluded): static -> +runtime exact-tier edges -> +runtime all joined edges  [+ workload driver]`);
+console.log(`\nTRANSITIVE CALLERS (distinct entities, seeds excluded): static -> +runtime exact-tier -> +runtime all-joined (hub-inflated) | seed-scoped  [+ workload driver]`);
 for (const [label, s] of seeds) {
   const ok = s.filter((x) => declared.has(x));
   if (!ok.length) { console.log(`  ${label}: seed not declared (${s.join(",")})`); continue; }
   const a = closure(mStatic, ok), x = closure(mExact, ok), b = closure(mBoth, ok), c = closure(mWithDriver, ok);
+  const sc = ok.length === 1 ? scoped(ok[0]).size : -1;
   const added = [...x].filter((y) => !a.has(y));
-  console.log(`  ${label}: ${a.size} -> ${x.size} -> ${b.size}  [driver: ${c.size}]${added.length ? "  exact-added: " + added.slice(0, 5).join(", ") + (added.length > 5 ? ", ..." : "") : ""}`);
+  console.log(`  ${label}: ${a.size} -> ${x.size} -> ${b.size} | seed-scoped ${sc}  [driver: ${c.size}]${added.length ? "  exact-added: " + added.slice(0, 5).join(", ") + (added.length > 5 ? ", ..." : "") : ""}`);
 }
 
 // ── the specific missing hops ─────────────────────────────────────────────
@@ -120,9 +151,25 @@ function path(m: Map<string, Set<string>>, from: string, to: string) {
 const PUB = "ts:v4/classic/schemas.ts:_zodTypeParseProps.@objectliteral0.parse.fn";
 console.log(`\nCALL PATH (user-facing wrapper -> ... -> implementation):`);
 for (const impl of ["ts:v4/core/schemas.ts:$ZodObjectJIT", "ts:v4/core/memoizer.ts:attachMemoizer.@arrowfunction0.wrapped"]) {
-  const ps = path(mStatic, impl, PUB), pe = path(mExact, impl, PUB), pb = path(mBoth, impl, PUB);
+  const ps = path(mStatic, impl, PUB), pe = path(mRealExact, impl, PUB), pb = path(mReal, impl, PUB);
   const f = (p: string[] | null) => (p ? `${p.length - 1} hops: ${p.join(" -> ")}` : "NO PATH");
-  console.log(`  ${impl}\n    static-only        : ${f(ps)}\n    +runtime exact-only: ${f(pe)}\n    +runtime all joined: ${f(pb)}`);
+  console.log(`  ${impl}\n    static-only        : ${f(ps)}\n    +runtime exact-only, shortcuts removed: ${f(pe)}\n    +runtime all joined, shortcuts removed: ${f(pb)}`);
 }
 const hist: Record<number, number> = {}; for (const e of R) hist[e.runs ?? 1] = (hist[e.runs ?? 1] ?? 0) + 1;
 console.log(`\nSAMPLING RECALL: ${TOTAL_RUNS} merged processes; edges by number of runs that saw them ${JSON.stringify(hist)}`);
+
+// ── the declared public method: does anything join it to an implementation? ──
+const DECL = "ts:v4/classic/schemas.ts:ZodType.parse";
+function fwd(edges: { callerId: string; calleeId: string }[], from: string) {
+  const m = new Map<string, Set<string>>();
+  for (const e of edges) (m.get(e.callerId) ?? m.set(e.callerId, new Set()).get(e.callerId)!).add(e.calleeId);
+  const seen = new Set([from]), q = [from];
+  while (q.length) for (const c of m.get(q.pop()!) ?? []) if (!seen.has(c)) { seen.add(c); q.push(c); }
+  seen.delete(from);
+  return seen;
+}
+const implCount = (xs: Set<string>) => [...xs].filter((x) => /core\/schemas\.ts:\$Zod\w+$/.test(x)).length;
+const fwdStatic = fwd(sCalls, DECL), fwdBoth = fwd([...sCalls, ...dj], DECL);
+console.log(`\nDECLARED PUBLIC METHOD ${DECL} (declared: ${declared.has(DECL)}; interface member, no body, never a frame):`);
+console.log(`  static callers of it in v4: ${sCalls.filter((f) => f.calleeId === DECL).length}; its own outgoing edges: static ${fwdStatic.size}, +runtime ${fwdBoth.size}`);
+console.log(`  forward reach to any $Zod* implementation: static ${implCount(fwdStatic)}, +runtime ${implCount(fwdBoth)}; reach to the installed wrapper fn: ${fwdBoth.has(PUB)}`);
