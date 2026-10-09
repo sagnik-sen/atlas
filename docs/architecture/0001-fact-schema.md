@@ -213,34 +213,60 @@ and path-shaped (`ZodObject._getCached.@typeliteral0.shape`). Per-occurrence ref
   instance of thesis §5.1's dynamic-language wall actually blocking the
   project's headline use case, and it is an argument for runtime trace
   ingestion being V2 rather than optional.
-- **Field reads are not modelled.** The 12 remaining flagged imports are used
-  via `datetimeBenchmarks.suites` — a property read on a non-namespace, which
-  the reference pass excludes because such reads dispatch on a runtime type.
-  Giving anonymous default exports ids was expected to clear these and did not;
-  clearing them needs a field-read edge kind, which is a schema decision this
-  ADR does not make.
+- **Field reads stay unmodelled, now on evidence.** This ADR previously
+  attributed the 12 remaining flagged imports to missing field-read edges.
+  Measured, that was wrong twice over: only 8 of the 12 were field reads, and
+  none was caused by the read — the receiver was already emitted as a
+  `references` fact and came back unresolved because `getDeclarationNode()`
+  returns undefined for an anonymous `export default`. Fixing that resolution
+  takes the rate to **1 of 148 (0.7%)** with no field-read edges at all, and the
+  survivor is the `out_of_scope` containment gap.
+
+  Field reads were built and measured on a branch: +14% facts and +18% bytes
+  (or +2% excluding function-local receivers) for **zero** marginal benefit on
+  this metric. 83% of resolved field reads point at a `type-property`, so the
+  real value, if any, is field-level impact queries ("who reads
+  `ParsePayload.issues`") rather than import hygiene — untested. The deferral
+  stands, and the `nonlocal` variant as `references` with `ctx: "field"` is the
+  shape to adopt if a lens needs it.
 - **Query substrate → ADR-0002.** thesis §7.3 calls Datalog the
   highest-reward decision in the project. This ADR deliberately does not decide
   it: the fact base is defined independently of what queries it.
 - **Cross-language identity.** The `ts:` prefix is a TypeScript scheme.
   decisions.md open tension #2 is untouched.
 - **Correctness beyond closure, and it is not marginal.** Closure proves
-  endpoints exist, not that edges are usable. Measured: **939 of 5,169 resolved
-  call edges (18.2%) terminate at an entity that cannot have a body, and all
-  939 carry confidence >= 0.8** — 615 at bodyless interface methods, 249 at
-  interfaces, 41 at type properties, 34 at parameters. Zod declares its public
-  API as bodyless interface members, so for this corpus the pattern is
-  structural, not incidental.
+  endpoints exist, not that edges are usable. Measured with a per-id body test
+  (a class, or any declaration with a non-null body, or a variable/property
+  initialised with a function): **653 of 5,707 resolved edges (11.4%), or 15.9%
+  of the 4,113 in-repo resolved edges, terminate at an entity that cannot
+  execute.** A resolved edge is only ever confidence 0.8 or 0.9, so every one of
+  them is high-confidence by construction — confidence carries no signal here.
 
-  This was first found as a single case (`props()` resolving to a parameter)
-  and recorded here as worth considering. At 18.2% it is more than that:
-  closure and confidence together do not tell a consumer whether an edge is
-  usable, which is a gap in the schema rather than in the extractor. The
-  candidate third invariant — a call edge terminates at an entity that can
-  execute, or is marked as higher-order indirection — is not adopted in this
-  ADR because the right response is undecided: re-resolve through the type
-  hierarchy, mark the edge, or accept it. It is reported as a diagnostic by
-  `questions.ts` Q6. No oracle for edge correctness exists.
+  True magnitude is a range, 653 to 1,048: another 395 edges end at an id
+  merging a `function` with a `type-method`, and the facts cannot say whether
+  TypeScript bound the call to the signature or the implementation.
+
+  By bucket, because the fixes differ:
+
+  | bucket | edges | what would resolve it |
+  |---|---|---|
+  | signature (interface or abstract member) | 279 | class-hierarchy resolution over existing `extends`/`implements` facts |
+  | value-bound (alias variable or property) | 153 | one-hop alias following |
+  | factory-const (`const ZodX = core.$constructor(...)`) | 101 | linking the `$constructor` init arrow to the constant |
+  | higher-order (parameter) | 120 | points-to analysis |
+
+  Note the motivating case — `props()` resolving to a parameter — is the
+  **smallest** bucket at 2.1% of resolved edges, and only 4 of its 120 edges
+  are strictly recoverable from existing facts. A points-to pass is not
+  justified. An earlier figure of 18.2% recorded here was an over-count: it
+  blacklisted entityTypes rather than testing for a body, so it counted
+  function-valued properties such as `"~standard": (self) => ...` as
+  non-executable, and counted externals, which may well execute.
+
+  Not adopted as a third invariant: a fail-on-nonzero check would fire
+  permanently while the right response per bucket is still undecided. Reported
+  as a diagnostic instead (`questions.ts` Q6). No oracle for edge correctness
+  exists.
 - **Incrementality.** thesis §4.2 claims it "falls out naturally". There is no
   incremental run, and the fact that any schema change invalidates every cached
   fact base suggests it will not fall out of anything by itself.
