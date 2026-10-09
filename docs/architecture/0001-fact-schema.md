@@ -224,13 +224,23 @@ and path-shaped (`ZodObject._getCached.@typeliteral0.shape`). Per-occurrence ref
   it: the fact base is defined independently of what queries it.
 - **Cross-language identity.** The `ts:` prefix is a TypeScript scheme.
   decisions.md open tension #2 is untouched.
-- **Correctness beyond closure.** Closure proves endpoints exist, not that
-  edges are right, and there is now a measured instance of the gap: in
-  `installLazyProps`, `props()` yields a resolved, closed, confidence-0.9 call
-  edge terminating at a *parameter* — an entity with no body. The invariant
-  passes and the edge is useless. A third invariant is worth considering: a
-  call edge terminates at an entity that can execute, or is marked as
-  higher-order indirection. No oracle for edge correctness exists.
+- **Correctness beyond closure, and it is not marginal.** Closure proves
+  endpoints exist, not that edges are usable. Measured: **939 of 5,169 resolved
+  call edges (18.2%) terminate at an entity that cannot have a body, and all
+  939 carry confidence >= 0.8** — 615 at bodyless interface methods, 249 at
+  interfaces, 41 at type properties, 34 at parameters. Zod declares its public
+  API as bodyless interface members, so for this corpus the pattern is
+  structural, not incidental.
+
+  This was first found as a single case (`props()` resolving to a parameter)
+  and recorded here as worth considering. At 18.2% it is more than that:
+  closure and confidence together do not tell a consumer whether an edge is
+  usable, which is a gap in the schema rather than in the extractor. The
+  candidate third invariant — a call edge terminates at an entity that can
+  execute, or is marked as higher-order indirection — is not adopted in this
+  ADR because the right response is undecided: re-resolve through the type
+  hierarchy, mark the edge, or accept it. It is reported as a diagnostic by
+  `questions.ts` Q6. No oracle for edge correctness exists.
 - **Incrementality.** thesis §4.2 claims it "falls out naturally". There is no
   incremental run, and the fact that any schema change invalidates every cached
   fact base suggests it will not fall out of anything by itself.
