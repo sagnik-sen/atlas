@@ -13,7 +13,7 @@ import { Project, Node, SyntaxKind } from "ts-morph";
 import { setRoot, idOfNode, callSite, typeOfNode, mid } from "./ids";
 
 // Optimizing tiers inline callees and elide their frames; keep the interpreter so every call shows up.
-if (process.env.TRACE_OPT !== "1") v8.setFlagsFromString("--no-opt");
+if (process.env.TRACE_OPT !== "1") for (const f of (process.env.TRACE_FLAGS ?? "--no-opt --no-maglev").split(" ")) v8.setFlagsFromString(f);
 const ROOT = fs.realpathSync(path.resolve(__dirname, "zod-repo/packages/zod/src"));
 const ENTRY = path.join(ROOT, "v4/classic/external.ts");
 const TSCONFIG = path.resolve(__dirname, "zod-repo/packages/zod/tsconfig.json");
