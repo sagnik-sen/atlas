@@ -52,24 +52,35 @@ highest-risk assumption. Tested: a structure-only hash puts **55.3% of
 entities** in a colliding id, with one id covering 256 parameters across 82
 files; it merges four distinct exported types with identical bodies.
 
-The failure mode is how that cost is paid. In the one rename commit, 95 of 153
-removed entities have their hash still present in the next commit attached to a
-different entity — **49 distinct events**, one of which (47 locale copies of an
-identical helper) accounts for 47 of the 95. So 48 independent false-continuity
-events plus one mass event, not 95 independent ones. Separately, **6.5% of body
-edits** (7 of 108) give the edited entity a hash that collides with an
-unrelated entity. A lost id is a visible failure the consumer can fall back
-from. A wrongly reused id is silent, and every downstream consumer inherits it.
+The failure mode is how that cost is paid, and the full-history run (297 pairs,
+389 commits) sharpens it considerably from the earlier 24-pair sample:
+
+| measure over 297 pairs | `structureId` | `contentId` |
+|---|---|---|
+| aliasing on body edit, raw | 3.9% (81) | 1.5% (32) |
+| ...where the old id was unique in the parent | 0.43% (9) | 0% (0) |
+| removed id reappears, as distinct events | 1,428 across 100 commits | 31 across 12 |
+| strict transfers (old id unique, new holder) | 891, but 888 have bodies under 12 nodes and cannot be adjudicated; **3** clear | 1 |
+| unchanged observations whose id is *shared* in the child | **48%** | 20% |
+
+The earlier "6.5% silent aliasing" was a small-sample artifact; at full scale it
+is 3.9%, and most of that is an old id that was already shared rather than an
+identity handed over. **The decisive row is the last one**: for half of all
+unchanged observations a surviving `structureId` does not pin a single entity.
+It identifies a *structure*, not an identity — the 60% collision rate
+reappearing across history rather than a separate defect. A lost id is a
+visible failure the consumer can fall back from. A wrongly reused id is silent,
+and every downstream consumer inherits it.
 
 §4.4's two claims cannot both hold. It says the hash is "stable across
 refactoring (same hash = same entity)" and that it "captures definition
 changes". A body edit therefore mints a new id, so the stability is only the
 stability of an entity that has not changed.
 
-**The change mix decides the trade.** Over 297 adjacent commit pairs: 1,981
-body edits across 244 commits, one rename event, zero clean moves. A
-body-sensitive id loses identity ~40x more often on this corpus than a
-rename-sensitive one.
+**The change mix decides the trade.** Over all 297 adjacent commit pairs
+(full run, not a sample): **2,070 body edits across 247 commits, 5 independent
+rename events, zero clean moves.** A body-sensitive id loses identity roughly
+400x more often on this corpus than a rename-sensitive one.
 
 ## Decision
 
@@ -181,7 +192,7 @@ occurrences and never leave their function.
 
 | Alternative | Pros | Cons | Why rejected |
 |---|---|---|---|
-| Content-addressed ids (thesis §4.4) | Survives rename and move; no path coupling | 60.1% of entities in a colliding id (worse as identity gets finer: 55.3% before scope qualification); 49 distinct false-continuity events in one commit; 6.5% silent aliasing on body edits; breaks on every body edit, the dominant change mode | Fails silently on the common case to survive the rare one |
+| Content-addressed ids (thesis §4.4) | Survives rename and move; no path coupling | 60.1% of entities in a colliding id (worse as identity gets finer: 55.3% before scope qualification); half of unchanged observations carry an id shared with another entity; 3.9% aliasing on body edits; breaks on every body edit, the dominant change mode | Fails silently on the common case to survive the rare one |
 | Hybrid: content hash primary, path as tiebreak | Keeps rename survival | Collision resolution needs the path, so the id is path-coupled anyway, with a hash's opacity added | Pays the cost of both, keeps the benefit of neither |
 | Compiler-assigned symbol ids (SCIP-style monikers) | Standard, tool-interoperable | Requires a resolved program; thesis §2.4 rejects a build requirement | Revisit if the build requirement is relaxed |
 | Graph node/edge model (original vision) | Familiar; direct traversal | No uncertainty model; flattens temporal and intentional facts | Already rejected by thesis §3 |
@@ -197,7 +208,23 @@ detection without being load-bearing.
 **Harder.** Ids remain unstable under rename and move — accepted, and the cost
 is visible rather than silent. Scope qualification is a breaking change to
 every member and parameter id — most of the fact base — and makes ids longer
-and path-shaped (`ZodObject._getCached.@typeliteral0.shape`). Per-occurrence references grow the fact base ~52%.
+and path-shaped (`ZodObject._getCached.@typeliteral0.shape`).
+
+**And the real instability is not what this ADR said it was.** Measured over
+full history, `entityId`'s dominant failure is **positional drift, not
+renames**: of 269 entities whose owner-qualified name changed, **263 (98%)
+across 43 commits are a `@blockN` / `@arrowfunctionN` / `@objectliteralN` index
+shifting because a sibling was inserted earlier in the file**. Only 6 were real
+owner renames, against 5 rename events in the entire history. Worst commits:
+`773a486` (75 entities), `3063993` (41), `6f04836` (19). It is a lower bound —
+entities under 12 nodes with the same drift land in removed-plus-added instead.
+
+That is a weakness of the *positional disambiguator* introduced with scope
+qualification, not of path-based identity as such. The `shortcut:` comments on
+`anonSegment` name exactly this risk; this is it, quantified. Anchoring
+anonymous scopes on something order-independent (nearest named ancestor plus a
+content-derived discriminator) would remove most of it, at the cost of making
+part of the id content-derived. Worth revisiting; not decided here. Per-occurrence references grow the fact base ~52%.
 
 **Unresolved, and deliberately out of scope.**
 - **Runtime method installation is not modelled, and for some corpora that is
