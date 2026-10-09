@@ -201,10 +201,19 @@ residual:
 | scope path from all enclosing named constructs | 163 |
 | positional segment for unbound type and object literals (a return-type annotation otherwise shares the method's scope with its locals) | **20** |
 
-20 of 15,822 ids (0.13%). The residual is a parameter and a local of the same
-name in sibling *block* scopes, which the path does not segment — marked with a
-`shortcut:` comment rather than fixed, since block paths would lengthen every
-id for a 0.13% gain.
+20 of 15,822 ids (0.13%). Inspecting all 20 rather than assuming: the residual
+is **not** a block-scope problem.
+
+| cause | count |
+|---|---|
+| overload signature parameter vs implementation local | 14 |
+| type-literal `PropertySignature` classified as value space | 2 |
+| nested arrow functions sharing a positional segment | 4 |
+
+`function tuple(items, params?): T;` is an overload signature — no body, so its
+`params` is a type-level annotation, not a runtime binding — while the
+implementation declares `const params`. Both land on `tuple.params`. The first
+two causes are defects with clear fixes rather than a ceiling.
 
 Anonymous default exports also get ids now: `export default function () {}` and
 `export default {...}` previously had no name and so no entity. 80 entities
