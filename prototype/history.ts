@@ -298,11 +298,26 @@ function oracle(A: Rec[], B: Rec[]): Row[] {
 // structural collisions.
 type Out = "survive" | "vanish" | "alias" | "reappear" | "none" | "missing";
 interface Tally { n: number; byScheme: Record<string, Record<Out, number>> }
+// Distinct-event collectors (ALL-entities slice only). Key = `${scheme}|${cat}|${kind}`, value = Map<`${childSha}|${id}`, entities>.
+// A mechanical commit that touches N copies of one id is ONE event of size N, not N events.
+const EV = new Map<string, Map<string, number>>();
+const bump = (k: string, ek: string) => { const m = EV.get(k) ?? EV.set(k, new Map()).get(k)!; m.set(ek, (m.get(ek) ?? 0) + 1); };
+let CUR = "", COLLECT = false;
+// survive-but-shared: id unchanged but the id names >1 entity in the child, so "survival" does not pin one entity.
+const SHARED = new Map<string, number>();
 const blank = (schemes: string[]): Tally => ({ n: 0, byScheme: Object.fromEntries(schemes.map(s => [s, { survive: 0, vanish: 0, alias: 0, reappear: 0, none: 0, missing: 0 }])) });
 
 function score(rows: Row[], A: Rec[], B: Rec[], schemes: string[], slice: (type: string) => boolean, into: Map<Cat, Tally>) {
   const idsA = Object.fromEntries(schemes.map(s => [s, new Set(A.map(r => r.ids[s]))]));
   const idsB = Object.fromEntries(schemes.map(s => [s, new Set(B.map(r => r.ids[s]))]));
+  // holder forensics for removed->id-reappears: is the id held by an entity ADDED in the child (a possible
+  // un-detected rename) or only by a pre-existing/surviving entity (a genuine foreign holder)?
+  const heldByAdded = Object.fromEntries(schemes.map(s => [s, new Set(rows.filter(r => r.cat === "added").map(r => r.b!.ids[s]))]));
+  const heldByOther = Object.fromEntries(schemes.map(s => [s, new Set(rows.filter(r => r.b && r.cat !== "added").map(r => r.b!.ids[s]))]));
+  const cntB = Object.fromEntries(schemes.map(s => [s, new Map<string, number>()]));
+  const cntA = Object.fromEntries(schemes.map(s => [s, new Map<string, number>()]));
+  for (const s of schemes) for (const r of A) cntA[s].set(r.ids[s], (cntA[s].get(r.ids[s]) ?? 0) + 1);
+  for (const s of schemes) for (const r of B) cntB[s].set(r.ids[s], (cntB[s].get(r.ids[s]) ?? 0) + 1);
   for (const row of rows) {
     if (!slice(row.type)) continue;
     const t = into.get(row.cat) ?? into.set(row.cat, blank(schemes)).get(row.cat)!;
@@ -313,10 +328,15 @@ function score(rows: Row[], A: Rec[], B: Rec[], schemes: string[], slice: (type:
       // A scheme absent on a declaration is "missing", never a survival (undefined === undefined).
       if ((row.a && row.a.ids[s] == null) || (row.b && row.b.ids[s] == null)) { o.missing++; continue; }
       if (row.a && row.b) {
-        if (row.a.ids[s] === row.b.ids[s]) o.survive++;
-        else if (idsB[s].has(row.a.ids[s])) o.alias++; else o.vanish++;
-      } else if (row.a) { if (idsB[s].has(row.a.ids[s])) o.reappear++; else o.none++; }
-      else if (row.b) { if (idsA[s].has(row.b.ids[s])) o.reappear++; else o.none++; }
+        if (row.a.ids[s] === row.b.ids[s]) { o.survive++; if (COLLECT && (cntB[s].get(row.b.ids[s]) ?? 0) > 1) SHARED.set(`${s}|${row.cat}`, (SHARED.get(`${s}|${row.cat}`) ?? 0) + 1); }
+        else if (idsB[s].has(row.a.ids[s])) { o.alias++; if (COLLECT) { bump(`${s}|${row.cat}|alias`, `${CUR}|${row.a.ids[s]}`); if (cntA[s].get(row.a.ids[s]) === 1) bump(`${s}|${row.cat}|  alias/old-id-unique-in-parent`, `${CUR}|${row.a.ids[s]}`); } } else o.vanish++;
+      } else if (row.a) { if (idsB[s].has(row.a.ids[s])) { o.reappear++; if (COLLECT) { bump(`${s}|${row.cat}|reappear`, `${CUR}|${row.a.ids[s]}`); if (cntA[s].get(row.a.ids[s]) === 1) {
+            const k = `${CUR}|${row.a.ids[s]}`, id = row.a.ids[s];
+            bump(`${s}|${row.cat}|reappear-id-unique-in-parent`, k);
+            bump(`${s}|${row.cat}|  unique/holder=${heldByOther[s].has(id) ? "pre-existing-or-surviving" : "ONLY-an-added-entity"}`, k);
+            if (row.a.n < MIN_NODES) bump(`${s}|${row.cat}|  unique/body<${MIN_NODES}-nodes (below oracle rename threshold)`, k);
+          } } } else o.none++; }
+      else if (row.b) { if (idsA[s].has(row.b.ids[s])) { o.reappear++; if (COLLECT) { bump(`${s}|${row.cat}|reappear`, `${CUR}|${row.b.ids[s]}`); if (cntB[s].get(row.b.ids[s]) === 1) bump(`${s}|${row.cat}|reappear-id-unique-in-child`, `${CUR}|${row.b.ids[s]}`); } } else o.none++; }
     }
   }
 }
@@ -380,6 +400,7 @@ async function main() {
       if ((r.cat === "removed" || r.cat === "added") && other.has(here.ids[schemes[0]]) && (examples[`${r.cat}-but-${schemes[0]}-reappears`] ??= []).length < 8)
         examples[`${r.cat}-but-${schemes[0]}-reappears`].push(`${p.child.slice(0, 7)} ${here.file}:${here.name} [${here.type} -> ${other.get(here.ids[schemes[0]])} on the other side]`);
     }
+    for (const r of rows) if (r.cat === "rename_owner") { const k = /@\w+?\d+/.test(r.a!.name + r.b!.name) ? "positional" : "named"; counts[`ro_${k}`] = (counts[`ro_${k}`] ?? 0) + 1; }
     perPair.push({ child: p.child, counts });
     // Blind-spot probe: rename/move combined with a body edit is invisible to the oracle and lands
     // in removed+added. Bound it: removed entities that have a plausible edited successor.
@@ -392,7 +413,9 @@ async function main() {
       if (mv) { blind.sameNameElsewhere++; if (!MEMBER_TYPES.has(r.a!.type)) (examples["candidate-edited-move (heuristic, NOT oracle-verified; non-member types)"] ??= []).push(`${p.child.slice(0, 7)} ${r.a!.file} -> ${mv.file}: ${r.a!.name} [${r.a!.type}, ${r.a!.n} -> ${mv.n} nodes]`); }
       if (!bFiles.has(r.a!.file)) blind.fileGone++;
     }
-    for (const [k, f] of Object.entries(slices)) score(rows, A.recs, B.recs, schemes, f, agg[k]);
+    CUR = p.child.slice(0, 7);
+    for (const [k, f] of Object.entries(slices)) { COLLECT = k === "ALL entities"; score(rows, A.recs, B.recs, schemes, f, agg[k]); }
+    COLLECT = false;
   }
   console.log(`\nPAIRS USED: ${used} (of ${sel.length} sampled); oracle min body size for fingerprint matching: ${MIN_NODES} nodes; schemes: ${schemes.join(", ")}`);
   console.log(`pairs with >=1 rename: ${perPair.filter(p => p.counts.rename).length}, rename_owner: ${perPair.filter(p => p.counts.rename_owner).length}, move: ${perPair.filter(p => p.counts.move).length}, rename_move: ${perPair.filter(p => p.counts.rename_move).length}, body_edit: ${perPair.filter(p => p.counts.body_edit).length}`);
@@ -400,6 +423,7 @@ async function main() {
   console.log(`blind-spot bound (removed entities that could be edited renames/moves): removed=${blind.removed}; has an added same-type entity in same file=${blind.sameFileSibling}; `
     + `added same-name+type in another file=${blind.sameNameElsewhere}; whole file gone=${blind.fileGone}`);
   console.log(`distinct commits (pairs) containing each oracle category: ` + CATS.map(c => `${c}=${perPair.filter(p => p.counts[c]).length}`).join(" "));
+  for (const c of ["body_edit", "rename", "rename_owner", "added", "removed"]) console.log(`per-commit entities, ${c}: ` + perPair.filter(p => p.counts[c]).map(p => `${p.child.slice(0, 7)}:${p.counts[c]}`).sort((a, b) => +b.split(":")[1] - +a.split(":")[1]).slice(0, 5).join(" "));
   const pct = (x: number, n: number) => n ? `${(100 * x / n).toFixed(1)}%` : "-";
   for (const [name, m] of Object.entries(agg)) {
     console.log(`\n=== ${name} ===`);
@@ -420,6 +444,16 @@ async function main() {
       const u = m.get("unchanged"); if (u && u.byScheme[s].survive + u.byScheme[s].missing !== u.n) console.log(`  !!! HARNESS BUG: ${s} kept only ${u.byScheme[s].survive}/${u.n} unchanged entities`);
     }
   }
+  console.log("\n=== DISTINCT EVENTS (ALL entities): raw entities vs distinct (commit,id) events, cluster sizes, per-commit concentration ===");
+  for (const [k, m] of [...EV].sort()) {
+    const sizes = [...m.values()].sort((a, b) => b - a), raw = sizes.reduce((a, b) => a + b, 0);
+    const perCommit = new Map<string, number>(); for (const [ek, n] of m) perCommit.set(ek.split("|")[0], (perCommit.get(ek.split("|")[0]) ?? 0) + n);
+    const top = [...perCommit].sort((a, b) => b[1] - a[1]).slice(0, 3).map(([c, n]) => `${c}:${n}`).join(" ");
+    console.log(`  ${k.padEnd(40)} raw=${String(raw).padStart(6)} events=${String(sizes.length).padStart(6)} distinct-ids=${new Set([...m.keys()].map(x => x.split("|").slice(1).join("|"))).size} commits=${perCommit.size} events-excluding-top-commit=${sizes.length - [...m.keys()].filter(x => x.startsWith(([...perCommit].sort((a, b) => b[1] - a[1])[0] ?? ["?"])[0] + "|")).length} size>1: ${sizes.filter(x => x > 1).length} top clusters [${sizes.slice(0, 8).join(",")}] top commits by raw ${top}`);
+  }
+  for (const k of ["ro_positional", "ro_named"]) console.log(`  rename_owner/${k}: entities=${perPair.reduce((a, p) => a + (p.counts[k] ?? 0), 0)} commits=${perPair.filter(p => p.counts[k]).length} per-commit: ${perPair.filter(p => p.counts[k]).map(p => p.child.slice(0, 7) + ":" + p.counts[k]).sort((a, b) => +b.split(":")[1] - +a.split(":")[1]).slice(0, 6).join(" ")}`);
+  console.log("  survive-but-id-shared-in-child (id unchanged yet names >1 entity):");
+  for (const [k, n] of [...SHARED].sort()) console.log(`    ${k}: ${n}`);
   console.log("\nexamples (first few per category):");
   for (const [c, xs] of Object.entries(examples)) { console.log(` ${c}: (${xs.length})`); for (const x of xs.filter((x, i) => c.startsWith("candidate") ? !x.startsWith("d3355f7") || i < 2 : i < 8)) console.log("   " + x); }
 }
