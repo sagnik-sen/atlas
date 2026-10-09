@@ -83,6 +83,7 @@ interface HeritageFact {
   kind: "extends" | "implements";
   childId: string;
   parentName: string;
+  parentId?: string;   // resolved entity; absent when the parent is unresolvable
 }
 
 const facts: Fact[] = [];
@@ -136,12 +137,25 @@ const isMember = (node: any) =>
 // shortcut: positional index among same-kind siblings of the parent node. Shifts
 // if a sibling callback is inserted before it; a stable scheme would need the
 // enclosing call's callee name, which is not always resolvable at this point.
+// Index among same-kind anonymous nodes under the nearest NAMED ancestor, in
+// document order. Indexing within the immediate parent gave every sibling in a
+// promise chain the same segment: `.then(() => {...}).then((x) => {...})` has
+// two arrows with different parents, each index 0 in its own parent, so a local
+// in the first collided with a parameter of the second.
+// shortcut: still positional, so inserting an earlier sibling shifts it. A
+// stable scheme needs the enclosing call's callee name, which is not always
+// resolvable here.
 function anonSegment(node: any): string {
-  const p = node.getParent?.();
-  if (!p) return "@anon";
-  const sibs = p.getChildren?.().filter((c: any) => c.getKind?.() === node.getKind()) ?? [];
+  const kindTag = `@${node.getKindName().replace(/Expression$|Declaration$/, "").toLowerCase()}`;
+  let anchor: any = null;
+  for (let a = node.getParent?.(); a; a = a.getParent?.()) {
+    if (Node.isSourceFile(a)) { anchor = a; break; }
+    if (namedSegment(a)) { anchor = a; break; }
+  }
+  if (!anchor) return `${kindTag}0`;
+  const sibs = anchor.getDescendantsOfKind?.(node.getKind()) ?? [];
   const i = sibs.findIndex((c: any) => c === node);
-  return `@${node.getKindName().replace(/Expression$|Declaration$/, "").toLowerCase()}${i < 0 ? 0 : i}`;
+  return `${kindTag}${i < 0 ? 0 : i}`;
 }
 
 // One segment of the lexical scope path, for ancestors that introduce a scope.
@@ -151,7 +165,9 @@ function anonSegment(node: any): string {
 // got the enclosing interface's name (so `interface Foo { x: { y: T } }` yielded
 // `Foo.y`, colliding with a real `Foo.y`), and parameters, bindings and locals
 // were never qualified at all. 438 ids collided within value space as a result.
-function scopeSegment(a: any): string | null {
+// The named half of scopeSegment, factored out so anonSegment can find its
+// anchor without recursing back through the anonymous branch.
+function namedSegment(a: any): string | null {
   if (Node.isClassDeclaration(a) || Node.isInterfaceDeclaration(a) || Node.isClassExpression(a)
       || Node.isFunctionDeclaration(a) || Node.isMethodDeclaration(a) || Node.isMethodSignature(a)
       || Node.isGetAccessorDeclaration(a) || Node.isSetAccessorDeclaration(a)
@@ -162,6 +178,21 @@ function scopeSegment(a: any): string | null {
     return a.getName?.() || null;
   }
   if (Node.isConstructorDeclaration(a)) return "constructor";
+  return null;
+}
+
+// A nested block (`if`, `for`, `try`) is a real lexical scope: a parameter and
+// a `const` of the same name can coexist when the const is inside one. A
+// function BODY block is not segmented, because the function already is.
+const isNestedBlock = (a: any) => {
+  if (!Node.isBlock(a)) return false;
+  const p = a.getParent?.();
+  return !!p && !isCallableContainer(p) && !Node.isConstructorDeclaration(p);
+};
+
+function scopeSegment(a: any): string | null {
+  const named = namedSegment(a);
+  if (named) return named;
   // A bound construct contributes nothing of its own: its binding is the
   // VariableDeclaration or PropertyAssignment above, already a segment.
   const bound = (n: any) => {
@@ -180,6 +211,11 @@ function scopeSegment(a: any): string | null {
   if (Node.isTypeLiteral(a) || Node.isObjectLiteralExpression(a)) {
     return bound(a) ? null : anonSegment(a);
   }
+  if (isNestedBlock(a)) return anonSegment(a);
+  // `catch (e)` binds e on the CatchClause, not inside its block, so without
+  // this the binding escapes block segmentation and collides with same-named
+  // locals elsewhere in the function.
+  if (Node.isCatchClause(a)) return anonSegment(a);
   return null;
 }
 
@@ -239,9 +275,16 @@ function typeOfNode(node: any): string {
   if (Node.isEnumDeclaration(node)) return "enum";
   if (Node.isFunctionDeclaration(node)) return "function";
   if (Node.isConstructorDeclaration(node)) return "constructor";
-  if (Node.isMethodDeclaration(node) || Node.isMethodSignature(node)) return "method";
+  // A MethodSignature/PropertySignature lives in TYPE space; a
+  // MethodDeclaration/PropertyDeclaration lives in VALUE space. Collapsing both
+  // to "method"/"property" made the declaration-space split misclassify them,
+  // so `type DIRTY = { value: T }`'s member collided with `DIRTY`'s `value`
+  // parameter, and `interface $constructor { init() }` with `function init()`.
+  if (Node.isMethodSignature(node)) return "type-method";
+  if (Node.isMethodDeclaration(node)) return "method";
   if (Node.isGetAccessorDeclaration(node) || Node.isSetAccessorDeclaration(node)) return "accessor";
-  if (Node.isPropertyDeclaration(node) || Node.isPropertySignature(node)) return "property";
+  if (Node.isPropertySignature(node)) return "type-property";
+  if (Node.isPropertyDeclaration(node)) return "property";
   if (Node.isParameterDeclaration(node)) return "parameter";
   if (Node.isPropertyAssignment(node) || Node.isShorthandPropertyAssignment(node)) return "property";
   if (Node.isBindingElement(node)) return "binding";
@@ -324,7 +367,18 @@ function emitHeritage(node: any, id: string) {
       // enum value, not a node — comparing its .getText() silently never matched.
       const kind = h.getToken() === SyntaxKind.ImplementsKeyword ? "implements" as const : "extends" as const;
       for (const t of h.getTypeNodes() || []) {
-        facts.push({ kind, childId: id, parentName: t.getText() });
+        // parentName is TEXT — `_ZodString<core.$ZodStringInternals<string>>`.
+        // 62% of heritage parents carry generics or a namespace qualifier, so
+        // matching them back to an entity afterwards needs name parsing plus
+        // import and re-export resolution, and is heuristic at best. Resolve it
+        // here instead, where the checker already has the symbol: take the
+        // bare type expression and route it through the same resolver as calls.
+        const exprNode = Node.isExpressionWithTypeArguments(t) ? t.getExpression() : t;
+        const nameNode = Node.isPropertyAccessExpression(exprNode) ? exprNode.getNameNode()
+          : Node.isTypeReference(exprNode) ? exprNode.getTypeName() : exprNode;
+        const leaf = Node.isQualifiedName(nameNode) ? nameNode.getRight() : nameNode;
+        const parentId = resolveEntity(leaf) ?? undefined;
+        facts.push({ kind, childId: id, parentName: t.getText(), parentId });
       }
     }
   } catch {}
@@ -573,9 +627,24 @@ function extractFile(file: SourceFile) {
   // Walking only top-level classes/interfaces/functions/type-aliases left
   // methods, constructors, accessors, nested functions and arrow-bound consts
   // undeclared. Calls from inside them had no resolvable container.
+  // A parameter of a bodyless signature — an overload signature, a
+  // MethodSignature, a function type — is a type-level annotation, not a
+  // runtime binding, so it is not an entity. Declaring them made
+  // `function tuple(items, params?): T;` (signature) collide with the
+  // implementation's `const params` on the id `tuple.params`.
+  const isSignatureParam = (node: any) => {
+    if (!Node.isParameterDeclaration(node)) return false;
+    const owner = node.getParent?.();
+    if (!owner) return false;
+    if (Node.isMethodSignature(owner) || Node.isCallSignatureDeclaration(owner)
+        || Node.isFunctionTypeNode(owner) || Node.isConstructSignatureDeclaration(owner)) return true;
+    return typeof owner.getBody === "function" && !owner.getBody();
+  };
+
   const emitDecl = (node: any) => {
     const declFile = np(node.getSourceFile().getFilePath());
     if (isExternalPath(declFile)) return;
+    if (isSignatureParam(node)) return;
     const id = idOfNode(node);
     if (!id) return;
     facts.push({
@@ -791,9 +860,13 @@ const declaredIds = new Set(
   unique.filter(f => f.kind === "declaration").map(f => (f as DeclFact).entityId)
 );
 const instantiations = unique.filter(f => f.kind === "instantiates") as InstantiatesFact[];
+const heritage = unique.filter(f => f.kind === "extends" || f.kind === "implements") as HeritageFact[];
 const edges: { callerId: string; targetId?: string; file: string; line: number }[] = [
   ...calls.map(c => ({ callerId: c.callerId, targetId: c.calleeId, file: c.file, line: c.line })),
   ...instantiations.map(i => ({ callerId: i.callerId, targetId: i.classId, file: i.file, line: i.line })),
+  // Heritage was the only edge kind the invariant never covered, because its
+  // target was a text name rather than an entity id.
+  ...heritage.map(h => ({ callerId: h.childId, targetId: h.parentId, file: h.childId, line: 0 })),
 ];
 // Reference edges obey the same invariant but are kept out of the
 // calls+instantiations closure figure, which is a tracked metric.
@@ -836,6 +909,7 @@ for (const d of unique.filter(f => f.kind === "declaration") as DeclFact[]) {
 const SPACE: Record<string, string> = {
   interface: "type", type: "type", class: "both", enum: "both",
   module: "ns", sourcefile: "ns",
+  "type-method": "type", "type-property": "type",
 };
 const space = (t: string) => SPACE[t] ?? "value";
 const ambiguous = [...typesById].filter(([, t]) => t.size > 1);
@@ -846,10 +920,7 @@ const withinSpace = ambiguous.filter(([, t]) => {
 log("info", `Entity ids with multiple entityTypes: ${ambiguous.length} of ${typesById.size}`);
 log("info", `  cross-space (declaration merges, expected): ${ambiguous.length - withinSpace.length}`);
 log("info", `  within one space (genuine collisions): ${withinSpace.length}`);
-for (const [id, t] of withinSpace.slice(0, 4)) log("info", `    ${id} -> ${[...t].join(", ")}`);
-// shortcut: block scopes (if/for/try bodies) contribute no path segment, so a
-// parameter and a local of the same name in sibling blocks of one function still
-// collide. That is the whole of the residual. Enforce once blocks are segmented.
+for (const [id, t] of withinSpace.slice(0, 8)) log("error", `    ${id} -> ${[...t].join(", ")}`);
 
 // Collision measure per id scheme. An "entity" is a distinct (file, name,
 // entityType); an id collides when it is shared by 2+ entities. Ids are
@@ -877,4 +948,14 @@ if (violations.length > 0) {
   process.exitCode = 1;
 } else {
   log("info", "Referential integrity: OK (every edge endpoint is declared or explicitly unresolved)");
+}
+
+// Enforced as of 2026-10-09, once scope qualification brought this to zero.
+// Cross-space pairs are NOT violations: a merged TypeScript symbol
+// (`interface X` plus `const X`) is one entity declared twice, per ADR-0001.
+if (withinSpace.length > 0) {
+  log("error", `UNAMBIGUOUS IDENTITY: ${withinSpace.length} ids name more than one entity within a declaration space`);
+  process.exitCode = 1;
+} else {
+  log("info", "Unambiguous identity: OK (no id names two entities in one declaration space)");
 }
