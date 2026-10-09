@@ -24,7 +24,7 @@ console.log(`  both endpoints EXACT (function node itself is a declared entity):
 const tally = (k: string) => { const t: Record<string, number> = {}; for (const e of R) { const v = e[k]; if (v !== "external") t[v] = (t[v] ?? 0) + 1; } return JSON.stringify(t); };
 console.log(`  caller tiers ${tally("callerTier")}`);
 console.log(`  callee tiers ${tally("calleeTier")}`);
-console.log(`  (exact = frame position is a declared function; enclosing = frame is an anonymous function with no id of its own, attributed to the nearest declared enclosing entity as extract.ts's callSite() does; module = top-level code; line = same-line fallback)`);
+console.log(`  (exact = frame position is a declared function; enclosing = frame is an anonymous function with no id of its own, attributed to the nearest declared enclosing entity as identity.ts's callSite() does; module = top-level code; line = same-line fallback)`);
 const frames = new Map<string, any>();
 for (const e of R) { frames.set(e.calleeFrame, e.calleeTier); if (e.callerFrame !== "<workload>") frames.set(e.callerFrame, e.callerTier); }
 const ft: Record<string, number> = {}; for (const t of frames.values()) ft[t] = (ft[t] ?? 0) + 1;

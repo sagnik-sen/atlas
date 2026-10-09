@@ -16,6 +16,7 @@
 // (a read-only copy; git runs only there, never against the shared zod-repo). ATLAS_SCRATCH
 // defaults to a session-specific path, so set it.
 import { Project, Node, ts } from "ts-morph";
+import { declName, typeOfNode } from "./identity";
 import * as fs from "fs";
 import * as path from "path";
 import * as zlib from "zlib";
@@ -43,101 +44,26 @@ for (const d of ["co", "facts", "fp", "log"]) fs.mkdirSync(path.join(SCRATCH, d)
 const git = (...a: string[]) => execFileSync("git", ["-C", GITDIR, ...a], { encoding: "utf8", maxBuffer: 1 << 28 });
 
 // ─── Entity enumeration (independent of extract.ts's id layer) ──────────
-// Mirrors extract.ts's declName/typeOfNode naming because the join to declaration facts is on
-// (file, name, entityType). Drift shows up as a low join rate, which the report prints.
-// Ported from extract.ts's identity layer. The join below is on
-// (file, name, entityType), so any drift from extract.ts's declName shows up as
-// a falling join rate, which this harness prints. Keep the two in step.
-const bound = (n: any) => {
-  const p = n.getParent?.();
-  return !!p && (Node.isVariableDeclaration(p) || Node.isPropertyAssignment(p)
-    || Node.isPropertyDeclaration(p) || Node.isPropertySignature(p) || Node.isTypeAliasDeclaration(p));
-};
-function anonSegment(node: any): string {
-  const kindTag = `@${node.getKindName().replace(/Expression$|Declaration$/, "").toLowerCase()}`;
-  let anchor: any = null;
-  for (let a = node.getParent?.(); a; a = a.getParent?.()) {
-    if (Node.isSourceFile(a)) { anchor = a; break; }
-    if (namedSegment(a)) { anchor = a; break; }
-  }
-  if (!anchor) return `${kindTag}0`;
-  const sibs = anchor.getDescendantsOfKind?.(node.getKind()) ?? [];
-  const i = sibs.findIndex((c: any) => c === node);
-  return `${kindTag}${i < 0 ? 0 : i}`;
-}
-function namedSegment(a: any): string | null {
-  if (Node.isClassDeclaration(a) || Node.isInterfaceDeclaration(a) || Node.isClassExpression(a)
-      || Node.isFunctionDeclaration(a) || Node.isMethodDeclaration(a) || Node.isMethodSignature(a)
-      || Node.isGetAccessorDeclaration(a) || Node.isSetAccessorDeclaration(a)
-      || Node.isTypeAliasDeclaration(a) || Node.isEnumDeclaration(a)
-      || Node.isVariableDeclaration(a) || Node.isPropertyAssignment(a)
-      || Node.isPropertyDeclaration(a) || Node.isPropertySignature(a)
-      || Node.isModuleDeclaration(a)) return a.getName?.() || null;
-  if (Node.isConstructorDeclaration(a)) return "constructor";
-  return null;
-}
-const isCallableLike = (n: any) => Node.isFunctionDeclaration(n) || Node.isMethodDeclaration(n)
-  || Node.isConstructorDeclaration(n) || Node.isGetAccessorDeclaration(n)
-  || Node.isSetAccessorDeclaration(n) || Node.isArrowFunction(n) || Node.isFunctionExpression(n);
-const isNestedBlock = (a: any) => {
-  if (!Node.isBlock(a)) return false;
-  const p = a.getParent?.();
-  return !!p && !isCallableLike(p) && !Node.isConstructorDeclaration(p);
-};
-function scopeSegment(a: any): string | null {
-  const named = namedSegment(a);
-  if (named) return named;
-  if (Node.isArrowFunction(a) || Node.isFunctionExpression(a)) return bound(a) ? null : anonSegment(a);
-  if (Node.isTypeLiteral(a) || Node.isObjectLiteralExpression(a)) return bound(a) ? null : anonSegment(a);
-  if (isNestedBlock(a)) return anonSegment(a);
-  if (Node.isCatchClause(a)) return anonSegment(a);
-  return null;
-}
-function scopePath(n: any): string[] {
-  const out: string[] = [];
-  for (let a = n.getParent?.(); a; a = a.getParent?.()) {
-    if (Node.isSourceFile(a)) break;
-    const seg = scopeSegment(a);
-    if (seg) out.unshift(seg);
-  }
-  return out;
-}
-function isDefaultExport(n: any): boolean {
-  try {
-    if (n.hasModifier?.(SyntaxKind.DefaultKeyword)) return true;
-    const p = n.getParent?.();
-    return !!p && Node.isExportAssignment(p);
-  } catch { return false; }
-}
-function declName(n: any): string | null {
-  if (Node.isArrowFunction(n) || Node.isFunctionExpression(n)) {
-    const p = n.getParent();
-    if (p && (Node.isVariableDeclaration(p) || Node.isPropertyAssignment(p) || Node.isPropertyDeclaration(p))) return declName(p);
-    if (isDefaultExport(n)) return [...scopePath(n), "default"].join(".");
-    return null;
-  }
-  const own = Node.isConstructorDeclaration(n) ? "constructor"
-    : (n.getName?.() || (isDefaultExport(n) ? "default" : null));
-  if (!own) return null;
-  return [...scopePath(n), own].join(".");
-}
+// The oracle must name entities WITHOUT consulting any id scheme, since the
+// schemes are what it scores. It therefore reuses identity.ts's declName and
+// typeOfNode — the naming half of the identity layer — but never idOfNode or
+// eid. The join below is on (file, name, entityType), so the join rate printed
+// measures whether the extractor's facts cover the entities the oracle sees.
+// It was 99.4% while this file kept its own hand-copy of declName, whose
+// isDefaultExport referenced an unimported SyntaxKind and so threw into its own
+// catch: no `export default` was ever named `default` here.
+
+// An oracle entity is a named declaration the join can key on. typeOfNode also
+// classifies parameters, bindings and signature members; ORACLE_TYPES filters
+// those out.
 function entityType(n: any): string | null {
-  if (Node.isClassDeclaration(n)) return "class";
-  if (Node.isInterfaceDeclaration(n)) return "interface";
-  if (Node.isTypeAliasDeclaration(n)) return "type";
-  if (Node.isEnumDeclaration(n)) return "enum";
-  if (Node.isFunctionDeclaration(n)) return "function";
-  if (Node.isConstructorDeclaration(n)) return "constructor";
-  if (Node.isMethodSignature(n)) return "type-method";
-  if (Node.isMethodDeclaration(n)) return "method";
-  if (Node.isGetAccessorDeclaration(n) || Node.isSetAccessorDeclaration(n)) return "accessor";
-  if (Node.isPropertySignature(n)) return "type-property";
-  if (Node.isPropertyDeclaration(n) || Node.isPropertyAssignment(n) || Node.isShorthandPropertyAssignment(n)) return "property";
-  if (Node.isVariableDeclaration(n)) {
-    const i = n.getInitializer?.();
-    return i && (Node.isArrowFunction(i) || Node.isFunctionExpression(i)) ? "function" : "variable";
-  }
-  return null; // parameters, bindings, modules, source files: not oracle entities
+  // typeOfNode has no branch for these two, so its kind-name fallback strips
+  // `Expression` and yields "function"/"class", which ORACLE_TYPES accepts.
+  // `const f = function(){}` would then key both the VariableDeclaration and
+  // the FunctionExpression as (file, "f", "function") and mark the pair `dup`.
+  if (Node.isFunctionExpression(n) || Node.isClassExpression(n)) return null;
+  const t = typeOfNode(n);
+  return ORACLE_TYPES.has(t) ? t : null;
 }
 const ORACLE_TYPES = new Set(["class", "interface", "type", "enum", "function", "constructor", "method", "accessor", "property", "variable"]);
 const MEMBER_TYPES = new Set(["property", "method", "accessor", "constructor"]);

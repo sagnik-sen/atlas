@@ -1,7 +1,16 @@
-// SPIKE SNAPSHOT of extract.ts (identity + enclosing-entity logic), copied
-// verbatim so trace.ts computes ids with the SAME functions the extractor uses,
-// without editing extract.ts (it runs on import and exports nothing).
-// Source ranges: extract.ts 96-310, 398-416, 312. Re-copy by hand if extract.ts identity logic changes.
+// THE identity layer: every entity id in the fact base and in the runtime
+// trace, and the entity names the history oracle joins on, come from this
+// module. ADR-0001 states the rule — one function produces entity ids, and
+// both declaration emission and edge resolution route through it, so closure
+// holds by construction. Before f1c1455 the two sides built ids separately and
+// 135 call edges dangled on a string-format disagreement. The rule then held
+// inside extract.ts while ids.ts and history.ts kept hand-copies of it:
+// ids.ts's copy was still in sync when it was deleted, history.ts's had
+// drifted — its isDefaultExport called `SyntaxKind.DefaultKeyword` without
+// importing SyntaxKind and swallowed the ReferenceError in its own catch, so
+// no `export default` was ever named `default` there.
+// Callers must setRoot() before computing any id: the `ts:` namespace is
+// relative to the analysed source root.
 import { Node, SyntaxKind } from "ts-morph";
 import * as path from "path";
 
@@ -36,14 +45,6 @@ function eid(file: string, name: string) {
     ? `external:${slug(externalOrigin(file))}:${name}`
     : `ts:${slug(path.relative(ROOT, file))}:${name}`;
 }
-
-// The class or interface a member belongs to. Members are qualified by owner
-// because a bare method name is not unique within a file — Zod declares
-// `_parse` on many types in one module.
-const isMember = (node: any) =>
-  Node.isMethodDeclaration(node) || Node.isMethodSignature(node)
-  || Node.isPropertyDeclaration(node) || Node.isPropertySignature(node)
-  || Node.isGetAccessorDeclaration(node) || Node.isSetAccessorDeclaration(node);
 
 // An anonymous function that is not bound to a name — a callback passed
 // straight into a call, as in `$constructor("ZodString", (inst, def) => {...})`.
@@ -223,6 +224,20 @@ const isCallableContainer = (n: any) =>
   || Node.isSetAccessorDeclaration(n) || Node.isArrowFunction(n)
   || Node.isFunctionExpression(n);
 function slug(s: string) { return s.replace(/\\/g, "/").replace(/[^a-zA-Z0-9_$/@.-]/g, "_"); }
+function rel(p: string) { return path.relative(ROOT, p).replace(/\\/g, "/"); }
+function np(p: string) { return p.replace(/\\/g, "/"); }
+
+// Attribute a node to the nearest enclosing declared entity, falling back to
+// the module. Shared by call and instantiation extraction so both sides of the
+// fact base use one notion of "where did this happen".
+// Attribute a node to the nearest enclosing entity. Prefer a callable
+// container; failing that, the declaration whose initializer the node sits in.
+//
+// `export const parse = core._parse(ZodRealError)` has no callable ancestor, so
+// this previously attributed the call to the module. Nothing calls a module, so
+// every value-flow chain through a top-level initializer dead-ended there — and
+// that is most of what made blast-radius queries shallow. Re-attributing those
+// sites grows the transitive-caller closure of core `_parse` from 4 to 13.
 const isDeclContainer = (n: any) =>
   Node.isVariableDeclaration(n) || Node.isPropertyAssignment(n)
   || Node.isPropertyDeclaration(n) || Node.isPropertySignature(n);
@@ -242,6 +257,4 @@ function callSite(node: any, moduleId: string) {
   return fallback ?? { callerId: moduleId, callerKind: "module" };
 }
 
-
-export { idOfNode, typeOfNode, callSite, isCallableContainer, declName, mid };
-function np(p: string) { return p.replace(/\\/g, "/"); }
+export { mid, rel, np, eid, isExternalPath, externalOrigin, declName, idOfNode, typeOfNode, isCallableContainer, callSite };
