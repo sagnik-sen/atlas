@@ -254,18 +254,29 @@ normalized body fingerprint that excludes name and path. 389 commits extracted,
 
 | Category | Entities | Commits containing it |
 |---|---|---|
-| unchanged | 2,182,900 obs. | 297 |
-| **body edit** | **1,981** | **244** |
-| rename | 51 | **1 event** |
+| unchanged | 2,842,894 obs. | 297 |
+| **body edit** | **2,070** | **247** |
+| rename | 51 | **5 independent events** |
+| rename_owner | 269 | 43 — but **263 (98%) are positional drift**, only 6 real |
 | move | **0** | 0 |
 | rename + move | 0 | 0 |
 
 **This is the measured result, and it reframes the question.** Zod has zero
-clean unedited moves and essentially one rename event — commit `d3355f7`,
-`Nouns` to `FormatDictionary`, applied mechanically across 51 locale files, so
-n=1 commit rather than 51 independent observations. Body edits are the
+clean unedited moves and 5 independent rename events — one mass commit
+(`d3355f7`, `Nouns` to `FormatDictionary` across 47 locale files) plus four
+genuine renames (`CompiledFastpass`→`CompiledFn`, `$IsValid`→`$Validate`,
+`$IsValidAsync`→`$ValidateAsync`, `process`→`processSchema`). Body edits are the
 overwhelming change mode: a scheme that breaks on body edits loses identity
-roughly 40x more often here than one that breaks on renames.
+roughly **400x** more often here than one that breaks on renames.
+
+**The biggest surprise is about `entityId`, not the content hashes.** Its
+dominant instability is not renames at all: of 269 owner-name changes, **263
+(98%) across 43 commits are a positional anonymous-scope index shifting
+because a sibling was inserted earlier in the file** — `@arrowfunction0`
+becoming `@arrowfunction1`. Only 6 are real owner renames. The `shortcut:`
+comment on `anonSegment` flagged this risk when scope qualification was added
+the same day; this is it, measured, and it is a lower bound because sub-12-node
+entities with the same drift land in removed-plus-added.
 
 Note that git's own rename detection finds **zero file-level renames across all
 298 src-touching commits**, which is why the oracle had to work at entity level.
@@ -295,7 +306,17 @@ corpus has none.
 
 The survival columns are tautological. These two are not.
 
-**False continuity.** In the rename commit, 95 of 153 removed entities have
+**Full-run figures supersede the sample below.** Over 297 pairs: aliasing on
+body edit is 3.9% raw for `structureId` (0.43% where the old id was unique in
+the parent) and 1.5% for `contentId` (0% unique) — the 6.5% below was a
+24-pair artifact. Removed-id reappearance is 1,428 distinct events across 100
+commits for `structureId`, 31 across 12 for `contentId`. Strict transfers:
+891 for `structureId`, but 888 have bodies under 12 nodes and are
+unadjudicable, leaving **3 clear cases**. And the number that matters most:
+**48% of unchanged `structureId` observations carry an id that is shared by
+another entity in the child** — it identifies a structure, not an entity.
+
+**False continuity (24-pair sample, superseded).** In the rename commit, 95 of 153 removed entities have
 their `structureId` still present in the child commit, attached to a
 *different* entity. Counted as distinct events that is **49**, cluster sizes
 `[47, 1, 1, 1, ...]`: one mass event — 47 locale copies of an identical helper,
