@@ -181,7 +181,7 @@ occurrences and never leave their function.
 
 | Alternative | Pros | Cons | Why rejected |
 |---|---|---|---|
-| Content-addressed ids (thesis §4.4) | Survives rename and move; no path coupling | 55.3% of entities in a colliding id; 49 distinct false-continuity events in one commit; 6.5% silent aliasing on body edits; breaks on every body edit, the dominant change mode | Fails silently on the common case to survive the rare one |
+| Content-addressed ids (thesis §4.4) | Survives rename and move; no path coupling | 60.1% of entities in a colliding id (worse as identity gets finer: 55.3% before scope qualification); 49 distinct false-continuity events in one commit; 6.5% silent aliasing on body edits; breaks on every body edit, the dominant change mode | Fails silently on the common case to survive the rare one |
 | Hybrid: content hash primary, path as tiebreak | Keeps rename survival | Collision resolution needs the path, so the id is path-coupled anyway, with a hash's opacity added | Pays the cost of both, keeps the benefit of neither |
 | Compiler-assigned symbol ids (SCIP-style monikers) | Standard, tool-interoperable | Requires a resolved program; thesis §2.4 rejects a build requirement | Revisit if the build requirement is relaxed |
 | Graph node/edge model (original vision) | Familiar; direct traversal | No uncertainty model; flattens temporal and intentional facts | Already rejected by thesis §3 |
@@ -200,6 +200,19 @@ every member and parameter id — most of the fact base — and makes ids longer
 and path-shaped (`ZodObject._getCached.@typeliteral0.shape`). Per-occurrence references grow the fact base ~52%.
 
 **Unresolved, and deliberately out of scope.**
+- **Runtime method installation is not modelled, and for some corpora that is
+  decisive.** Zod installs its public `parse` with
+  `_installLazyProps(inst, "parse", _zodTypeParseProps)`, then
+  `for (const key in built) defineCached(proto, key, built[key])`, then
+  dispatches through the mutable field `schema._zod.run`. No syntactic
+  construct names `parse` along that path, so no fact can link the declared
+  method to its implementation. Blast radius for Zod's public entry points is
+  therefore unanswerable from static facts alone — not because of a defect, but
+  because the information is not in the source text. See
+  `prototype/report.md`'s 2026-10-09b section. This is the first measured
+  instance of thesis §5.1's dynamic-language wall actually blocking the
+  project's headline use case, and it is an argument for runtime trace
+  ingestion being V2 rather than optional.
 - **Field reads are not modelled.** The 12 remaining flagged imports are used
   via `datetimeBenchmarks.suites` — a property read on a non-namespace, which
   the reference pass excludes because such reads dispatch on a runtime type.
@@ -212,7 +225,12 @@ and path-shaped (`ZodObject._getCached.@typeliteral0.shape`). Per-occurrence ref
 - **Cross-language identity.** The `ts:` prefix is a TypeScript scheme.
   decisions.md open tension #2 is untouched.
 - **Correctness beyond closure.** Closure proves endpoints exist, not that
-  edges are right. No oracle for edge correctness exists.
+  edges are right, and there is now a measured instance of the gap: in
+  `installLazyProps`, `props()` yields a resolved, closed, confidence-0.9 call
+  edge terminating at a *parameter* — an entity with no body. The invariant
+  passes and the edge is useless. A third invariant is worth considering: a
+  call edge terminates at an entity that can execute, or is marked as
+  higher-order indirection. No oracle for edge correctness exists.
 - **Incrementality.** thesis §4.2 claims it "falls out naturally". There is no
   incremental run, and the fact that any schema change invalidates every cached
   fact base suggests it will not fall out of anything by itself.
