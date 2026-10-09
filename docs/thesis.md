@@ -4,6 +4,40 @@ A technical thesis on the minimal representation required for machine understand
 
 ---
 
+## Measured status (2026-10-09)
+
+This document was written before any code existed. Several of its claims have
+since been tested against a real corpus (Zod, commit `e516c3b`, 132 non-test
+source files) by the prototype in `prototype/`. This section records which
+claims now have evidence and which still do not. It is a scoreboard, not a
+revision — the argument below is unchanged, and where evidence contradicts it
+that is said here rather than edited in silently.
+
+| Claim | Section | Status |
+|---|---|---|
+| Content-addressed ids are the foundation; "same hash = same entity"; stable across refactoring | §4.4 | **Refuted as primary identity.** A structure-only hash puts 60.1% of entities in a colliding id, with one id covering 1,519 entities. Worse, it asserts *false* identity: 48 independent cases where a removed entity's hash reappears on a different entity, and 6.5% of body edits alias onto an unrelated entity. The two claims also conflict — an id cannot be stable across refactoring while capturing definition changes. See ADR-0001. |
+| Static analysis is insufficient for dynamic languages; runtime traces needed | §5.1 | **Confirmed, and it blocks the headline use case.** Zod installs its public `parse` via `installLazyProps` → `for (const key in built) defineCached(...)` → dispatch through the mutable field `_zod.run`. No syntactic construct names `parse` on that path, so blast radius for the public API is unanswerable from static facts. This is the strongest argument in the record for runtime ingestion being V2 rather than optional. |
+| Uncertainty is first-class; confidence lets consumers filter | §4.2, §3.3 | **Partly confirmed, with a gap.** Unresolved edges are emitted at confidence 0.3 rather than dropped, which works. But confidence does not capture *usefulness*: `props()` inside `installLazyProps` resolves to a parameter at confidence 0.9 — closed, high-confidence, and useless, because a parameter has no body. |
+| The fact model is queryable and efficient | §4.1, §4.2 | **Confirmed.** 16,434 declarations and ~34k facts from 132 files in ~3s. Typed facts from the compiler's own symbol table need no custom type checker. |
+| Incrementality "falls out naturally" | §4.2 | **Untested, and looking doubtful.** There is no incremental run. Every schema change invalidates every cached fact base, which is the opposite of falling out naturally. |
+| Facts are "versioned" | §4.1 | **Not implemented.** No versioning exists. |
+| Each lens is independently queryable | §4.3 | **Not implemented.** No lens exists. Two ad-hoc Node query scripts stand in, and both had defects that produced wrong published conclusions. |
+| Datalog is the right query substrate | §7.3, §8 | **Deliberately undecided** (ADR-0002). The evidence so far argues it is not the bottleneck: the limiting factor is missing runtime facts, not query expressiveness. |
+| Correctness is graded, not binary; contradictions are facts | §5.3 | **Partly implemented.** Two invariants are enforced — closure and unambiguous identity — and both reach zero violations. Neither proves an edge is *correct*, and contradictions are not yet modelled as facts. |
+| Scale: millions of facts for a large monorepo | §5.4 | **Consistent so far.** Growth is linear in LOC at ~1.2 facts per line. Nothing here contradicts the estimate; nothing tests the billion-fact case either. |
+| Cross-language identity; ids stable "across extractors" | §4.4 | **Untested.** The id scheme is TypeScript-only (`ts:` prefix). |
+
+A pattern worth recording, because it bears on §5.3 more than any single claim:
+**four separate findings in this project's record turned out to be defects in
+the extractor or its query scripts, not facts about static analysis** — a
+"FATAL" method-resolution result, a 100% accidental-dependency rate, a failure
+catalogue of hardcoded literals, and 86 of 113 flagged imports being an
+`importType` misclassification. Each was reported as evidence about the
+approach. None were. That is the case for asserting invariants inside the
+extractor and failing the run, which the prototype now does.
+
+---
+
 ## Abstract
 
 Existing representations of software — ASTs, IR, call graphs, code property graphs, LSP indexes — model code at either instruction-level precision or symbol-level granularity. None model the system as a system. None compose structural, temporal, behavioral, and intentional data. None treat uncertainty as first-class. Atlas proposes a fact-based architecture where the representation is a typed, provenance-tracked fact base; a graph is one query-optimized lens among many.
