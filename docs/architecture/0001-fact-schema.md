@@ -120,9 +120,15 @@ non-top-level declaration collided by name within its file.
   positional segment, since a return-type annotation otherwise shares the
   method's scope with its locals. `ShorthandPropertyAssignment` is not a
   declaration — `{ shape }` is a reference to an existing binding. Result:
-  **438 → 20 collisions** (0.13% of 15,822 ids). The residual 20 are a
-  parameter and a local of the same name in sibling *block* scopes, which the
-  path does not segment.
+  **438 → 20 collisions** (0.13% of 15,822 ids). Inspecting all 20: they are
+  not a block-scope problem, as first assumed. 14 are **overload signatures** —
+  `function tuple(items, params?): T;` declares a type-level parameter `params`
+  and the implementation declares `const params`, and both land on
+  `tuple.params`. An overload signature has no body, so its parameters are not
+  runtime bindings and should not be entities. 2 (`DIRTY.value`, `OK.value`)
+  are a space-classifier defect: a `PropertySignature` in a type literal is
+  type space, but the classifier maps every `property` to value space. The rest
+  are nested arrow functions sharing a positional segment.
 - **Cross-space (267):** genuine TypeScript declaration merges — 247 are the
   `interface X` + `const X` pattern this corpus uses pervasively. **One
   TypeScript symbol is one entity**, so these keep one id and carry multiple
@@ -143,8 +149,9 @@ are defined now:
   declarations of a single TypeScript symbol count as one entity. The check is
   split by declaration space accordingly: 267 cross-space merges are reported
   as expected, and 20 within-space collisions as genuine. Reported, not yet
-  enforced — enforcing requires segmenting block scopes, which is the whole of
-  the residual 20.
+  enforced — enforcing requires dropping overload-signature parameters as
+  entities and classifying type-literal members as type space, which together
+  are most of the residual 20.
 
 Given the four artifacts above, this is not a quality-of-implementation detail.
 It is the schema's primary defence.
