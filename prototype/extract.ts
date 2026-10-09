@@ -333,16 +333,31 @@ function emitHeritage(node: any, id: string) {
 // Attribute a node to the nearest enclosing declared entity, falling back to
 // the module. Shared by call and instantiation extraction so both sides of the
 // fact base use one notion of "where did this happen".
+// Attribute a node to the nearest enclosing entity. Prefer a callable
+// container; failing that, the declaration whose initializer the node sits in.
+//
+// `export const parse = core._parse(ZodRealError)` has no callable ancestor, so
+// this previously attributed the call to the module. Nothing calls a module, so
+// every value-flow chain through a top-level initializer dead-ended there — and
+// that is most of what made blast-radius queries shallow. Re-attributing those
+// sites grows the transitive-caller closure of core `_parse` from 4 to 13.
+const isDeclContainer = (n: any) =>
+  Node.isVariableDeclaration(n) || Node.isPropertyAssignment(n)
+  || Node.isPropertyDeclaration(n) || Node.isPropertySignature(n);
+
 function callSite(node: any, moduleId: string) {
+  let fallback: { callerId: string; callerKind: string } | null = null;
   for (let a = node.getParent(); a; a = a.getParent()) {
-    if (!isCallableContainer(a)) continue;
+    const callable = isCallableContainer(a);
+    if (!callable && !isDeclContainer(a)) continue;
     const id = idOfNode(a);
-    if (id) {
-      const t = typeOfNode(a);
-      return { callerId: id, callerKind: t === "unknown" ? a.getKindName() : t };
-    }
+    if (!id) continue;
+    const t = typeOfNode(a);
+    const hit = { callerId: id, callerKind: t === "unknown" ? a.getKindName() : t };
+    if (callable) return hit;
+    fallback ??= hit;
   }
-  return { callerId: moduleId, callerKind: "module" };
+  return fallback ?? { callerId: moduleId, callerKind: "module" };
 }
 
 // Resolve a name node to a declared entity id, declaring dependency entities

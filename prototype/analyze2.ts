@@ -149,7 +149,16 @@ console.log(`\nBidirectional imports: ${mutual} pairs`);
 // 2. Blast radius
 console.log("\n--- 2. Blast radius (transitive callers) ---\n");
 
-const targets = decls.filter((d: any) => d.name === "parse" || d.name === "safeParse" || d.name === "_parse");
+// Seed on the LAST segment of the qualified name. Matching `d.name` exactly
+// missed every class-qualified method — `ZodType.parse` alone carries 53 of the
+// 101 inbound call facts in this family, and 90 of the 101 sat on entities the
+// query never seeded.
+const PARSE = new Set(["parse", "safeParse", "_parse"]);
+const lastSeg = (n: string) => n.slice(n.lastIndexOf(".") + 1);
+const inboundCount = new Map<string, number>();
+for (const c of calls) if (c.calleeId) inboundCount.set(c.calleeId, (inboundCount.get(c.calleeId) ?? 0) + 1);
+const targets = decls.filter((d: any) => PARSE.has(lastSeg(d.name)))
+  .sort((a: any, b: any) => (inboundCount.get(b.entityId) ?? 0) - (inboundCount.get(a.entityId) ?? 0));
 for (const t of targets.slice(0, 5)) {
   const visited = new Set<string>();
   const stack = [t.entityId];
