@@ -14,6 +14,43 @@ no longer exists upstream, and upstream has since force-pushed `main` so
 `e516c3b` is not an ancestor of it. `prototype/zod-repo/` is gitignored, so a
 fresh clone does not reproduce the corpus either.
 
+## Update (2026-10-09c): runtime tracing spike
+
+Question: does a runtime trace recover the edges static analysis cannot (the
+`parse` wall in the section below)? Tool: `trace.ts` (V8 sampling profiler via
+in-process `inspector`, tsx source maps back to `.ts`), `trace-analyze.ts`
+(comparison), output `facts.runtime.json` (`calls` facts, confidence 0.95,
+reason `runtime`; 237 KB, 12 merged processes x 6000 workload iterations).
+
+**Yes for the downstream hops, no for the callers of the public method.**
+
+- `defineCached` getter -> `_zodTypeParseProps.parse` is captured in 12/12 runs.
+  `installLazyProps -> _zodTypeParseProps` (the `props()` call static resolves
+  to a parameter) is captured in 8/12: it fires once per process, so a sampler
+  sees it by luck.
+- The `_zod.run` hop is captured: `parse.fn -> core _parse.fn -> memoizer
+  wrapped -> $ZodObjectJIT / $ZodNumber / $ZodUnion / ...` (12/12 for the
+  hot ones). Static has one resolved edge for that call, to the interface
+  member `_$ZodTypeInternals.run`, never to an implementation.
+- 520 runtime edges: 367 zod->zod, 153 rooted at the workload driver (outside
+  the corpus). 364 of the 367 resolve to declared ids at both ends (99.2%), but
+  only 131 (35.7%) are exact: the other endpoints are anonymous functions
+  (`inst._zod.parse = ...` assignments have no entity, so they attribute to the
+  enclosing constructor, `$ZodObjectJIT`) or module top level. 98 of the 364
+  joined edges (26.9%) are already in static facts; 266 are new.
+- Transitive callers of `classic/parse.ts:parse`: **1 static, 1 with runtime
+  edges** (2 if the workload driver is counted). Its real callers are user and
+  test code, which is outside the corpus by construction (Cause 3), so a trace
+  cannot add entities that were never extracted. The factory closure is also a
+  join problem: the frame is `core/parse.ts:_parse.fn`, not `classic/parse.ts:parse`.
+- Where it does help is the other direction: callers of an implementation behind
+  `_zod.run` go from 0 to a path to the public wrapper. The all-joined closure
+  there (about 355) is inflated by `$constructor.init` hub conflation and should
+  not be quoted as a blast radius.
+- Sampling recall is the weak point: 91 of 520 edges were seen by exactly one of
+  12 runs, and the union was still growing slowly (499 -> 520 over the last 5 runs).
+- Static call pairs observed: 91 of 3,652 (2.5%); the workload is tiny.
+
 ## Update (2026-10-09b): why blast radius was shallow
 
 The blast-radius query — transitive callers of a function, the use case this
