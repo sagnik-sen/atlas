@@ -420,7 +420,26 @@ function resolveEntity(node: any): string | null {
   try {
     const defs = node.getDefinitions();
     if (!defs.length) return null;
-    const defNode = defs[0].getDeclarationNode();
+    // getDeclarationNode() returns undefined for an anonymous `export default`,
+    // so every use of a default-imported binding resolved to nothing. That was
+    // the actual cause of the residual flagged imports — the benchmark modules
+    // and the `en()`/`km()`/`uk()` locale calls — not the missing field-read
+    // edges it was attributed to. Fall back to the default export of the
+    // definition's own file.
+    let defNode = defs[0].getDeclarationNode();
+    if (!defNode) {
+      // The definition's own node is the `default` keyword or the exported
+      // expression; walk out to the nearest construct idOfNode can name.
+      const at = defs[0].getNode?.();
+      for (let a = at; a; a = a.getParent?.()) {
+        if (Node.isSourceFile(a)) break;
+        if (declName(a)) { defNode = a; break; }
+      }
+      if (!defNode) {
+        const sf = defs[0].getSourceFile?.();
+        defNode = sf?.getDefaultExportSymbol?.()?.getDeclarations?.()?.[0] ?? null;
+      }
+    }
     if (!defNode) return null;
     const id = idOfNode(defNode);
     if (!id) return null;
