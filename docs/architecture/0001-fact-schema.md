@@ -211,8 +211,29 @@ and path-shaped (`ZodObject._getCached.@typeliteral0.shape`). Per-occurrence ref
   because the information is not in the source text. See
   `prototype/report.md`'s 2026-10-09b section. This is the first measured
   instance of thesis §5.1's dynamic-language wall actually blocking the
-  project's headline use case, and it is an argument for runtime trace
-  ingestion being V2 rather than optional.
+  project's headline use case.
+
+  **A runtime-tracing spike then tested whether traces close it, and the answer
+  is "partly, and not the part that was asked".** A V8 sampling profiler with
+  frames source-mapped back to entity ids captured 548 edges, of which 80 are
+  genuinely new function-to-function pairs. It *does* recover the dispatch
+  chain static analysis cannot see: `installLazyProps → _zodTypeParseProps`
+  (which static resolves to a parameter) in 9 of 12 runs, the `defineCached`
+  getter → the wrapper in 12 of 12, and the whole `_zod.run` dispatch into
+  `$ZodObjectJIT`/`$ZodString`/`$ZodNumber` in 12 of 12. Callers of an
+  implementation behind `_zod.run` go from 0 to a 3-hop path.
+
+  But blast radius for the public `parse` stays **1**, for two reasons neither
+  of which a better tracer fixes: `ZodType.parse` is a bodyless interface
+  member, so it is never a stack frame and nothing joins it to the wrapper
+  without call-site positions and the property key; and its real callers are
+  user and test code that is not in the fact base at all. **Runtime ingestion
+  is therefore conditional, not simply V2.** Three things must come first:
+  (1) the identity layer must give ids to functions bound by property
+  assignment — only 34% of runtime edges join *exactly* today, the rest falling
+  back to an enclosing constructor; (2) capture must be deterministic and carry
+  call-site positions, which a sampler does not; (3) the traced workload's code
+  must itself be in the fact base.
 - **Field reads stay unmodelled, now on evidence.** This ADR previously
   attributed the 12 remaining flagged imports to missing field-read edges.
   Measured, that was wrong twice over: only 8 of the 12 were field reads, and
