@@ -14,6 +14,137 @@ no longer exists upstream, and upstream has since force-pushed `main` so
 `e516c3b` is not an ancestor of it. `prototype/zod-repo/` is gitignored, so a
 fresh clone does not reproduce the corpus either.
 
+## Update (2026-10-09b): why blast radius was shallow
+
+The blast-radius query — transitive callers of a function, the use case this
+project exists to serve — returned **1** transitive caller for `parse` in
+`v4/classic/parse.ts` and **4** for `_parse`, against a fact base of 16,000+
+declarations at 97% closure. Four parallel investigations, each given one
+hypothesis and told not to assume it.
+
+The answer is four distinct causes at three different layers. Two were defects
+and are fixed; one is a corpus property; one is a genuine wall.
+
+### Cause 1 (defect, fixed): calls in initializers were attributed to the module
+
+```ts
+export const parse = core._parse(ZodRealError);   // classic/parse.ts:13
+```
+
+`callSite()` walked up for a *callable* container. A `VariableDeclaration` is
+not callable, so the call fell through to the module id. Nothing calls a
+module, so every value-flow chain through a top-level initializer dead-ended
+there — and **1,543 of 5,329 call facts (29%)** were attributed that way.
+
+Fixed by falling back to the declaration whose initializer the node sits in.
+Module-attributed calls: **1,543 → 192**.
+
+### Cause 2 (defect, fixed): the query seeded on bare names
+
+`analyze2.ts` seeded on `d.name === "parse"`, which matches only module-level
+`parse` variables. `ZodType.parse` never matched. **90 of the 101 inbound call
+facts in the parse family sat on entities the query never seeded**, and
+`ZodType.parse` alone holds 53 of them. `analyze.ts` was worse: it also required
+`entityType === "function"`, so only `core/parse.ts:_parse` survived and the
+classic entry point was never reported at all.
+
+The traversal itself was correct — an independent BFS matched it on all 56
+entities, 0 mismatches. The bug was entirely in seed selection.
+
+| entity | before | after |
+|---|---|---|
+| `ts:v3/types.ts:ZodType._parse` | never seeded | **38** |
+| `ts:v3/types.ts:ZodType.safeParse` | never seeded | 12 |
+| `ts:v3/types.ts:ZodType.parse` | never seeded | 8 |
+| `ts:v4/core/parse.ts:_parse` | 4 | **14** |
+
+### Cause 3 (corpus): the public API's callers are all in excluded tests
+
+| pattern | included (132 files) | excluded (189 test files) |
+|---|---|---|
+| `.parse(` | 66 | **3,565** |
+| `.safeParse(` | 12 | 1,174 |
+| `._parse(` | 19 | 0 |
+
+Of the 66 included `.parse(`, 51 are in `v3/benchmarks/` and 6 are
+`JSON.parse`. **Non-test source under `v4/classic` contains zero
+`schema.parse()` call sites.** The entire caller population of the public
+method lives in the 88 test files the extractor excludes by design — which is
+why the 53 `ZodType.parse` edges are all v3 benchmark call sites.
+
+This is not a defect. It is a statement about what the corpus can demonstrate.
+
+### Cause 4 (genuine wall): the public method is installed at runtime
+
+`parse` is not a class method. The full chain for `z.string().parse("x")` is 15
+hops; the relevant ones:
+
+```ts
+// classic/schemas.ts:176
+_installLazyProps(inst, "parse", _zodTypeParseProps);
+
+// core/util.ts — installLazyProps
+const built = props();                      // calls through a PARAMETER
+for (const key in built) {
+  defineCached(proto, key, built[key]);     // property name is a runtime string
+}
+```
+
+Two indirections, with different consequences:
+
+- `props()` resolves to **`ts:v4/core/util.ts:installLazyProps.props`** — the
+  parameter — at confidence 0.9. The edge is closed, the invariant passes, and
+  it leads nowhere, because a parameter has no body. The real target
+  `_zodTypeParseProps` is connected only by a `references` fact at the argument
+  site.
+- `defineCached(proto, key, …)` under `for (const key in built)` means
+  `inst.parse` ← `built.parse` has **no syntactic form naming `parse` at all**.
+
+And the final dispatch, `schema._zod.run(...)` at `core/parse.ts:25`, goes
+through a **mutable per-instance data field**: 47 writes to `_zod.parse`, 8 to
+`_zod.run`. A runtime probe confirmed `z.string()._zod.run === z.string()._zod.parse`.
+The possible targets are every function ever stored into that field.
+
+**This is thesis §5.1's dynamic-language wall, and for the public API it is
+real.** `ts:v4/classic/parse.ts:parse` still returns 1 transitive caller after
+both defects are fixed, and that 1 is correct: its only caller is the
+`_zodTypeParseProps` wrapper, which nothing connects to `ZodType.parse`.
+Static-only extraction cannot serve blast radius for Zod's public entry points.
+Hops 2–12 are recoverable in principle with points-to analysis; the `_zod.run`
+hop is not.
+
+### What it was *not*: virtual dispatch over the type hierarchy
+
+The initial suspicion was unmodelled method override. Measured and refuted:
+
+- Override-aware traversal (ascending and descending the heritage hierarchy)
+  adds **16 implementation nodes and zero new callers** for
+  `ZodType._parse`, and nothing at all for `core/parse.ts:_parse`.
+- Only **21 of 5,169 resolved call edges (0.41%)** target a member that has a
+  same-named member on a related type. Virtual dispatch is a rounding error in
+  this corpus.
+- **Zod v4 declares no class inheritance among schema types.** `_parse` does
+  not appear in v4's core or classic schemas at all (0 occurrences); the
+  implementations are `inst._zod.parse` assignments. The 36 `_parse` overrides
+  are all v3.
+- Of the 666 `extends` facts, child entityType splits interface 334, class 43,
+  **variable 289** — the last being the cross-space declaration merge surfacing
+  in heritage data.
+
+So Zod's type hierarchy and its runtime dispatch structure are **disjoint**.
+The fact base models the former; the behaviour lives in the latter.
+
+### A category the schema does not model
+
+`props()` produces a resolved, closed, confidence-0.9 call edge that terminates
+at a parameter — an entity with no body. Closure is satisfied; the edge is
+useless. ADR-0001 says closure "proves endpoints exist, not that edges are
+right"; this is the concrete instance, and it suggests a third invariant worth
+considering: a call edge should terminate at an entity that can execute, or be
+marked as higher-order indirection.
+
+---
+
 ## Update (2026-10-09): identity, references, and version history
 
 Three experiments. The headline: **content-addressed identity, which thesis.md
