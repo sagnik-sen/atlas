@@ -10,7 +10,7 @@ import { SourceMap } from "node:module";
 import * as fs from "fs";
 import * as path from "path";
 import { Project, Node, SyntaxKind } from "ts-morph";
-import { setRoot, idOfNode, callSite, typeOfNode, mid } from "./ids";
+import { setRoot, idOfNode, callSite, typeOfNode, mid } from "./identity";
 
 // Optimizing tiers inline callees and elide their frames; keep the interpreter so every call shows up.
 if (process.env.TRACE_OPT !== "1") for (const f of (process.env.TRACE_FLAGS ?? "--no-opt --no-maglev").split(" ")) v8.setFlagsFromString(f);
