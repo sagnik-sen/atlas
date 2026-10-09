@@ -54,13 +54,18 @@ const bound = (n: any) => {
     || Node.isPropertyDeclaration(p) || Node.isPropertySignature(p) || Node.isTypeAliasDeclaration(p));
 };
 function anonSegment(node: any): string {
-  const p = node.getParent?.();
-  if (!p) return "@anon";
-  const sibs = p.getChildren?.().filter((c: any) => c.getKind?.() === node.getKind()) ?? [];
+  const kindTag = `@${node.getKindName().replace(/Expression$|Declaration$/, "").toLowerCase()}`;
+  let anchor: any = null;
+  for (let a = node.getParent?.(); a; a = a.getParent?.()) {
+    if (Node.isSourceFile(a)) { anchor = a; break; }
+    if (namedSegment(a)) { anchor = a; break; }
+  }
+  if (!anchor) return `${kindTag}0`;
+  const sibs = anchor.getDescendantsOfKind?.(node.getKind()) ?? [];
   const i = sibs.findIndex((c: any) => c === node);
-  return `@${node.getKindName().replace(/Expression$|Declaration$/, "").toLowerCase()}${i < 0 ? 0 : i}`;
+  return `${kindTag}${i < 0 ? 0 : i}`;
 }
-function scopeSegment(a: any): string | null {
+function namedSegment(a: any): string | null {
   if (Node.isClassDeclaration(a) || Node.isInterfaceDeclaration(a) || Node.isClassExpression(a)
       || Node.isFunctionDeclaration(a) || Node.isMethodDeclaration(a) || Node.isMethodSignature(a)
       || Node.isGetAccessorDeclaration(a) || Node.isSetAccessorDeclaration(a)
@@ -69,8 +74,23 @@ function scopeSegment(a: any): string | null {
       || Node.isPropertyDeclaration(a) || Node.isPropertySignature(a)
       || Node.isModuleDeclaration(a)) return a.getName?.() || null;
   if (Node.isConstructorDeclaration(a)) return "constructor";
+  return null;
+}
+const isCallableLike = (n: any) => Node.isFunctionDeclaration(n) || Node.isMethodDeclaration(n)
+  || Node.isConstructorDeclaration(n) || Node.isGetAccessorDeclaration(n)
+  || Node.isSetAccessorDeclaration(n) || Node.isArrowFunction(n) || Node.isFunctionExpression(n);
+const isNestedBlock = (a: any) => {
+  if (!Node.isBlock(a)) return false;
+  const p = a.getParent?.();
+  return !!p && !isCallableLike(p) && !Node.isConstructorDeclaration(p);
+};
+function scopeSegment(a: any): string | null {
+  const named = namedSegment(a);
+  if (named) return named;
   if (Node.isArrowFunction(a) || Node.isFunctionExpression(a)) return bound(a) ? null : anonSegment(a);
   if (Node.isTypeLiteral(a) || Node.isObjectLiteralExpression(a)) return bound(a) ? null : anonSegment(a);
+  if (isNestedBlock(a)) return anonSegment(a);
+  if (Node.isCatchClause(a)) return anonSegment(a);
   return null;
 }
 function scopePath(n: any): string[] {
@@ -108,9 +128,11 @@ function entityType(n: any): string | null {
   if (Node.isEnumDeclaration(n)) return "enum";
   if (Node.isFunctionDeclaration(n)) return "function";
   if (Node.isConstructorDeclaration(n)) return "constructor";
-  if (Node.isMethodDeclaration(n) || Node.isMethodSignature(n)) return "method";
+  if (Node.isMethodSignature(n)) return "type-method";
+  if (Node.isMethodDeclaration(n)) return "method";
   if (Node.isGetAccessorDeclaration(n) || Node.isSetAccessorDeclaration(n)) return "accessor";
-  if (Node.isPropertyDeclaration(n) || Node.isPropertySignature(n) || Node.isPropertyAssignment(n) || Node.isShorthandPropertyAssignment(n)) return "property";
+  if (Node.isPropertySignature(n)) return "type-property";
+  if (Node.isPropertyDeclaration(n) || Node.isPropertyAssignment(n) || Node.isShorthandPropertyAssignment(n)) return "property";
   if (Node.isVariableDeclaration(n)) {
     const i = n.getInitializer?.();
     return i && (Node.isArrowFunction(i) || Node.isFunctionExpression(i)) ? "function" : "variable";
