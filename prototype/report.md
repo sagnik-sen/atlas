@@ -252,9 +252,23 @@ entity-level change with an oracle independent of any id scheme — matching on 
 normalized body fingerprint that excludes name and path. 389 commits extracted,
 297 adjacent pairs scored, every src-touching commit on first-parent history.
 
+The oracle's join to the declaration facts is now complete — 100% of entity
+keys on every commit, where it read 99.4% when these numbers were first
+published. The gap was a bug in the harness, not in the extractor: `history.ts`
+kept its own hand-copy of `declName`, and that copy called
+`SyntaxKind.DefaultKeyword` without importing `SyntaxKind`, so the
+ReferenceError fell into its own `catch` and no `export default` was ever named
+`default` there. Routing the harness through the shared identity layer recovers
+those entities. The table below is restated on the fixed oracle, and the only
+figure that moved is the `unchanged` count, 2,842,894 to 2,859,426: the 16,532
+recovered observations plus 14 in `added` are the whole effect. Every change
+category below — body edits, renames, owner renames, moves — holds to the
+entity, and so does every figure in §4: aliasing on edit, removed-id
+reappearance, strict transfers, and the shared-id percentages.
+
 | Category | Entities | Commits containing it |
 |---|---|---|
-| unchanged | 2,842,894 obs. | 297 |
+| unchanged | 2,859,426 obs. | 297 |
 | **body edit** | **2,070** | **247** |
 | rename | 51 | **5 independent events** |
 | rename_owner | 269 | 43 — but **263 (98%) are positional drift**, only 6 real |
