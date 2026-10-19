@@ -79551,7 +79551,7 @@
   {
     "kind": "import",
     "importerFile": "v3/benchmarks/discriminatedUnion.ts",
-    "exportedBy": "external:zod/v3",
+    "exportedBy": "v3/index.ts",
     "importedName": "z",
     "importType": "named"
   },
@@ -82255,7 +82255,7 @@
   {
     "kind": "import",
     "importerFile": "v3/benchmarks/object.ts",
-    "exportedBy": "external:zod/v3",
+    "exportedBy": "v3/index.ts",
     "importedName": "z",
     "importType": "named"
   },
@@ -84278,7 +84278,7 @@
   {
     "kind": "import",
     "importerFile": "v3/benchmarks/primitives.ts",
-    "exportedBy": "external:zod/v3",
+    "exportedBy": "v3/index.ts",
     "importedName": "z",
     "importType": "named"
   },
@@ -85306,7 +85306,7 @@
   {
     "kind": "import",
     "importerFile": "v3/benchmarks/realworld.ts",
-    "exportedBy": "external:zod/v3",
+    "exportedBy": "v3/index.ts",
     "importedName": "z",
     "importType": "named"
   },
@@ -86069,7 +86069,7 @@
   {
     "kind": "import",
     "importerFile": "v3/benchmarks/string.ts",
-    "exportedBy": "external:zod/v3",
+    "exportedBy": "v3/index.ts",
     "importedName": "z",
     "importType": "named"
   },
@@ -87202,7 +87202,7 @@
   {
     "kind": "import",
     "importerFile": "v3/benchmarks/union.ts",
-    "exportedBy": "external:zod/v3",
+    "exportedBy": "v3/index.ts",
     "importedName": "z",
     "importType": "named"
   },
