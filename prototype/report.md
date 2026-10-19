@@ -14,6 +14,78 @@ no longer exists upstream, and upstream has since force-pushed `main` so
 `e516c3b` is not an ancestor of it. `prototype/zod-repo/` is gitignored, so a
 fresh clone does not reproduce the corpus either.
 
+## Update (2026-10-19c): every anonymous function is an entity
+
+ADR-0001's first precondition for runtime ingestion read: give ids to functions
+bound by property assignment, because only 34.4% of runtime edges (127 of 369
+zod->zod) joined *exactly*. The rest fell back to an enclosing constructor.
+Checked before building, by the syntactic position of every non-exact frame
+endpoint (309):
+
+| position of the function at the frame | endpoints |
+|---|---|
+| argument to `$constructor` (a schema's init callback) | 133 (43%) |
+| right-hand side of `=` (`inst._zod.parse`, `_zod.run`, `_zod.check`) | 86 (28%) |
+| argument to another call (`map`, `push`, `cached`, ...) | 46 |
+| returned, or nested in another arrow | 37 |
+| no function at the position | 7 |
+
+Property assignment alone could have reached 180 exact edges (48.8%). Ids for
+every anonymous function could reach 342 (92.7%). The other 27 touch module
+top-level code and can never be exact. The precondition as written was too
+narrow, so the second option was built.
+
+**What changed.** An unbound arrow or function expression is declared as an
+`anonymous-function`. Its id is the scope prefix its own locals already carry,
+so it is unique by construction: 916 entities, with ids rising from 16,059 to
+16,975, and still 0 within-space collisions and 270 cross-space. Static
+attribution is deliberately unchanged:
+- `callSite` skips anonymous functions, so calls inside one stay attributed to
+  the nearest named entity. That entity is recorded on the declaration as
+  `ownerId`, and the closure invariant covers it.
+- `resolveEntity`'s walk-out also skips them. The first build moved 7
+  `mapper(issue)` edges from the parameter `mapper` onto its default value
+  `(issue) => issue.message`. That is wrong for a parameter whose value the
+  caller supplies, and it is fixed.
+
+The result is purely additive: 916 declarations plus 916 `contains`, and every
+one of the 48,737 existing facts is byte-identical and in the same order.
+`questions.ts` and `analyze.ts` output is byte-identical. The history harness
+is too, on a fresh cache (join 100.0%), because `anonymous-function` is not an
+oracle type.
+
+**Measured without re-tracing.** `trace.ts` gained `TRACE_RESOLVE=1`, which
+re-derives ids and tiers from the frames `facts.runtime.json` already stores.
+Sampling is nondeterministic, so this is the only repeatable way to measure an
+identity change against runtime data. On the pre-change code it reproduces the
+committed file byte-for-byte. That took one detail: the trace caches
+resolutions by position, so a named frame at `file:1:0` inherits the module
+result.
+
+| zod->zod runtime edges | before | after |
+|---|---|---|
+| both endpoints exact | 127 (34.4%) | **342 (92.7%)** |
+| caller tiers | exact 205, enclosing 142, line 2, module 20 | exact 347, line 2, module 20 |
+| callee tiers | exact 291, enclosing 160, line 2, module 92, none 3 | exact 451, line 2, module 92, none 3 |
+
+`trace-analyze.ts` compares runtime with static at static's granularity, so it
+rolls an anonymous endpoint up to its `ownerId`. A rolled-up endpoint is an
+attribution, so it does not count as exact in the downstream graphs. The first
+attempt counted it, and the exact-only closures inflated to the 354-entity
+`$constructor` hub. With that rule every downstream line is unchanged, and only
+the headline and the tier tallies move. It adds one line computed on the
+functions' own ids: wrapper `parse.fn` -> `_parse.fn` -> memoizer `wrapped` ->
+`$ZodObjectJIT.@arrowfunction[$constructor]0.@arrowfunction[parse]0`, **3
+hops, every one exact**. The earlier 3-hop path existed only by attribution to
+`$ZodObjectJIT`.
+
+**What it does not change.** Blast radius for the public `parse` is still 1.
+`ZodType.parse` is a bodyless interface member and is never a frame, and its
+callers are outside the corpus. Preconditions (2), deterministic capture with
+call-site positions, and (3), the workload's code in the fact base, are
+untouched. Runtime ingestion stays conditional. One of its three
+preconditions is now met.
+
 ## Update (2026-10-19b): `zod/v3` is not an external package
 
 `resolveImport` treated every bare specifier as external. That was recorded
@@ -159,7 +231,8 @@ the callers of the public method cannot be added by any trace.**
   the corpus). 366 of the 369 have both ends in declared ids (99.2%), but only
   127 (34.4%) join exactly: the rest are anonymous functions
   (`inst._zod.parse = ...` assignments have no entity, so they attribute to the
-  enclosing constructor, `$ZodObjectJIT`) or module top level. By distinct id
+  enclosing constructor, `$ZodObjectJIT`) or module top level. Since
+  2026-10-19c anonymous functions are entities and 342 (92.7%) join exactly. By distinct id
   pair, 92 of 354 joined pairs (26%) are in static facts; 262 are not, of which
   13 are self-loops, 15 involve a module, 234 are function->function and only
   80 of those have both ends exact.

@@ -178,6 +178,17 @@ function isDefaultExport(node: any): boolean {
   } catch { return false; }
 }
 
+// An arrow or function expression with no binding of its own: a callback, an
+// IIFE, or `inst._zod.parse = (payload, ctx) => ...`. Runtime frames land on
+// these more than on anything else, so they are entities. Their id is the scope
+// prefix their own parameters and locals already carry, unique by construction.
+function isAnonymousFunction(node: any): boolean {
+  if (!Node.isArrowFunction(node) && !Node.isFunctionExpression(node)) return false;
+  const p = node.getParent();
+  if (p && (Node.isVariableDeclaration(p) || Node.isPropertyAssignment(p) || Node.isPropertyDeclaration(p))) return false;
+  return !(isDefaultExport(node) || (p && Node.isExportAssignment(p)));
+}
+
 function declName(node: any): string | null {
   // An arrow or function expression has no name of its own; it borrows the
   // binding it is assigned to. `const x = () => {}` is the dominant idiom in
@@ -189,7 +200,7 @@ function declName(node: any): string | null {
     if (isDefaultExport(node) || (p && Node.isExportAssignment(p))) {
       return [...scopePath(node), "default"].join(".");
     }
-    return null;
+    return [...scopePath(node), anonSegment(node)].join(".");
   }
   const own = Node.isConstructorDeclaration(node)
     ? "constructor"
@@ -233,6 +244,7 @@ function typeOfNode(node: any): string {
     return init && (Node.isArrowFunction(init) || Node.isFunctionExpression(init))
       ? "function" : "variable";
   }
+  if (isAnonymousFunction(node)) return "anonymous-function";
   // Falling back to a bare "unknown" hid what these actually were: 32 of them,
   // all namespace re-exports (`export * as z from ...`), which the export map
   // yields as nodes none of the branches above match. Naming the syntax kind
@@ -268,6 +280,8 @@ const isDeclContainer = (n: any) =>
 function callSite(node: any, moduleId: string) {
   let fallback: { callerId: string; callerKind: string } | null = null;
   for (let a = node.getParent(); a; a = a.getParent()) {
+    // Static calls stay attributed to the nearest NAMED entity: nothing calls an anonymous function by name, so attributing to it would dead-end transitive-caller chains, the defect 2026-10-09b fixed for module attribution.
+    if (isAnonymousFunction(a)) continue;
     const callable = isCallableContainer(a);
     if (!callable && !isDeclContainer(a)) continue;
     const id = idOfNode(a);
@@ -280,4 +294,4 @@ function callSite(node: any, moduleId: string) {
   return fallback ?? { callerId: moduleId, callerKind: "module" };
 }
 
-export { mid, rel, np, eid, isExternalPath, externalOrigin, declName, idOfNode, typeOfNode, isCallableContainer, callSite };
+export { mid, rel, np, eid, isExternalPath, externalOrigin, declName, idOfNode, typeOfNode, isCallableContainer, callSite, isAnonymousFunction };

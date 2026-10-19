@@ -165,6 +165,23 @@ non-top-level declaration collided by name within its file.
   or removed, which was half of all owner-qualified name changes in Zod's
   history. The slot is content-derived, so passing an object to a different
   function changes its id; that is an owner move, and losing the id is right.
+- **Every anonymous function is an entity.** An unbound arrow or function
+  expression (a callback, an IIFE, `inst._zod.parse = (payload, ctx) => ...`)
+  is declared with type `anonymous-function`. Its id is the scope prefix its
+  own parameters and locals already carry,
+  `$ZodObjectJIT.@arrowfunction[$constructor]0.@arrowfunction[parse]0`, so it
+  is unique by construction, and 916 of them were added with no new collision.
+  Static attribution does not move:
+  - Calls inside an anonymous function stay attributed to the nearest *named*
+    entity. Nothing calls an anonymous function by name, so attributing to it
+    would dead-end transitive-caller chains.
+  - Resolution never walks out onto one: `mapper(issue)` still names the
+    parameter `mapper`, not its default value.
+  - The function's declaration carries that named entity as `ownerId`, under
+    the closure invariant.
+
+  Every pre-existing fact is byte-identical. This is what lets a runtime frame
+  join exactly (see "Runtime method installation" below).
 
 **3. Content hashes are facts about an entity, not its identity.** `contentId`
 and `structureId` remain as fields on declaration facts, for cross-version
@@ -271,7 +288,9 @@ Per-occurrence references grow the fact base ~52%.
   (which static resolves to a parameter) in 9 of 12 runs, the `defineCached`
   getter → the wrapper in 12 of 12, and the whole `_zod.run` dispatch into
   `$ZodObjectJIT`/`$ZodString`/`$ZodNumber` in 12 of 12. Callers of an
-  implementation behind `_zod.run` go from 0 to a 3-hop path.
+  implementation behind `_zod.run` go from 0 to a 3-hop path, and since
+  anonymous functions became entities, every hop of it is exact on the
+  functions' own ids, ending at `$ZodObjectJIT`'s `[parse]` arrow.
 
   But blast radius for the public `parse` stays **1**, for two reasons neither
   of which a better tracer fixes: `ZodType.parse` is a bodyless interface
@@ -279,11 +298,18 @@ Per-occurrence references grow the fact base ~52%.
   without call-site positions and the property key; and its real callers are
   user and test code that is not in the fact base at all. **Runtime ingestion
   is therefore conditional, not simply V2.** Three things must come first:
-  (1) the identity layer must give ids to functions bound by property
-  assignment — only 34% of runtime edges join *exactly* today, the rest falling
-  back to an enclosing constructor; (2) capture must be deterministic and carry
-  call-site positions, which a sampler does not; (3) the traced workload's code
-  must itself be in the fact base.
+  (1) the identity layer must give ids to the functions frames land on;
+  (2) capture must be deterministic and carry call-site positions, which a
+  sampler does not; (3) the traced workload's code must itself be in the fact
+  base.
+
+  (1) is now met. As first written it named functions bound by property
+  assignment, but those were only 28% of the non-exact frame endpoints;
+  `$constructor` init callbacks were 43% and other callbacks most of the rest.
+  With every anonymous function an entity, 342 of 369 runtime edges (92.7%)
+  join exactly, against 127 (34.4%) before. The other 27 touch module
+  top-level code and can never be exact. (2) and (3) are untouched, and blast
+  radius for the public `parse` is still 1, so the conditional verdict stands.
 - **Field reads stay unmodelled, now on evidence.** This ADR previously
   attributed the 12 remaining flagged imports to missing field-read edges.
   Measured, that was wrong twice over: only 8 of the 12 were field reads, and
