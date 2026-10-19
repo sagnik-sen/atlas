@@ -50,9 +50,11 @@ attribution is deliberately unchanged:
 
 The result is purely additive: 916 declarations plus 916 `contains`, and every
 one of the 48,737 existing facts is byte-identical and in the same order.
-`questions.ts` and `analyze.ts` output is byte-identical. The history harness
-is too, on a fresh cache (join 100.0%), because `anonymous-function` is not an
-oracle type.
+`questions.ts` and `analyze.ts` output is byte-identical. The history harness is
+byte-identical on the three worst-drift commits, rerun on a fresh cache with a
+100.0% join. That holds structurally for all commits: `anonymous-function` is
+not an oracle type, and `buildRecords` filters to the oracle types before
+keying.
 
 **Measured without re-tracing.** `trace.ts` gained `TRACE_RESOLVE=1`, which
 re-derives ids and tiers from the frames `facts.runtime.json` already stores.
