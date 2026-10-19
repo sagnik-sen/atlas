@@ -14,6 +14,34 @@ no longer exists upstream, and upstream has since force-pushed `main` so
 `e516c3b` is not an ancestor of it. `prototype/zod-repo/` is gitignored, so a
 fresh clone does not reproduce the corpus either.
 
+## Update (2026-10-19b): `zod/v3` is not an external package
+
+`resolveImport` treated every bare specifier as external. That was recorded
+as a tsconfig `paths` gap, but zod has no `paths`. Its benchmarks import
+`zod/v3`, which resolves through the package's own `exports` map under the
+`@zod/source` custom condition (`customConditions` in its tsconfig) to
+`src/v3/index.ts`. Reading `compilerOptions.paths` would not have fixed it.
+Bare specifiers now go to the compiler (`getModuleSpecifierSourceFile()`),
+which honours `paths`, `exports` and conditions alike. Anything it resolves
+outside the source root, or into node_modules, stays `external:`. Relative
+imports keep their existing resolver.
+
+The fact base changes by exactly six facts: the six `import { z } from
+"zod/v3"` edges in `v3/benchmarks/` now name `v3/index.ts` instead of
+`external:zod/v3`. Every other fact is identical, and the extractor's
+invariants and closure are unchanged. Downstream:
+
+- **analyze2.ts:** the flagged-import rate goes from 1 of 148 (0.7%) to 1 of
+  154 (0.6%), because the six new value imports all have evidence once barrels
+  are followed.
+- **analyze.ts:** external package imports go from 15 to 9 (`benchmark` only).
+- **questions.ts Q4:** "dead weight" rises from 14 of 188 to 20 of 194. Q4
+  does not follow barrels transitively. `z` is a namespace re-exported by
+  `v3/index.ts`, so its uses land in `v3/types.ts`, never in the barrel
+  itself. That is the same artifact as Q4's existing `v4/classic/coerce.ts ->
+  v4/core/index.ts [core]` sample, and Q4's verdict already says it needs all
+  three evidence kinds together.
+
 ## Update (2026-10-19): positional drift was half the story, and it is fixed
 
 The full-history run's headline about `entityId`, "263 of 269 owner-name

@@ -98,7 +98,7 @@ function log(level: string, msg: string) {
 }
 
 // Resolve import specifier to file path
-function resolveImport(fromFile: string, specifier: string): string | null {
+function resolveImport(fromFile: string, specifier: string, decl: any): string | null {
   const dir = path.dirname(fromFile);
   // relative imports
   if (specifier.startsWith(".")) {
@@ -116,10 +116,13 @@ function resolveImport(fromFile: string, specifier: string): string | null {
     }
     return null; // relative but unresolvable
   }
-  // ponytail: bare specifiers are treated as external. tsconfig `paths`
-  // aliases that point back into the repo (zod's own `zod/v3`) land here
-  // wrongly; read compilerOptions.paths if alias-heavy repos matter.
-  return null; // external package — has no path inside this repo
+  // A bare specifier can still land inside this repo: zod imports itself as
+  // `zod/v3`, which resolves through its own package.json `exports` and the
+  // `@zod/source` custom condition, not tsconfig `paths`. Ask the compiler,
+  // which honours all three; anything it puts outside the source root stays external.
+  const target = decl.getModuleSpecifierSourceFile?.();
+  const p = target ? np(target.getFilePath()) : null;
+  return p && !isExternalPath(p) ? p : null;
 }
 
 // JSDoc extraction (guarded)
@@ -518,7 +521,7 @@ function extractFile(file: SourceFile) {
   // ── Imports ──
   const mkImport = (imp: any) => {
     const msv = imp.getModuleSpecifierValue();
-    const resolved = resolveImport(fp, msv);
+    const resolved = resolveImport(fp, msv, imp);
     const isType = imp.isTypeOnly?.() || false;
     const defaultImport = imp.getDefaultImport?.();
     const namespaceImport = imp.getNamespaceImport?.();
@@ -545,7 +548,7 @@ function extractFile(file: SourceFile) {
   for (const exp of file.getExportDeclarations()) {
     const msv = exp.getModuleSpecifierValue?.();
     if (!msv) continue; // export { x } without "from"
-    const resolved = resolveImport(fp, msv);
+    const resolved = resolveImport(fp, msv, exp);
     const source = resolved ? rel(resolved) : `external:${msv}`;
     const named = exp.getNamedExports?.() || [];
     if (named.length > 0) {

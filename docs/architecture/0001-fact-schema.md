@@ -291,7 +291,8 @@ Per-occurrence references grow the fact base ~52%.
   `references` fact and came back unresolved because `getDeclarationNode()`
   returns undefined for an anonymous `export default`. Fixing that resolution
   takes the rate to **1 of 148 (0.7%)** with no field-read edges at all, and the
-  survivor is the `out_of_scope` containment gap.
+  survivor is the `out_of_scope` containment gap. It is 1 of 154 (0.6%) now that
+  the six `zod/v3` self-imports resolve into the repo rather than to `external:`.
 
   Field reads were built and measured on a branch: +14% facts and +18% bytes
   (or +2% excluding function-local receivers) for **zero** marginal benefit on
