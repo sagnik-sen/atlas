@@ -326,7 +326,8 @@ async function main() {
       if ((r.cat === "removed" || r.cat === "added") && other.has(here.ids[schemes[0]]) && (examples[`${r.cat}-but-${schemes[0]}-reappears`] ??= []).length < 8)
         examples[`${r.cat}-but-${schemes[0]}-reappears`].push(`${p.child.slice(0, 7)} ${here.file}:${here.name} [${here.type} -> ${other.get(here.ids[schemes[0]])} on the other side]`);
     }
-    for (const r of rows) if (r.cat === "rename_owner") { const k = /@\w+?\d+/.test(r.a!.name + r.b!.name) ? "positional" : "named"; counts[`ro_${k}`] = (counts[`ro_${k}`] ?? 0) + 1; }
+    // Positional only if the names differ in nothing but an anonymous segment's trailing index (`@block6`, `@arrowfunction[check]2`); an `@` segment merely being present says nothing.
+    for (const r of rows) if (r.cat === "rename_owner") { const strip = (s: string) => s.replace(/(@[^.]*?)\d+(?=\.|$)/g, "$1"); const k = strip(r.a!.name) === strip(r.b!.name) ? "positional" : "named"; counts[`ro_${k}`] = (counts[`ro_${k}`] ?? 0) + 1; }
     perPair.push({ child: p.child, counts });
     // Blind-spot probe: rename/move combined with a body edit is invisible to the oracle and lands
     // in removed+added. Bound it: removed entities that have a plausible edited successor.

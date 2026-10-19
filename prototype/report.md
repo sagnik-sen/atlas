@@ -14,6 +14,93 @@ no longer exists upstream, and upstream has since force-pushed `main` so
 `e516c3b` is not an ancestor of it. `prototype/zod-repo/` is gitignored, so a
 fresh clone does not reproduce the corpus either.
 
+## Update (2026-10-19): positional drift was half the story, and it is fixed
+
+The full-history run's headline about `entityId`, "263 of 269 owner-name
+changes (98%) are positional drift, only 6 real", was a harness mislabel.
+`history.ts` called a `rename_owner` positional whenever either name
+*contained* an anonymous segment such as `@objectliteral0`, whether or not the
+index moved. The worst commit cited for it is the counterexample. All 75
+entities in `773a486` are `_zodTypeMethods.@objectliteral0.check` →
+`ZodType.@objectliteral0.check`: the index did not move, the named owner did.
+A change now counts as positional only if the two names are equal once every
+anonymous segment's index is stripped.
+
+Rescored from the same cache, every other line of output is byte-identical:
+
+| rename_owner | entities | commits |
+|---|---|---|
+| positional drift (only an anonymous index moved) | **140 (52%)** | 38 |
+| real owner move | **129 (48%)** | 9 |
+
+111 of the 129 come from two Zod refactors. `3063993` ("move methods to the
+prototype") moved every schema's method object out of its init callback into
+`_zodTypeMethods`-style factories. `773a486` ("declare a trait's members on
+`$constructor`") then moved them into `$constructor`'s members argument. A
+path-based id cannot survive either move, and should not pretend to.
+
+**The fix.** An anonymous segment now carries its *slot*: the property it is
+assigned to, the function it is an argument of, `return`, or the statement
+that owns a block. Its index counts only same-kind, same-slot rivals under the
+nearest named ancestor, as in
+`$ZodCheckLessThan.@arrowfunction[$constructor]0.@arrowfunction[check]0` and
+`finalize.@block[if]7`. Before, the index counted every same-kind node under the
+anchor. So when `6f04836` removed one callback per check, every
+`inst._zod.check = (payload) => ...` after it was renumbered. At `e516c3b` the
+extractor's invariants are unchanged:
+- 0 within-space collisions
+- 270 cross-space merges
+- closure of 6,414 of 6,553 call edges and 9,229 of 9,286 reference edges
+- 16,059 ids over 16,329 entities
+
+4,815 of the 5,687 ids with an anonymous segment now carry a slot.
+`facts.runtime.json` was rewritten to the new ids, not re-traced: `questions.ts`
+output is byte-identical, and `trace-analyze.ts` differs only in id strings.
+
+Full history, old segments against slot-keyed:
+
+| | old | slot-keyed |
+|---|---|---|
+| rename_owner, positional | 140 across 38 commits | **80** across 27 |
+| rename_owner, real owner move | 129 across 9 | 154 across 13 |
+| removed | 3,266 | **2,723** |
+| added | 6,381 | **5,840** |
+| unchanged | 2,859,426 obs. | 2,859,980 |
+| body edit | 2,070 | 2,113 |
+
+The bigger effect is not in `rename_owner`. The drift figure was called a
+lower bound because entities under 12 nodes, or edited in the same commit,
+drift into removed-plus-added instead, and that is where most of it was.
+Removed and added each fall by about 540 entities, which now count as
+unchanged (+554) or as body edits (+43).
+
+Owner moves rise by 25 because some changes that only looked like index shifts
+were real moves. `6f04836` moved `_ZodString`'s methods out of `$constructor`'s
+argument and into a `util.derived(inst, {...})` call.
+
+The 80 that remain are same-slot rivals, mostly `case` and `if` blocks in the
+locale files' `switch` statements (15 in `d3355f7`). The `shortcut:` on
+`anonSegment` records that limit.
+
+**The content-hash figures move with the oracle.** The oracle names entities
+with the same `declName`, so it now matches entities it used to lose to drift,
+and more edits are observed. `contentId` also hashes the qualified name.
+ADR-0001's table carries the new values:
+
+| measure over 297 pairs | `structureId` | `contentId` |
+|---|---|---|
+| aliasing on body edit, raw | 3.9% (81) → **6.0% (127)** | 1.5% (32) → **3.1% (66)** |
+| ...where the old id was unique in the parent | 0.43% (9) → 0.80% (17) | 0% → 0% |
+| removed id reappears, distinct events | 1,428 across 100 → 1,210 across 82 | 31 across 12 → 11 across 4 |
+| strict transfers, clear (body ≥ 12 nodes) | 3 of 891 → 4 of 798 | 1 → 0 |
+| unchanged observations whose id is shared | 48.7% → 48.7% | 20.1% → 18.7% |
+
+The rise in aliasing is concentrated in `d3355f7`, the locale refactor, which
+contributes 49 of the 127 and 32 of the 66 (one 32-entity `contentId`
+cluster). Its entities used to sit in removed-plus-added, so their hashes were
+never scored on an edit. No conclusion changes, and the case against content
+hashes as identity gets slightly stronger.
+
 ## Update (2026-10-09c): runtime tracing spike
 
 Question: does a runtime trace recover the edges static analysis cannot (the
@@ -271,7 +358,7 @@ reappearance, strict transfers, and the shared-id percentages.
 | unchanged | 2,859,426 obs. | 297 |
 | **body edit** | **2,070** | **247** |
 | rename | 51 | **5 independent events** |
-| rename_owner | 269 | 43 — but **263 (98%) are positional drift**, only 6 real |
+| rename_owner | 269 | 43 — 140 positional drift (38 commits), 129 real owner moves (9); first published as "263 (98%) positional", a mislabel, see 2026-10-19 |
 | move | **0** | 0 |
 | rename + move | 0 | 0 |
 
@@ -284,13 +371,14 @@ overwhelming change mode: a scheme that breaks on body edits loses identity
 roughly **400x** more often here than one that breaks on renames.
 
 **The biggest surprise is about `entityId`, not the content hashes.** Its
-dominant instability is not renames at all: of 269 owner-name changes, **263
-(98%) across 43 commits are a positional anonymous-scope index shifting
-because a sibling was inserted earlier in the file** — `@arrowfunction0`
-becoming `@arrowfunction1`. Only 6 are real owner renames. The `shortcut:`
-comment on `anonSegment` flagged this risk when scope qualification was added
-the same day; this is it, measured, and it is a lower bound because sub-12-node
-entities with the same drift land in removed-plus-added.
+dominant instability is not renames: of 269 owner-name changes, 140 (38
+commits) are a positional anonymous-scope index shifting because a sibling was
+inserted or removed earlier, as in `@arrowfunction2` becoming `@arrowfunction1`. The
+other 129 (9 commits) are real owner moves. This was first published as "263
+(98%) positional, only 6 real", which was a classifier mislabel; the 2026-10-19
+update has the correction and the fix, which keys anonymous segments on their
+syntactic slot. The figure is a lower bound, because sub-12-node entities with
+the same drift land in removed-plus-added.
 
 Note that git's own rename detection finds **zero file-level renames across all
 298 src-touching commits**, which is why the oracle had to work at entity level.
@@ -320,7 +408,8 @@ corpus has none.
 
 The survival columns are tautological. These two are not.
 
-**Full-run figures supersede the sample below.** Over 297 pairs: aliasing on
+**Full-run figures supersede the sample below, and are themselves restated
+on slot-keyed ids in the 2026-10-19 update.** Over 297 pairs: aliasing on
 body edit is 3.9% raw for `structureId` (0.43% where the old id was unique in
 the parent) and 1.5% for `contentId` (0% unique) — the 6.5% below was a
 24-pair artifact. Removed-id reappearance is 1,428 distinct events across 100

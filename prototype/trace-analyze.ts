@@ -108,12 +108,12 @@ function scoped(seed: string) {
 const seeds: [string, string[]][] = [
   ["public parse, classic/parse.ts:parse (the report's 1)", [PUBLIC_PARSE]],
   ["  + factory alias (parse := _parse.fn)", [PUBLIC_PARSE, ...aliases]],
-  ["ZodType.parse wrapper fn (what z.string().parse IS at runtime)", ["ts:v4/classic/schemas.ts:_zodTypeParseProps.@objectliteral0.parse.fn"]],
+  ["ZodType.parse wrapper fn (what z.string().parse IS at runtime)", ["ts:v4/classic/schemas.ts:_zodTypeParseProps.@objectliteral[return]0.parse.fn"]],
   ["_parse.fn (core)", aliases],
   ["$ZodObjectJIT (inst._zod.parse impl, behind _zod.run)", ["ts:v4/core/schemas.ts:$ZodObjectJIT"]],
   ["$ZodString (inst._zod.parse impl, behind _zod.run)", ["ts:v4/core/schemas.ts:$ZodString"]],
   ["$ZodNumber", ["ts:v4/core/schemas.ts:$ZodNumber"]],
-  ["_zodTypeParseProps.parse factory (installed via installLazyProps)", ["ts:v4/classic/schemas.ts:_zodTypeParseProps.@objectliteral0.parse"]],
+  ["_zodTypeParseProps.parse factory (installed via installLazyProps)", ["ts:v4/classic/schemas.ts:_zodTypeParseProps.@objectliteral[return]0.parse"]],
 ];
 console.log(`\nTRANSITIVE CALLERS (distinct entities, seeds excluded): static -> +runtime exact-tier -> +runtime all-joined (hub-inflated) | seed-scoped  [+ workload driver]`);
 for (const [label, s] of seeds) {
@@ -136,7 +136,7 @@ show(/installLazyProps -> .*_zodTypeParseProps$|defineCached.*get -> .*_zodTypeP
 console.log(" ZodType.parse wrapper -> core _parse -> _zod.run -> implementation:");
 show(/parse\.fn -> .*(_parse\.fn|\$Zod)|_parse\.fn -> .*(wrapped|\$Zod)|wrapped -> .*\$Zod/, 12);
 // The static fact base's own best attempt at the same hop:
-const staticFromParseFn = sCalls.filter((f) => /_zodTypeParseProps\.@objectliteral0\.parse\.fn$/.test(f.callerId)).map((f) => f.calleeId);
+const staticFromParseFn = sCalls.filter((f) => /_zodTypeParseProps\.@objectliteral\[return\]0\.parse\.fn$/.test(f.callerId)).map((f) => f.calleeId);
 console.log(` static callees of the wrapper fn: ${JSON.stringify(staticFromParseFn)}`);
 const staticRun = sCalls.filter((f) => /core\/parse\.ts:_parse\.fn$/.test(f.callerId) && /_zod|run/.test(f.calleeName));
 console.log(` static facts for the _zod.run call in _parse.fn: ${JSON.stringify(staticRun.map((f) => [f.calleeName, f.calleeId, f.reason, f.confidence]))}`);
@@ -148,9 +148,9 @@ function path(m: Map<string, Set<string>>, from: string, to: string) {
   if (!par.has(to)) return null;
   const out = []; for (let x = to; x; x = par.get(x)!) out.push(x); return out;
 }
-const PUB = "ts:v4/classic/schemas.ts:_zodTypeParseProps.@objectliteral0.parse.fn";
+const PUB = "ts:v4/classic/schemas.ts:_zodTypeParseProps.@objectliteral[return]0.parse.fn";
 console.log(`\nCALL PATH (user-facing wrapper -> ... -> implementation):`);
-for (const impl of ["ts:v4/core/schemas.ts:$ZodObjectJIT", "ts:v4/core/memoizer.ts:attachMemoizer.@arrowfunction0.wrapped"]) {
+for (const impl of ["ts:v4/core/schemas.ts:$ZodObjectJIT", "ts:v4/core/memoizer.ts:attachMemoizer.@arrowfunction[push]0.wrapped"]) {
   const ps = path(mStatic, impl, PUB), pe = path(mRealExact, impl, PUB), pb = path(mReal, impl, PUB);
   const f = (p: string[] | null) => (p ? `${p.length - 1} hops: ${p.join(" -> ")}` : "NO PATH");
   console.log(`  ${impl}\n    static-only        : ${f(ps)}\n    +runtime exact-only, shortcuts removed: ${f(pe)}\n    +runtime all joined, shortcuts removed: ${f(pb)}`);
