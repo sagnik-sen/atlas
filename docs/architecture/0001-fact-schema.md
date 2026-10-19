@@ -25,8 +25,8 @@ something. Closure asks whether the thing it returned names an entity the fact
 base declares. The same fact base measured 96.6% on the first and **16.8%** on
 the second. Resolving an edge to an identifier nothing declares is worse than
 leaving it unresolved, because the edge carries confidence 0.8–0.9 and is
-unusable. Closure is now 97.0% of call and instantiation edges and 9,213 of
-9,284 reference edges, with zero dangling endpoints.
+unusable. Closure is now 97.9% of call and instantiation edges (6,414 of
+6,553) and 9,229 of 9,286 reference edges, with zero dangling endpoints.
 
 **Four separate "findings" about static analysis were extractor defects.** Each
 was recorded as evidence about Atlas's approach; each was a bug:
@@ -57,15 +57,18 @@ The failure mode is how that cost is paid, and the full-history run (297 pairs,
 
 | measure over 297 pairs | `structureId` | `contentId` |
 |---|---|---|
-| aliasing on body edit, raw | 3.9% (81) | 1.5% (32) |
-| ...where the old id was unique in the parent | 0.43% (9) | 0% (0) |
-| removed id reappears, as distinct events | 1,428 across 100 commits | 31 across 12 |
-| strict transfers (old id unique, new holder) | 891, but 888 have bodies under 12 nodes and cannot be adjudicated; **3** clear | 1 |
-| unchanged observations whose id is *shared* in the child | **48%** | 20% |
+| aliasing on body edit, raw | 6.0% (127) | 3.1% (66) |
+| ...where the old id was unique in the parent | 0.80% (17) | 0% (0) |
+| removed id reappears, as distinct events | 1,210 across 82 commits | 11 across 4 |
+| strict transfers (old id unique, new holder) | 798, but 794 have bodies under 12 nodes and cannot be adjudicated; **4** clear | 0 |
+| unchanged observations whose id is *shared* in the child | **48%** | 19% |
 
-The earlier "6.5% silent aliasing" was a small-sample artifact; at full scale it
-is 3.9%, and most of that is an old id that was already shared rather than an
-identity handed over. **The decisive row is the last one**: for half of all
+Restated 2026-10-19 on slot-keyed anonymous segments (Decision 2), which let
+the oracle match entities it previously lost to positional drift; the values
+measured before that are in `prototype/report.md`. The earlier "6.5% silent
+aliasing" was a small-sample artifact; at full scale it is 6.0%, 49 of those
+127 in one locale refactor (`d3355f7`), and most of it is an old id that was
+already shared rather than an identity handed over. **The decisive row is the last one**: for half of all
 unchanged observations a surviving `structureId` does not pin a single entity.
 It identifies a *structure*, not an identity — the 60% collision rate
 reappearing across history rather than a separate defect. A lost id is a
@@ -78,7 +81,7 @@ changes". A body edit therefore mints a new id, so the stability is only the
 stability of an entity that has not changed.
 
 **The change mix decides the trade.** Over all 297 adjacent commit pairs
-(full run, not a sample): **2,070 body edits across 247 commits, 5 independent
+(full run, not a sample): **2,113 body edits across 247 commits, 5 independent
 rename events, zero clean moves.** A body-sensitive id loses identity roughly
 400x more often on this corpus than a rename-sensitive one.
 
@@ -140,12 +143,28 @@ non-top-level declaration collided by name within its file.
   are a space-classifier defect: a `PropertySignature` in a type literal is
   type space, but the classifier maps every `property` to value space. The rest
   are nested arrow functions sharing a positional segment.
-- **Cross-space (267):** genuine TypeScript declaration merges — 247 are the
+  All 20 are since fixed (`3bbe171`): parameters of bodyless signatures are not
+  entities, signature members are type space (`type-method`,
+  `type-property`), an anonymous function is indexed under its nearest *named*
+  ancestor rather than its immediate parent, and nested blocks and catch
+  clauses get a segment. **Within-space collisions are 0 of 16,059 ids.**
+- **Cross-space (267, now 270):** genuine TypeScript declaration merges — 247 are the
   `interface X` + `const X` pattern this corpus uses pervasively. **One
   TypeScript symbol is one entity**, so these keep one id and carry multiple
   declaration facts.
 - **Anonymous `export default` gets an id.** 80 entities previously had no
   name and therefore no identity.
+- **Anonymous scopes are keyed on their syntactic slot.** An unbound arrow,
+  function expression, object or type literal, nested block or catch clause
+  contributes a segment made of its kind, its slot — the property it is
+  assigned to, the function it is an argument of, `return`, or the statement
+  that owns a block — and an index among same-kind, same-slot nodes under the
+  nearest named ancestor: `@arrowfunction[check]0`,
+  `@objectliteral[$constructor]0`, `@block[if]7`. Indexing among *all*
+  same-kind nodes made the id shift whenever an earlier sibling was inserted
+  or removed, which was half of all owner-qualified name changes in Zod's
+  history. The slot is content-derived, so passing an object to a different
+  function changes its id; that is an owner move, and losing the id is right.
 
 **3. Content hashes are facts about an entity, not its identity.** `contentId`
 and `structureId` remain as fields on declaration facts, for cross-version
@@ -158,11 +177,9 @@ are defined now:
   unresolved with confidence ≤ 0.3. Enforced; exits non-zero.
 - *Unambiguous identity*: one entity id names one entity, where merged
   declarations of a single TypeScript symbol count as one entity. The check is
-  split by declaration space accordingly: 267 cross-space merges are reported
-  as expected, and 20 within-space collisions as genuine. Reported, not yet
-  enforced — enforcing requires dropping overload-signature parameters as
-  entities and classifying type-literal members as type space, which together
-  are most of the residual 20.
+  split by declaration space accordingly: 270 cross-space merges are reported
+  as expected, and a within-space collision is a violation. Enforced since
+  `3bbe171`, at 0; exits non-zero.
 
 Given the four artifacts above, this is not a quality-of-implementation detail.
 It is the schema's primary defence.
@@ -192,7 +209,7 @@ occurrences and never leave their function.
 
 | Alternative | Pros | Cons | Why rejected |
 |---|---|---|---|
-| Content-addressed ids (thesis §4.4) | Survives rename and move; no path coupling | 60.1% of entities in a colliding id (worse as identity gets finer: 55.3% before scope qualification); half of unchanged observations carry an id shared with another entity; 3.9% aliasing on body edits; breaks on every body edit, the dominant change mode | Fails silently on the common case to survive the rare one |
+| Content-addressed ids (thesis §4.4) | Survives rename and move; no path coupling | 60.1% of entities in a colliding id (worse as identity gets finer: 55.3% before scope qualification); half of unchanged observations carry an id shared with another entity; 6.0% aliasing on body edits; breaks on every body edit, the dominant change mode | Fails silently on the common case to survive the rare one |
 | Hybrid: content hash primary, path as tiebreak | Keeps rename survival | Collision resolution needs the path, so the id is path-coupled anyway, with a hash's opacity added | Pays the cost of both, keeps the benefit of neither |
 | Compiler-assigned symbol ids (SCIP-style monikers) | Standard, tool-interoperable | Requires a resolved program; thesis §2.4 rejects a build requirement | Revisit if the build requirement is relaxed |
 | Graph node/edge model (original vision) | Familiar; direct traversal | No uncertainty model; flattens temporal and intentional facts | Already rejected by thesis §3 |
@@ -210,21 +227,27 @@ is visible rather than silent. Scope qualification is a breaking change to
 every member and parameter id — most of the fact base — and makes ids longer
 and path-shaped (`ZodObject._getCached.@typeliteral0.shape`).
 
-**And the real instability is not what this ADR said it was.** Measured over
-full history, `entityId`'s dominant failure is **positional drift, not
-renames**: of 269 entities whose owner-qualified name changed, **263 (98%)
-across 43 commits are a `@blockN` / `@arrowfunctionN` / `@objectliteralN` index
-shifting because a sibling was inserted earlier in the file**. Only 6 were real
-owner renames, against 5 rename events in the entire history. Worst commits:
-`773a486` (75 entities), `3063993` (41), `6f04836` (19). It is a lower bound —
-entities under 12 nodes with the same drift land in removed-plus-added instead.
+**And the real instability is not what this ADR said it was, twice.**
+Measured over full history, 269 entities changed their owner-qualified name
+across 43 commits, against 5 rename events. This ADR first reported 263 (98%)
+of them as positional drift and only 6 as real. That was a harness mislabel:
+any name *containing* an `@kindN` segment was counted as drift, whether or not
+the index moved. Split properly, **140 (38 commits) were positional drift and
+129 (9 commits) were real owner moves**. 111 of the moves are two Zod
+refactors, `3063993` and `773a486`, that moved its method objects from one
+owner to another. A path-based id cannot survive that, and should not
+pretend to.
 
-That is a weakness of the *positional disambiguator* introduced with scope
-qualification, not of path-based identity as such. The `shortcut:` comments on
-`anonSegment` name exactly this risk; this is it, quantified. Anchoring
-anonymous scopes on something order-independent (nearest named ancestor plus a
-content-derived discriminator) would remove most of it, at the cost of making
-part of the id content-derived. Worth revisiting; not decided here. Per-occurrence references grow the fact base ~52%.
+The positional half was a weakness of the disambiguator introduced with scope
+qualification, not of path-based identity, and it is now fixed: anonymous
+segments are keyed on their syntactic slot (Decision 2). Positional owner
+renames fall from 140 to 80. The larger effect is the drift that had been
+hiding in removed-plus-added, which is why the first figure was called a lower
+bound: removed and added each fall by about 540 entities. The 80 that remain
+are same-slot rivals (mostly `case` and `if` blocks in the locale files), and
+the `shortcut:` on `anonSegment` records them.
+
+Per-occurrence references grow the fact base ~52%.
 
 **Unresolved, and deliberately out of scope.**
 - **Runtime method installation is not modelled, and for some corpora that is

@@ -134,7 +134,7 @@ h1(4, "Which imports are dead weight?");
 h1(5, "What happens when a user calls z.string().parse(x)?");
 {
   const pub = "ts:v4/classic/schemas.ts:ZodType.parse";
-  const impl = "ts:v4/classic/schemas.ts:_zodTypeParseProps.@objectliteral0.parse";
+  const impl = "ts:v4/classic/schemas.ts:_zodTypeParseProps.@objectliteral[return]0.parse";
   const linked = F.some((f) => (f.calleeId === impl || f.targetId === impl) && f.callerId === pub);
   console.log(`  declared public method: ${declById.has(pub) ? "yes" : "no"}`);
   console.log(`  declared implementation: ${declById.has(impl) ? "yes" : "no"}`);

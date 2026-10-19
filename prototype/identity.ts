@@ -50,28 +50,51 @@ function eid(file: string, name: string) {
 // straight into a call, as in `$constructor("ZodString", (inst, def) => {...})`.
 // Its parameters and locals need some disambiguator or they collide with every
 // other callback's `inst` in the same file.
-// shortcut: positional index among same-kind siblings of the parent node. Shifts
-// if a sibling callback is inserted before it; a stable scheme would need the
-// enclosing call's callee name, which is not always resolvable at this point.
-// Index among same-kind anonymous nodes under the nearest NAMED ancestor, in
-// document order. Indexing within the immediate parent gave every sibling in a
-// promise chain the same segment: `.then(() => {...}).then((x) => {...})` has
-// two arrows with different parents, each index 0 in its own parent, so a local
-// in the first collided with a parameter of the second.
-// shortcut: still positional, so inserting an earlier sibling shifts it. A
-// stable scheme needs the enclosing call's callee name, which is not always
-// resolvable here.
+//
+// The segment is the node's kind, its syntactic slot, and an index among
+// same-kind, same-slot nodes under the nearest NAMED ancestor, in document
+// order. Indexing within the immediate parent gave every sibling in a promise
+// chain the same segment: `.then(() => {...}).then((x) => {...})` has two
+// arrows with different parents, each index 0 in its own parent. Indexing
+// among ALL same-kind nodes under the anchor then made the index shift whenever
+// any earlier sibling was inserted — 6f04836 removed one callback per check and
+// renumbered every `inst._zod.check = (payload) => ...` after it.
+// shortcut: still positional within a slot, so an earlier rival in the SAME
+// slot (a second `.push(() => ...)`, another `if`) shifts it; revisit if the
+// history harness's ro_positional count says that drift matters.
 function anonSegment(node: any): string {
   const kindTag = `@${node.getKindName().replace(/Expression$|Declaration$/, "").toLowerCase()}`;
+  const slot = anonSlot(node);
+  const tag = slot ? `${kindTag}[${slot}]` : kindTag;
   let anchor: any = null;
   for (let a = node.getParent?.(); a; a = a.getParent?.()) {
     if (Node.isSourceFile(a)) { anchor = a; break; }
     if (namedSegment(a)) { anchor = a; break; }
   }
-  if (!anchor) return `${kindTag}0`;
-  const sibs = anchor.getDescendantsOfKind?.(node.getKind()) ?? [];
+  if (!anchor) return `${tag}0`;
+  const sibs = (anchor.getDescendantsOfKind?.(node.getKind()) ?? []).filter((c: any) => anonSlot(c) === slot);
   const i = sibs.findIndex((c: any) => c === node);
-  return `${kindTag}${i < 0 ? 0 : i}`;
+  return `${tag}${i < 0 ? 0 : i}`;
+}
+
+// The slot an anonymous node fills: the property or variable it is assigned to
+// (`inst._zod.check = ...` -> check), the function it is an argument of
+// (`$constructor(...)` -> $constructor), `return`, or for a nested block the
+// statement that owns it (if / else / for / try / finally ...). "" if none.
+function anonSlot(node: any): string {
+  const p = node.getParent?.();
+  if (!p) return "";
+  const nameOf = (e: any) => Node.isPropertyAccessExpression(e) ? e.getName() : Node.isIdentifier(e) ? e.getText() : "";
+  let s = "";
+  if (Node.isBinaryExpression(p) && p.getOperatorToken().getKind() === SyntaxKind.EqualsToken && p.getRight() === node) s = nameOf(p.getLeft());
+  else if ((Node.isCallExpression(p) || Node.isNewExpression(p)) && (p.getArguments() ?? []).includes(node)) s = nameOf(p.getExpression());
+  else if (Node.isReturnStatement(p)) s = "return";
+  else if (Node.isBlock(node)) {
+    s = Node.isIfStatement(p) ? (p.getElseStatement() === node ? "else" : "if")
+      : Node.isTryStatement(p) ? (p.getFinallyBlock() === node ? "finally" : "try")
+      : p.getKindName().replace(/Statement$/, "").toLowerCase();
+  }
+  return s.replace(/[^\w$]/g, "_");
 }
 
 // One segment of the lexical scope path, for ancestors that introduce a scope.
