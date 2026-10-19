@@ -2,7 +2,7 @@ import { Project, SyntaxKind, Node, ts, type SourceFile } from "ts-morph";
 import * as path from "path";
 import * as fs from "fs";
 import { fingerprint } from "./fingerprint";
-import { setRoot, mid, rel, np, eid, isExternalPath, externalOrigin, declName, idOfNode, typeOfNode, isCallableContainer, callSite } from "./identity";
+import { setRoot, mid, rel, np, eid, isExternalPath, externalOrigin, declName, idOfNode, typeOfNode, isCallableContainer, callSite, isAnonymousFunction } from "./identity";
 
 type Fact = DeclFact | ContainsFact | ImportFact | ReexportFact | CallsFact | HeritageFact | InstantiatesFact | ReferencesFact;
 
@@ -17,6 +17,7 @@ interface DeclFact {
   // when the node is not fingerprintable (modules, stubs, namespace re-exports).
   structureId?: string; // structure only: survives rename and move
   contentId?: string;   // name + structure: survives move, not rename
+  ownerId?: string;     // anonymous-function only: the entity its calls are attributed to (identity.ts callSite)
 }
 
 interface ContainsFact {
@@ -189,7 +190,8 @@ function resolveEntity(node: any): string | null {
       const at = defs[0].getNode?.();
       for (let a = at; a; a = a.getParent?.()) {
         if (Node.isSourceFile(a)) break;
-        if (declName(a)) { defNode = a; break; }
+        // Skip anonymous functions: `mapper = (issue) => ...` names the parameter, not its default value.
+        if (declName(a) && !isAnonymousFunction(a)) { defNode = a; break; }
       }
       if (!defNode) {
         const sf = defs[0].getSourceFile?.();
@@ -420,11 +422,14 @@ function extractFile(file: SourceFile) {
     const declFile = np(node.getSourceFile().getFilePath());
     if (isExternalPath(declFile)) return;
     if (isSignatureParam(node)) return;
+    // A bound arrow is declared by its binding (`const f = () => {}` is `f`).
+    if ((Node.isArrowFunction(node) || Node.isFunctionExpression(node)) && !isAnonymousFunction(node)) return;
     const id = idOfNode(node);
     if (!id) return;
     facts.push({
       kind: "declaration", entityId: id, entityType: typeOfNode(node),
       name: declName(node)!, file: rel(declFile), exported: !!node.isExported?.(),
+      ...(isAnonymousFunction(node) ? { ownerId: callSite(node, mid(declFile)).callerId } : {}),
       ...fingerprint(node, declName(node)!),
     });
     facts.push({ kind: "contains", containerId: mid(declFile), entityId: id });
@@ -449,6 +454,8 @@ function extractFile(file: SourceFile) {
     // a new entity. Declaring it made `const shape` and the shorthand collide on
     // one id in the same scope. The reference pass already covers the use.
     SyntaxKind.BindingElement,
+    // Anonymous functions (callbacks, `x.y = () => ...`): runtime frames land on them.
+    SyntaxKind.ArrowFunction, SyntaxKind.FunctionExpression,
   ];
   for (const k of DECL_KINDS) {
     for (const node of file.getDescendantsOfKind(k)) emitDecl(node);
@@ -647,7 +654,10 @@ const edges: { callerId: string; targetId?: string; file: string; line: number }
 // calls+instantiations closure figure, which is a tracked metric.
 const refs = unique.filter(f => f.kind === "references") as ReferencesFact[];
 const refEdges = refs.map(r => ({ callerId: r.callerId, targetId: r.targetId, file: r.file, line: r.line }));
-const violations = [...edges, ...refEdges].flatMap(e => {
+// An anonymous function's ownerId is an entity reference too (ADR-0001 decision 1): closed, but not an edge in the closure metric.
+const ownerEdges = (unique.filter(f => f.kind === "declaration" && (f as DeclFact).ownerId) as DeclFact[])
+  .map(d => ({ callerId: d.entityId, targetId: d.ownerId, file: d.file, line: 0 }));
+const violations = [...edges, ...refEdges, ...ownerEdges].flatMap(e => {
   const bad: string[] = [];
   if (!declaredIds.has(e.callerId)) bad.push(`caller ${e.callerId}`);
   if (e.targetId && !declaredIds.has(e.targetId)) bad.push(`target ${e.targetId}`);
