@@ -32,7 +32,7 @@ These need debate before ADR-0001 is finalized:
 
 2. **Language model universality.** How much of the node/edge model is universal vs. language-specific? Rust traits, Go embedding, TypeScript structural typing don't map 1:1. Lean: universal core with typed extension slots. Needs debate.
 
-3. **Correctness verification. Partly answered.** Two invariants are now asserted on every extraction run and exit non-zero on violation: closure (every edge endpoint is a declared entity or explicitly unresolved) and unambiguous identity (no id names two entities within one declaration space). Both reached zero violations on 2026-10-09. Neither proves an edge is *correct*: `installLazyProps`'s `props()` yields a closed, confidence-0.9 edge terminating at a parameter with no body. Original note follows.
+3. **Correctness verification. Partly answered.** Two invariants are now asserted on every extraction run and exit non-zero on violation: closure (every edge endpoint is a declared entity or explicitly unresolved) and unambiguous identity (no id names two entities within one declaration space). Both reached zero violations on 2026-10-09, though the identity check missed same-type collisions until 2026-11-15 (14 ids, fixed; see report.md). Neither proves an edge is *correct*: `installLazyProps`'s `props()` yields a closed, confidence-0.9 edge terminating at a parameter with no body. Original note follows.
 
    **Correctness verification.** If the graph is wrong, everything downstream is wrong. How do we prove extraction correctness? Not urgent for V1 but hardest quality problem. Should be explored early.
 

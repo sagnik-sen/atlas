@@ -147,7 +147,11 @@ non-top-level declaration collided by name within its file.
   entities, signature members are type space (`type-method`,
   `type-property`), an anonymous function is indexed under its nearest *named*
   ancestor rather than its immediate parent, and nested blocks and catch
-  clauses get a segment. **Within-space collisions are 0 of 16,059 ids.**
+  clauses get a segment. **Within-space collisions are 0 of 16,059 ids** as that check
+  counted them. It could not see two entities of the *same* entityType sharing
+  an id; 14 such ids existed until 2026-11-15 (`for`-header bindings and
+  anonymous segments under overload signatures), now fixed and checked by
+  compiler symbol. See report.md "Update (2026-11-15)".
 - **Cross-space (267, now 270):** genuine TypeScript declaration merges — 247 are the
   `interface X` + `const X` pattern this corpus uses pervasively. **One
   TypeScript symbol is one entity**, so these keep one id and carry multiple
@@ -196,7 +200,9 @@ are defined now:
   declarations of a single TypeScript symbol count as one entity. The check is
   split by declaration space accordingly: 270 cross-space merges are reported
   as expected, and a within-space collision is a violation. Enforced since
-  `3bbe171`, at 0; exits non-zero.
+  `3bbe171`; exits non-zero. Since 2026-11-15 it also fails when one
+  `(id, entityType)` covers more than one compiler symbol, which the
+  space split alone missed. At 0 under both.
 
 Given the four artifacts above, this is not a quality-of-implementation detail.
 It is the schema's primary defence.

@@ -72,7 +72,15 @@ function anonSegment(node: any): string {
     if (namedSegment(a)) { anchor = a; break; }
   }
   if (!anchor) return `${tag}0`;
-  const sibs = (anchor.getDescendantsOfKind?.(node.getKind()) ?? []).filter((c: any) => anonSlot(c) === slot);
+  // Overload signatures are separate nodes carrying one name, so indexing
+  // under a single one restarts at 0 in each: every `_function(params: {...})`
+  // overload yielded `_function.@typeliteral0`. Index across all same-kind
+  // declarations of the anchor's symbol in this file instead.
+  const file = anchor.getSourceFile();
+  const own = Node.isSourceFile(anchor) ? [] : (anchor.getSymbol?.()?.getDeclarations() ?? [])
+    .filter((d: any) => d.getKind() === anchor.getKind() && d.getSourceFile() === file);
+  const anchors = own.includes(anchor) ? own.sort((a: any, b: any) => a.getStart() - b.getStart()) : [anchor];
+  const sibs = anchors.flatMap((a: any) => a.getDescendantsOfKind?.(node.getKind()) ?? []).filter((c: any) => anonSlot(c) === slot);
   const i = sibs.findIndex((c: any) => c === node);
   return `${tag}${i < 0 ? 0 : i}`;
 }
@@ -160,9 +168,14 @@ function scopeSegment(a: any): string | null {
 
 function scopePath(node: any): string[] {
   const out: string[] = [];
-  for (let a = node.getParent?.(); a; a = a.getParent?.()) {
+  for (let from = node, a = node.getParent?.(); a; from = a, a = a.getParent?.()) {
     if (Node.isSourceFile(a)) break;
-    const seg = scopeSegment(a);
+    // `for (let i ...)` binds i on the statement, outside its body block, so two
+    // loops in one function shared `fn.i`. Only the header gets the segment:
+    // the body is already a nested block.
+    const header = (Node.isForStatement(a) || Node.isForInStatement(a) || Node.isForOfStatement(a))
+      && a.getStatement() !== from;
+    const seg = header ? anonSegment(a) : scopeSegment(a);
     if (seg) out.unshift(seg);
   }
   return out;
