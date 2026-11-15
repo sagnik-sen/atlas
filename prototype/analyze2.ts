@@ -1,6 +1,7 @@
 import * as fs from "fs";
+import * as path from "path";
 
-const F: any[] = JSON.parse(fs.readFileSync("facts.json", "utf-8"));
+const F: any[] = JSON.parse(fs.readFileSync(path.resolve(__dirname, "facts.json"), "utf-8"));
 
 const decls = F.filter((f: any) => f.kind === "declaration");
 const imports = F.filter((f: any) => f.kind === "import");
