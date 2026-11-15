@@ -2,8 +2,8 @@
 // Run: cd prototype && npx tsx trace-analyze.ts
 import * as fs from "fs";
 
-const S: any[] = JSON.parse(fs.readFileSync("facts.json", "utf-8"));
-const R: any[] = JSON.parse(fs.readFileSync(process.env.RUNTIME_FACTS ?? "facts.runtime.json", "utf-8"));
+const S: any[] = JSON.parse(fs.readFileSync(`${__dirname}/facts.json`, "utf-8"));
+const R: any[] = JSON.parse(fs.readFileSync(process.env.RUNTIME_FACTS ?? `${__dirname}/facts.runtime.json`, "utf-8"));
 const TOTAL_RUNS = Math.max(...R.map((e) => e.runs ?? 1));
 const pct = (a: number, b: number) => `${a}/${b} (${b ? ((100 * a) / b).toFixed(1) : "-"}%)`;
 

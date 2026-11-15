@@ -134,16 +134,6 @@ function resolveImport(fromFile: string, specifier: string, decl: any): string |
   return p && !isExternalPath(p) ? p : null;
 }
 
-// JSDoc extraction (guarded)
-function jsdoc(node: any): string | undefined {
-  try {
-    if (typeof node.getJsDocs === "function") {
-      return node.getJsDocs().map((d: any) => d.getDescription()).join("\n") || undefined;
-    }
-  } catch {}
-  return undefined;
-}
-
 function extractCalleeName(expr: any): string | null {
   if (Node.isIdentifier(expr)) return expr.getText();
   if (Node.isPropertyAccessExpression(expr)) return expr.getText();
@@ -154,76 +144,72 @@ function extractCalleeName(expr: any): string | null {
 // Emitting them from one call site only silently drops the non-exported half.
 function emitHeritage(node: any, id: string) {
   if (!Node.isClassDeclaration(node) && !Node.isInterfaceDeclaration(node)) return;
-  try {
-    for (const h of node.getHeritageClauses?.() || []) {
-      // `class C extends B implements I` yields two clauses; the token
-      // distinguishes them. Emitting both as "extends" merged two distinct
-      // relations into a single fact type. getToken() returns a SyntaxKind
-      // enum value, not a node — comparing its .getText() silently never matched.
-      const kind = h.getToken() === SyntaxKind.ImplementsKeyword ? "implements" as const : "extends" as const;
-      for (const t of h.getTypeNodes() || []) {
-        // parentName is TEXT — `_ZodString<core.$ZodStringInternals<string>>`.
-        // 62% of heritage parents carry generics or a namespace qualifier, so
-        // matching them back to an entity afterwards needs name parsing plus
-        // import and re-export resolution, and is heuristic at best. Resolve it
-        // here instead, where the checker already has the symbol: take the
-        // bare type expression and route it through the same resolver as calls.
-        const exprNode = Node.isExpressionWithTypeArguments(t) ? t.getExpression() : t;
-        const nameNode = Node.isPropertyAccessExpression(exprNode) ? exprNode.getNameNode()
-          : Node.isTypeReference(exprNode) ? exprNode.getTypeName() : exprNode;
-        const leaf = Node.isQualifiedName(nameNode) ? nameNode.getRight() : nameNode;
-        const parentId = resolveEntity(leaf) ?? undefined;
-        facts.push({ kind, childId: id, parentName: t.getText(), parentId });
-      }
+  for (const h of node.getHeritageClauses?.() || []) {
+    // `class C extends B implements I` yields two clauses; the token
+    // distinguishes them. Emitting both as "extends" merged two distinct
+    // relations into a single fact type. getToken() returns a SyntaxKind
+    // enum value, not a node — comparing its .getText() silently never matched.
+    const kind = h.getToken() === SyntaxKind.ImplementsKeyword ? "implements" as const : "extends" as const;
+    for (const t of h.getTypeNodes() || []) {
+      // parentName is TEXT — `_ZodString<core.$ZodStringInternals<string>>`.
+      // 62% of heritage parents carry generics or a namespace qualifier, so
+      // matching them back to an entity afterwards needs name parsing plus
+      // import and re-export resolution, and is heuristic at best. Resolve it
+      // here instead, where the checker already has the symbol: take the
+      // bare type expression and route it through the same resolver as calls.
+      const exprNode = Node.isExpressionWithTypeArguments(t) ? t.getExpression() : t;
+      const nameNode = Node.isPropertyAccessExpression(exprNode) ? exprNode.getNameNode()
+        : Node.isTypeReference(exprNode) ? exprNode.getTypeName() : exprNode;
+      const leaf = Node.isQualifiedName(nameNode) ? nameNode.getRight() : nameNode;
+      const parentId = resolveEntity(leaf) ?? undefined;
+      facts.push({ kind, childId: id, parentName: t.getText(), parentId });
     }
-  } catch {}
+  }
 }
 
 // Resolve a name node to a declared entity id, declaring dependency entities
 // on first reference since the file walk never visits them.
 function resolveEntity(node: any): string | null {
-  try {
-    const defs = node.getDefinitions();
-    if (!defs.length) return null;
-    // getDeclarationNode() returns undefined for an anonymous `export default`,
-    // so every use of a default-imported binding resolved to nothing. That was
-    // the actual cause of the residual flagged imports — the benchmark modules
-    // and the `en()`/`km()`/`uk()` locale calls — not the missing field-read
-    // edges it was attributed to. Fall back to the default export of the
-    // definition's own file.
-    let defNode = defs[0].getDeclarationNode();
+  const defs = node.getDefinitions();
+  if (!defs.length) return null;
+  // getDeclarationNode() returns undefined for an anonymous `export default`,
+  // so every use of a default-imported binding resolved to nothing. That was
+  // the actual cause of the residual flagged imports — the benchmark modules
+  // and the `en()`/`km()`/`uk()` locale calls — not the missing field-read
+  // edges it was attributed to. Fall back to the default export of the
+  // definition's own file.
+  let defNode = defs[0].getDeclarationNode();
+  if (!defNode) {
+    // The definition's own node is the `default` keyword or the exported
+    // expression; walk out to the nearest construct idOfNode can name.
+    const at = defs[0].getNode?.();
+    for (let a = at; a; a = a.getParent?.()) {
+      if (Node.isSourceFile(a)) break;
+      // Skip anonymous functions: `mapper = (issue) => ...` names the parameter, not its default value.
+      if (declName(a) && !isAnonymousFunction(a)) { defNode = a; break; }
+    }
     if (!defNode) {
-      // The definition's own node is the `default` keyword or the exported
-      // expression; walk out to the nearest construct idOfNode can name.
-      const at = defs[0].getNode?.();
-      for (let a = at; a; a = a.getParent?.()) {
-        if (Node.isSourceFile(a)) break;
-        // Skip anonymous functions: `mapper = (issue) => ...` names the parameter, not its default value.
-        if (declName(a) && !isAnonymousFunction(a)) { defNode = a; break; }
-      }
-      if (!defNode) {
-        const sf = defs[0].getSourceFile?.();
-        defNode = sf?.getDefaultExportSymbol?.()?.getDeclarations?.()?.[0] ?? null;
-      }
+      const sf = defs[0].getSourceFile?.();
+      defNode = sf?.getDefaultExportSymbol?.()?.getDeclarations?.()?.[0] ?? null;
     }
-    if (!defNode) return null;
-    const id = idOfNode(defNode);
-    if (!id) return null;
-    // Anything the walk never visits must be declared here or the edge
-    // resolves to an id the fact base does not contain.
-    const defFile = np(defNode.getSourceFile().getFilePath());
-    if (!ANALYSED.has(defFile)) {
-      const external = isExternalPath(defFile);
-      facts.push({
-        kind: "declaration", entityId: id,
-        entityType: external ? "external" : "out_of_scope",
-        name: declName(defNode)!,
-        file: external ? `external:${externalOrigin(defFile)}` : rel(defFile),
-        exported: true,
-      });
-    }
-    return id;
-  } catch { return null; }
+  }
+  if (!defNode) return null;
+  const id = idOfNode(defNode);
+  if (!id) return null;
+  // Anything the walk never visits must be declared here or the edge
+  // resolves to an id the fact base does not contain.
+  const defFile = np(defNode.getSourceFile().getFilePath());
+  if (!ANALYSED.has(defFile)) {
+    const external = isExternalPath(defFile);
+    facts.push({
+      kind: "declaration", entityId: id,
+      entityType: external ? "external" : "out_of_scope",
+      name: declName(defNode)!,
+      file: external ? `external:${externalOrigin(defFile)}` : rel(defFile),
+      exported: true,
+    });
+  }
+  return id;
 }
 
 
@@ -382,25 +368,21 @@ function extractFile(file: SourceFile) {
   const moduleId = mid(fp);
 
   // ── Top-level declarations from export map ──
-  try {
-    const exportedDecls = file.getExportedDeclarations();
-    for (const [name, nodes] of exportedDecls) {
-      for (const node of nodes) {
-        // Use the declaration's actual source file (for re-exports, this is the original file, not the barrel)
-        const defFile = np(node.getSourceFile().getFilePath());
-        if (isExternalPath(defFile)) continue;
-        // The export map keys by exported name; idOfNode keys by declared name.
-        // They differ under `export { a as b }`, so record both when they do.
-        const id = idOfNode(node) ?? eid(defFile, name);
-        const dn = declName(node) ?? name;
-        track(id, typeOfNode(node), node);
-        facts.push({ kind: "declaration", entityId: id, entityType: typeOfNode(node), name: dn, file: rel(defFile), exported: true, ...fingerprint(node, dn) });
-        facts.push({ kind: "contains", containerId: mid(defFile), entityId: id });
-        emitHeritage(node, id);
-      }
+  const exportedDecls = file.getExportedDeclarations();
+  for (const [name, nodes] of exportedDecls) {
+    for (const node of nodes) {
+      // Use the declaration's actual source file (for re-exports, this is the original file, not the barrel)
+      const defFile = np(node.getSourceFile().getFilePath());
+      if (isExternalPath(defFile)) continue;
+      // The export map keys by exported name; idOfNode keys by declared name.
+      // They differ under `export { a as b }`, so record both when they do.
+      const id = idOfNode(node) ?? eid(defFile, name);
+      const dn = declName(node) ?? name;
+      track(id, typeOfNode(node), node);
+      facts.push({ kind: "declaration", entityId: id, entityType: typeOfNode(node), name: dn, file: rel(defFile), exported: true, ...fingerprint(node, dn) });
+      facts.push({ kind: "contains", containerId: mid(defFile), entityId: id });
+      emitHeritage(node, id);
     }
-  } catch (e: any) {
-    log("warn", `Exported declarations failed for ${rel(fp)}: ${e.message}`);
   }
 
   // ── Module entity ──
@@ -424,7 +406,7 @@ function extractFile(file: SourceFile) {
     if (!owner) return false;
     if (Node.isMethodSignature(owner) || Node.isCallSignatureDeclaration(owner)
         || Node.isFunctionTypeNode(owner) || Node.isConstructSignatureDeclaration(owner)) return true;
-    return typeof owner.getBody === "function" && !owner.getBody();
+    return "getBody" in owner && !owner.getBody();
   };
 
   const emitDecl = (node: any) => {
@@ -558,7 +540,7 @@ function extractFile(file: SourceFile) {
   };
 
   for (const imp of file.getImportDeclarations()) {
-    try { mkImport(imp); } catch {}
+    mkImport(imp);
   }
 
   // ── Re-exports ──
@@ -607,6 +589,8 @@ for (const file of sourceFiles) {
     extractFile(file);
   } catch (e: any) {
     log("error", `FAILED ${rel(file.getFilePath())}: ${e.message}`);
+    // A file that throws is missing from the fact base; that is not a passing run.
+    process.exitCode = 1;
   }
 }
 

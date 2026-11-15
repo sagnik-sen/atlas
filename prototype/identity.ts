@@ -184,11 +184,9 @@ function scopePath(node: any): string[] {
 // `export default function () {}` and `export default {...}` have no name.
 // 11 of the 12 remaining flagged imports and 3 unresolved calls traced to this.
 function isDefaultExport(node: any): boolean {
-  try {
-    if (node.hasModifier?.(SyntaxKind.DefaultKeyword)) return true;
-    const p = node.getParent?.();
-    return !!p && Node.isExportAssignment(p);
-  } catch { return false; }
+  if (node.hasModifier?.(SyntaxKind.DefaultKeyword)) return true;
+  const p = node.getParent?.();
+  return !!p && Node.isExportAssignment(p);
 }
 
 // An arrow or function expression with no binding of its own: a callback, an

@@ -8,9 +8,10 @@
 //
 // Usage: npx tsx questions.ts
 import * as fs from "fs";
+import * as path from "path";
 
 type Fact = any;
-const F: Fact[] = JSON.parse(fs.readFileSync("facts.json", "utf-8"));
+const F: Fact[] = JSON.parse(fs.readFileSync(path.resolve(__dirname, "facts.json"), "utf-8"));
 const of = (k: string) => F.filter((f) => f.kind === k);
 
 const decls = of("declaration");
