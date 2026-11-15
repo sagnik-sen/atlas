@@ -59,7 +59,7 @@ The failure mode is how that cost is paid, and the full-history run (297 pairs,
 |---|---|---|
 | aliasing on body edit, raw | 6.0% (127) | 3.1% (66) |
 | ...where the old id was unique in the parent | 0.80% (17) | 0% (0) |
-| removed id reappears, as distinct events | 1,210 across 82 commits | 11 across 4 |
+| removed id reappears, as distinct events | 1,214 across 82 commits | 11 across 4 |
 | strict transfers (old id unique, new holder) | 798, but 794 have bodies under 12 nodes and cannot be adjudicated; **4** clear | 0 |
 | unchanged observations whose id is *shared* in the child | **48%** | 19% |
 
@@ -81,7 +81,7 @@ changes". A body edit therefore mints a new id, so the stability is only the
 stability of an entity that has not changed.
 
 **The change mix decides the trade.** Over all 297 adjacent commit pairs
-(full run, not a sample): **2,113 body edits across 247 commits, 5 independent
+(full run, not a sample): **2,112 body edits across 247 commits, 5 independent
 rename events, zero clean moves.** A body-sensitive id loses identity roughly
 400x more often on this corpus than a rename-sensitive one.
 
