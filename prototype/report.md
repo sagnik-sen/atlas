@@ -45,8 +45,33 @@ closure (6,414 of 6,553, 97.9%), reference closure, `questions.ts` output and
 the runtime join are all unchanged; `facts.runtime.json` re-resolves to the
 same bytes.
 
-Not rerun: the full-history harness. Its entityId figures were computed with
-the collisions present, and its cache is invalidated by this change.
+**Full history, rerun on the fixed identity layer** (389 commits, 297 pairs,
+with the bare `catch` blocks also removed from the extractor):
+
+- Every one of the 389 historical commits extracts with exit 0 and passes both
+  invariants, including the new symbol check. The removed catches were dead
+  across the whole history, not only at `e516c3b`.
+- The oracle join stays at 100.0%.
+
+| | before | after |
+|---|---|---|
+| rename_owner, positional | 80 across 27 commits | 80 across 27 |
+| rename_owner, real owner move | 154 across 13 | 154 across 13 |
+| removed | 2,723 | 2,749 |
+| added | 5,840 | 5,880 |
+| unchanged | 2,859,980 obs. | 2,865,699 |
+| body edit | 2,113 | 2,112 |
+| `structureId` aliasing on body edit | 6.0% (127) | 6.0% (127) |
+| `contentId` aliasing on body edit | 3.1% (66) | 3.1% (66) |
+| `structureId` removed id reappears, events | 1,210 across 82 | 1,214 across 82 |
+| unchanged obs. whose `structureId` / `contentId` is shared | 48.7% / 18.7% | 48.8% / 18.6% |
+
+The `for`-header segment is positional, and it added no drift: both
+`rename_owner` rows are unchanged. The 5,719 extra unchanged observations are
+about 19 entities per pair. The likely source is entities that used to share
+an id: the oracle marks a repeated key `dup` and skips it, and they now have
+keys of their own. That attribution was not checked against the old cache,
+which no longer exists. No conclusion in ADR-0001 moves.
 
 ## Update (2026-10-19c): every anonymous function is an entity
 
