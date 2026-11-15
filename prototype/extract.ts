@@ -93,6 +93,14 @@ const facts: Fact[] = [];
 // instantiating a class from the excluded tests/ tree — and such an entity is
 // real but never declared by the walk.
 const ANALYSED = new Set<string>();
+// `id\0entityType` -> the compiler symbols declared under it. Two symbols are
+// two entities sharing an id inside ONE entityType, which the entityType-set
+// check at the bottom cannot see. Overloads and get/set pairs share a symbol.
+const SYMS = new Map<string, Set<unknown>>();
+function track(id: string, type: string, node: any) {
+  const k = `${id}\0${type}`;
+  (SYMS.get(k) ?? SYMS.set(k, new Set()).get(k)!).add(node.getSymbol?.()?.compilerSymbol ?? node.compilerNode);
+}
 
 function log(level: string, msg: string) {
   if (level !== "debug") process.stderr.write(`[${level}] ${msg}\n`);
@@ -385,6 +393,7 @@ function extractFile(file: SourceFile) {
         // They differ under `export { a as b }`, so record both when they do.
         const id = idOfNode(node) ?? eid(defFile, name);
         const dn = declName(node) ?? name;
+        track(id, typeOfNode(node), node);
         facts.push({ kind: "declaration", entityId: id, entityType: typeOfNode(node), name: dn, file: rel(defFile), exported: true, ...fingerprint(node, dn) });
         facts.push({ kind: "contains", containerId: mid(defFile), entityId: id });
         emitHeritage(node, id);
@@ -426,6 +435,7 @@ function extractFile(file: SourceFile) {
     if ((Node.isArrowFunction(node) || Node.isFunctionExpression(node)) && !isAnonymousFunction(node)) return;
     const id = idOfNode(node);
     if (!id) return;
+    track(id, typeOfNode(node), node);
     facts.push({
       kind: "declaration", entityId: id, entityType: typeOfNode(node),
       name: declName(node)!, file: rel(declFile), exported: !!node.isExported?.(),
@@ -706,6 +716,11 @@ log("info", `Entity ids with multiple entityTypes: ${ambiguous.length} of ${type
 log("info", `  cross-space (declaration merges, expected): ${ambiguous.length - withinSpace.length}`);
 log("info", `  within one space (genuine collisions): ${withinSpace.length}`);
 for (const [id, t] of withinSpace.slice(0, 8)) log("error", `    ${id} -> ${[...t].join(", ")}`);
+// The same defect inside one entityType: the set above has size 1 there, so it
+// reported 0 while two `for (let i ...)` loops shared `handleTupleResults.i`.
+const sameType = [...SYMS].filter(([, syms]) => syms.size > 1);
+log("info", `  within one entityType (distinct symbols, one id): ${sameType.length}`);
+for (const [k, syms] of sameType.slice(0, 8)) log("error", `    ${k.replace("\0", " [")}] x${syms.size}`);
 
 // Collision measure per id scheme. An "entity" is a distinct (file, name,
 // entityType); an id collides when it is shared by 2+ entities. Ids are
@@ -738,8 +753,8 @@ if (violations.length > 0) {
 // Enforced as of 2026-10-09, once scope qualification brought this to zero.
 // Cross-space pairs are NOT violations: a merged TypeScript symbol
 // (`interface X` plus `const X`) is one entity declared twice, per ADR-0001.
-if (withinSpace.length > 0) {
-  log("error", `UNAMBIGUOUS IDENTITY: ${withinSpace.length} ids name more than one entity within a declaration space`);
+if (withinSpace.length + sameType.length > 0) {
+  log("error", `UNAMBIGUOUS IDENTITY: ${withinSpace.length + sameType.length} ids name more than one entity within a declaration space`);
   process.exitCode = 1;
 } else {
   log("info", "Unambiguous identity: OK (no id names two entities in one declaration space)");

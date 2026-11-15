@@ -14,6 +14,40 @@ no longer exists upstream, and upstream has since force-pushed `main` so
 `e516c3b` is not an ancestor of it. `prototype/zod-repo/` is gitignored, so a
 fresh clone does not reproduce the corpus either.
 
+## Update (2026-11-15): the identity invariant could not see same-type collisions
+
+"0 within-space collisions, enforced" was wrong. The check grouped each id's
+declarations by their *set of entityTypes* and flagged a set of size 2 or more
+within one declaration space. Two entities of the same type sharing an id give
+a set of size 1, so they were never counted. Deduplication hid them further:
+two colliding declarations with identical bodies collapse into one fact.
+
+The check now also records the compiler symbol behind every declaration it
+emits and fails when one `(id, entityType)` covers more than one symbol.
+Overloads and get/set pairs share a symbol, so they stay one entity (50 such
+ids). Run against the unchanged identity layer it found **14 colliding ids
+covering 39 entities**, from two causes:
+
+- **`for` headers.** `for (let i ...)` binds `i` on the statement, outside the
+  body block that already had a segment, so two loops in one function shared
+  `handleTupleResults.i`. A `for` / `for-in` / `for-of` header now contributes
+  a segment (`@forstatement0`) to what it declares; the body is unchanged.
+- **Overload signatures.** Each overload is its own node carrying the same
+  name, so the anonymous-segment index restarted at 0 under each one and every
+  `_function(params: {...})` overload yielded `_function.@typeliteral0.input`.
+  The index now runs across all same-kind declarations of the anchor's symbol
+  in the file.
+
+After the fix: 17,370 declarations (was 17,350), 17,000 ids (was 16,975),
+50,614 facts, 0 collisions under both checks, 270 cross-space merges. 165 ids
+were retired and 190 introduced, 173 of them `for`-header bindings. Edge
+closure (6,414 of 6,553, 97.9%), reference closure, `questions.ts` output and
+the runtime join are all unchanged; `facts.runtime.json` re-resolves to the
+same bytes.
+
+Not rerun: the full-history harness. Its entityId figures were computed with
+the collisions present, and its cache is invalidated by this change.
+
 ## Update (2026-10-19c): every anonymous function is an entity
 
 ADR-0001's first precondition for runtime ingestion read: give ids to functions

@@ -26717,18 +26717,18 @@
   },
   {
     "kind": "declaration",
-    "entityId": "ts:v3/types.ts:ZodString._parse.check",
+    "entityId": "ts:v3/types.ts:ZodString._parse.@forofstatement0.check",
     "entityType": "variable",
-    "name": "ZodString._parse.check",
+    "name": "ZodString._parse.@forofstatement0.check",
     "file": "v3/types.ts",
     "exported": false,
     "structureId": "struct:sha256:eb670730d7c863da",
-    "contentId": "content:sha256:f8e5841f29b19fcd"
+    "contentId": "content:sha256:85844b83edce30a6"
   },
   {
     "kind": "contains",
     "containerId": "module:v3/types.ts",
-    "entityId": "ts:v3/types.ts:ZodString._parse.check"
+    "entityId": "ts:v3/types.ts:ZodString._parse.@forofstatement0.check"
   },
   {
     "kind": "declaration",
@@ -26837,18 +26837,18 @@
   },
   {
     "kind": "declaration",
-    "entityId": "ts:v3/types.ts:ZodString.minLength.ch",
+    "entityId": "ts:v3/types.ts:ZodString.minLength.@forofstatement0.ch",
     "entityType": "variable",
-    "name": "ZodString.minLength.ch",
+    "name": "ZodString.minLength.@forofstatement0.ch",
     "file": "v3/types.ts",
     "exported": false,
     "structureId": "struct:sha256:eb670730d7c863da",
-    "contentId": "content:sha256:48a1734cbcf10e71"
+    "contentId": "content:sha256:08bdd3f2ab619dc8"
   },
   {
     "kind": "contains",
     "containerId": "module:v3/types.ts",
-    "entityId": "ts:v3/types.ts:ZodString.minLength.ch"
+    "entityId": "ts:v3/types.ts:ZodString.minLength.@forofstatement0.ch"
   },
   {
     "kind": "declaration",
@@ -26867,18 +26867,18 @@
   },
   {
     "kind": "declaration",
-    "entityId": "ts:v3/types.ts:ZodString.maxLength.ch",
+    "entityId": "ts:v3/types.ts:ZodString.maxLength.@forofstatement0.ch",
     "entityType": "variable",
-    "name": "ZodString.maxLength.ch",
+    "name": "ZodString.maxLength.@forofstatement0.ch",
     "file": "v3/types.ts",
     "exported": false,
     "structureId": "struct:sha256:eb670730d7c863da",
-    "contentId": "content:sha256:c3e1ac0fabf57655"
+    "contentId": "content:sha256:0d39d09bbffeb57c"
   },
   {
     "kind": "contains",
     "containerId": "module:v3/types.ts",
-    "entityId": "ts:v3/types.ts:ZodString.maxLength.ch"
+    "entityId": "ts:v3/types.ts:ZodString.maxLength.@forofstatement0.ch"
   },
   {
     "kind": "declaration",
@@ -27017,18 +27017,18 @@
   },
   {
     "kind": "declaration",
-    "entityId": "ts:v3/types.ts:ZodNumber._parse.check",
+    "entityId": "ts:v3/types.ts:ZodNumber._parse.@forofstatement0.check",
     "entityType": "variable",
-    "name": "ZodNumber._parse.check",
+    "name": "ZodNumber._parse.@forofstatement0.check",
     "file": "v3/types.ts",
     "exported": false,
     "structureId": "struct:sha256:eb670730d7c863da",
-    "contentId": "content:sha256:a6d61b22e673e0b1"
+    "contentId": "content:sha256:1bbf4f83063de2d4"
   },
   {
     "kind": "contains",
     "containerId": "module:v3/types.ts",
-    "entityId": "ts:v3/types.ts:ZodNumber._parse.check"
+    "entityId": "ts:v3/types.ts:ZodNumber._parse.@forofstatement0.check"
   },
   {
     "kind": "declaration",
@@ -27077,18 +27077,18 @@
   },
   {
     "kind": "declaration",
-    "entityId": "ts:v3/types.ts:ZodNumber.minValue.ch",
+    "entityId": "ts:v3/types.ts:ZodNumber.minValue.@forofstatement0.ch",
     "entityType": "variable",
-    "name": "ZodNumber.minValue.ch",
+    "name": "ZodNumber.minValue.@forofstatement0.ch",
     "file": "v3/types.ts",
     "exported": false,
     "structureId": "struct:sha256:eb670730d7c863da",
-    "contentId": "content:sha256:1925ff5520d9e628"
+    "contentId": "content:sha256:b5118250beb6e32f"
   },
   {
     "kind": "contains",
     "containerId": "module:v3/types.ts",
-    "entityId": "ts:v3/types.ts:ZodNumber.minValue.ch"
+    "entityId": "ts:v3/types.ts:ZodNumber.minValue.@forofstatement0.ch"
   },
   {
     "kind": "declaration",
@@ -27107,18 +27107,18 @@
   },
   {
     "kind": "declaration",
-    "entityId": "ts:v3/types.ts:ZodNumber.maxValue.ch",
+    "entityId": "ts:v3/types.ts:ZodNumber.maxValue.@forofstatement0.ch",
     "entityType": "variable",
-    "name": "ZodNumber.maxValue.ch",
+    "name": "ZodNumber.maxValue.@forofstatement0.ch",
     "file": "v3/types.ts",
     "exported": false,
     "structureId": "struct:sha256:eb670730d7c863da",
-    "contentId": "content:sha256:25775c8a6204c2fe"
+    "contentId": "content:sha256:f8cdc467ac4d7788"
   },
   {
     "kind": "contains",
     "containerId": "module:v3/types.ts",
-    "entityId": "ts:v3/types.ts:ZodNumber.maxValue.ch"
+    "entityId": "ts:v3/types.ts:ZodNumber.maxValue.@forofstatement0.ch"
   },
   {
     "kind": "declaration",
@@ -27152,18 +27152,18 @@
   },
   {
     "kind": "declaration",
-    "entityId": "ts:v3/types.ts:ZodNumber.isFinite.ch",
+    "entityId": "ts:v3/types.ts:ZodNumber.isFinite.@forofstatement0.ch",
     "entityType": "variable",
-    "name": "ZodNumber.isFinite.ch",
+    "name": "ZodNumber.isFinite.@forofstatement0.ch",
     "file": "v3/types.ts",
     "exported": false,
     "structureId": "struct:sha256:eb670730d7c863da",
-    "contentId": "content:sha256:19a37876adacaf54"
+    "contentId": "content:sha256:53b037d67b588ff1"
   },
   {
     "kind": "contains",
     "containerId": "module:v3/types.ts",
-    "entityId": "ts:v3/types.ts:ZodNumber.isFinite.ch"
+    "entityId": "ts:v3/types.ts:ZodNumber.isFinite.@forofstatement0.ch"
   },
   {
     "kind": "declaration",
@@ -27212,18 +27212,18 @@
   },
   {
     "kind": "declaration",
-    "entityId": "ts:v3/types.ts:ZodBigInt._parse.check",
+    "entityId": "ts:v3/types.ts:ZodBigInt._parse.@forofstatement0.check",
     "entityType": "variable",
-    "name": "ZodBigInt._parse.check",
+    "name": "ZodBigInt._parse.@forofstatement0.check",
     "file": "v3/types.ts",
     "exported": false,
     "structureId": "struct:sha256:eb670730d7c863da",
-    "contentId": "content:sha256:a79d3396ec6f9b4f"
+    "contentId": "content:sha256:ed69808183062dd6"
   },
   {
     "kind": "contains",
     "containerId": "module:v3/types.ts",
-    "entityId": "ts:v3/types.ts:ZodBigInt._parse.check"
+    "entityId": "ts:v3/types.ts:ZodBigInt._parse.@forofstatement0.check"
   },
   {
     "kind": "declaration",
@@ -27287,18 +27287,18 @@
   },
   {
     "kind": "declaration",
-    "entityId": "ts:v3/types.ts:ZodBigInt.minValue.ch",
+    "entityId": "ts:v3/types.ts:ZodBigInt.minValue.@forofstatement0.ch",
     "entityType": "variable",
-    "name": "ZodBigInt.minValue.ch",
+    "name": "ZodBigInt.minValue.@forofstatement0.ch",
     "file": "v3/types.ts",
     "exported": false,
     "structureId": "struct:sha256:eb670730d7c863da",
-    "contentId": "content:sha256:457278e3cab7f588"
+    "contentId": "content:sha256:0720bc3204937086"
   },
   {
     "kind": "contains",
     "containerId": "module:v3/types.ts",
-    "entityId": "ts:v3/types.ts:ZodBigInt.minValue.ch"
+    "entityId": "ts:v3/types.ts:ZodBigInt.minValue.@forofstatement0.ch"
   },
   {
     "kind": "declaration",
@@ -27317,18 +27317,18 @@
   },
   {
     "kind": "declaration",
-    "entityId": "ts:v3/types.ts:ZodBigInt.maxValue.ch",
+    "entityId": "ts:v3/types.ts:ZodBigInt.maxValue.@forofstatement0.ch",
     "entityType": "variable",
-    "name": "ZodBigInt.maxValue.ch",
+    "name": "ZodBigInt.maxValue.@forofstatement0.ch",
     "file": "v3/types.ts",
     "exported": false,
     "structureId": "struct:sha256:eb670730d7c863da",
-    "contentId": "content:sha256:1ab12f1c2a82b4cd"
+    "contentId": "content:sha256:99c09fd759afbfdd"
   },
   {
     "kind": "contains",
     "containerId": "module:v3/types.ts",
-    "entityId": "ts:v3/types.ts:ZodBigInt.maxValue.ch"
+    "entityId": "ts:v3/types.ts:ZodBigInt.maxValue.@forofstatement0.ch"
   },
   {
     "kind": "declaration",
@@ -27437,18 +27437,18 @@
   },
   {
     "kind": "declaration",
-    "entityId": "ts:v3/types.ts:ZodDate._parse.check",
+    "entityId": "ts:v3/types.ts:ZodDate._parse.@forofstatement0.check",
     "entityType": "variable",
-    "name": "ZodDate._parse.check",
+    "name": "ZodDate._parse.@forofstatement0.check",
     "file": "v3/types.ts",
     "exported": false,
     "structureId": "struct:sha256:eb670730d7c863da",
-    "contentId": "content:sha256:40a553a56d0e078b"
+    "contentId": "content:sha256:1e00398721b0a28b"
   },
   {
     "kind": "contains",
     "containerId": "module:v3/types.ts",
-    "entityId": "ts:v3/types.ts:ZodDate._parse.check"
+    "entityId": "ts:v3/types.ts:ZodDate._parse.@forofstatement0.check"
   },
   {
     "kind": "declaration",
@@ -27467,18 +27467,18 @@
   },
   {
     "kind": "declaration",
-    "entityId": "ts:v3/types.ts:ZodDate.minDate.ch",
+    "entityId": "ts:v3/types.ts:ZodDate.minDate.@forofstatement0.ch",
     "entityType": "variable",
-    "name": "ZodDate.minDate.ch",
+    "name": "ZodDate.minDate.@forofstatement0.ch",
     "file": "v3/types.ts",
     "exported": false,
     "structureId": "struct:sha256:eb670730d7c863da",
-    "contentId": "content:sha256:81f90022d32c36da"
+    "contentId": "content:sha256:23d9338cae1ae90c"
   },
   {
     "kind": "contains",
     "containerId": "module:v3/types.ts",
-    "entityId": "ts:v3/types.ts:ZodDate.minDate.ch"
+    "entityId": "ts:v3/types.ts:ZodDate.minDate.@forofstatement0.ch"
   },
   {
     "kind": "declaration",
@@ -27497,18 +27497,18 @@
   },
   {
     "kind": "declaration",
-    "entityId": "ts:v3/types.ts:ZodDate.maxDate.ch",
+    "entityId": "ts:v3/types.ts:ZodDate.maxDate.@forofstatement0.ch",
     "entityType": "variable",
-    "name": "ZodDate.maxDate.ch",
+    "name": "ZodDate.maxDate.@forofstatement0.ch",
     "file": "v3/types.ts",
     "exported": false,
     "structureId": "struct:sha256:eb670730d7c863da",
-    "contentId": "content:sha256:360a56b80524f4c7"
+    "contentId": "content:sha256:d205861641689c00"
   },
   {
     "kind": "contains",
     "containerId": "module:v3/types.ts",
-    "entityId": "ts:v3/types.ts:ZodDate.maxDate.ch"
+    "entityId": "ts:v3/types.ts:ZodDate.maxDate.@forofstatement0.ch"
   },
   {
     "kind": "declaration",
@@ -27737,18 +27737,18 @@
   },
   {
     "kind": "declaration",
-    "entityId": "ts:v3/types.ts:deepPartialify.@block[if]0.key",
+    "entityId": "ts:v3/types.ts:deepPartialify.@block[if]0.@forinstatement0.key",
     "entityType": "variable",
-    "name": "deepPartialify.@block[if]0.key",
+    "name": "deepPartialify.@block[if]0.@forinstatement0.key",
     "file": "v3/types.ts",
     "exported": false,
     "structureId": "struct:sha256:eb670730d7c863da",
-    "contentId": "content:sha256:e5b5b168846ef6c3"
+    "contentId": "content:sha256:948c712ea68741ea"
   },
   {
     "kind": "contains",
     "containerId": "module:v3/types.ts",
-    "entityId": "ts:v3/types.ts:deepPartialify.@block[if]0.key"
+    "entityId": "ts:v3/types.ts:deepPartialify.@block[if]0.@forinstatement0.key"
   },
   {
     "kind": "declaration",
@@ -27872,18 +27872,18 @@
   },
   {
     "kind": "declaration",
-    "entityId": "ts:v3/types.ts:ZodObject._parse.@block[if]1.key",
+    "entityId": "ts:v3/types.ts:ZodObject._parse.@block[if]1.@forinstatement0.key",
     "entityType": "variable",
-    "name": "ZodObject._parse.@block[if]1.key",
+    "name": "ZodObject._parse.@block[if]1.@forinstatement0.key",
     "file": "v3/types.ts",
     "exported": false,
     "structureId": "struct:sha256:eb670730d7c863da",
-    "contentId": "content:sha256:66ef3cd1b0ade4e7"
+    "contentId": "content:sha256:a73b4651e24996ac"
   },
   {
     "kind": "contains",
     "containerId": "module:v3/types.ts",
-    "entityId": "ts:v3/types.ts:ZodObject._parse.@block[if]1.key"
+    "entityId": "ts:v3/types.ts:ZodObject._parse.@block[if]1.@forinstatement0.key"
   },
   {
     "kind": "declaration",
@@ -27902,18 +27902,18 @@
   },
   {
     "kind": "declaration",
-    "entityId": "ts:v3/types.ts:ZodObject._parse.key",
+    "entityId": "ts:v3/types.ts:ZodObject._parse.@forofstatement0.key",
     "entityType": "variable",
-    "name": "ZodObject._parse.key",
+    "name": "ZodObject._parse.@forofstatement0.key",
     "file": "v3/types.ts",
     "exported": false,
     "structureId": "struct:sha256:eb670730d7c863da",
-    "contentId": "content:sha256:422c3413ff94801b"
+    "contentId": "content:sha256:7510b3615ef2ba93"
   },
   {
     "kind": "contains",
     "containerId": "module:v3/types.ts",
-    "entityId": "ts:v3/types.ts:ZodObject._parse.key"
+    "entityId": "ts:v3/types.ts:ZodObject._parse.@forofstatement0.key"
   },
   {
     "kind": "declaration",
@@ -27962,18 +27962,18 @@
   },
   {
     "kind": "declaration",
-    "entityId": "ts:v3/types.ts:ZodObject._parse.@block[if]3.@block[if]4.key",
+    "entityId": "ts:v3/types.ts:ZodObject._parse.@block[if]3.@block[if]4.@forofstatement1.key",
     "entityType": "variable",
-    "name": "ZodObject._parse.@block[if]3.@block[if]4.key",
+    "name": "ZodObject._parse.@block[if]3.@block[if]4.@forofstatement1.key",
     "file": "v3/types.ts",
     "exported": false,
     "structureId": "struct:sha256:eb670730d7c863da",
-    "contentId": "content:sha256:f86da9007b5cc6e4"
+    "contentId": "content:sha256:b22bda8d1fa35ad3"
   },
   {
     "kind": "contains",
     "containerId": "module:v3/types.ts",
-    "entityId": "ts:v3/types.ts:ZodObject._parse.@block[if]3.@block[if]4.key"
+    "entityId": "ts:v3/types.ts:ZodObject._parse.@block[if]3.@block[if]4.@forofstatement1.key"
   },
   {
     "kind": "declaration",
@@ -27992,18 +27992,18 @@
   },
   {
     "kind": "declaration",
-    "entityId": "ts:v3/types.ts:ZodObject._parse.@block[else]1.key",
+    "entityId": "ts:v3/types.ts:ZodObject._parse.@block[else]1.@forofstatement2.key",
     "entityType": "variable",
-    "name": "ZodObject._parse.@block[else]1.key",
+    "name": "ZodObject._parse.@block[else]1.@forofstatement2.key",
     "file": "v3/types.ts",
     "exported": false,
     "structureId": "struct:sha256:eb670730d7c863da",
-    "contentId": "content:sha256:31ee334cbad8011a"
+    "contentId": "content:sha256:8be70ee5c1475c8b"
   },
   {
     "kind": "contains",
     "containerId": "module:v3/types.ts",
-    "entityId": "ts:v3/types.ts:ZodObject._parse.@block[else]1.key"
+    "entityId": "ts:v3/types.ts:ZodObject._parse.@block[else]1.@forofstatement2.key"
   },
   {
     "kind": "declaration",
@@ -28037,18 +28037,18 @@
   },
   {
     "kind": "declaration",
-    "entityId": "ts:v3/types.ts:ZodObject._parse.@block[if]8.@arrowfunction[then]0.pair",
+    "entityId": "ts:v3/types.ts:ZodObject._parse.@block[if]8.@arrowfunction[then]0.@forofstatement3.pair",
     "entityType": "variable",
-    "name": "ZodObject._parse.@block[if]8.@arrowfunction[then]0.pair",
+    "name": "ZodObject._parse.@block[if]8.@arrowfunction[then]0.@forofstatement3.pair",
     "file": "v3/types.ts",
     "exported": false,
     "structureId": "struct:sha256:eb670730d7c863da",
-    "contentId": "content:sha256:4c129480ff19a216"
+    "contentId": "content:sha256:cb617da41dfde166"
   },
   {
     "kind": "contains",
     "containerId": "module:v3/types.ts",
-    "entityId": "ts:v3/types.ts:ZodObject._parse.@block[if]8.@arrowfunction[then]0.pair"
+    "entityId": "ts:v3/types.ts:ZodObject._parse.@block[if]8.@arrowfunction[then]0.@forofstatement3.pair"
   },
   {
     "kind": "declaration",
@@ -28127,18 +28127,18 @@
   },
   {
     "kind": "declaration",
-    "entityId": "ts:v3/types.ts:ZodObject.pick.key",
+    "entityId": "ts:v3/types.ts:ZodObject.pick.@forofstatement0.key",
     "entityType": "variable",
-    "name": "ZodObject.pick.key",
+    "name": "ZodObject.pick.@forofstatement0.key",
     "file": "v3/types.ts",
     "exported": false,
     "structureId": "struct:sha256:eb670730d7c863da",
-    "contentId": "content:sha256:ed698620300b083a"
+    "contentId": "content:sha256:19e4acd9d895fd57"
   },
   {
     "kind": "contains",
     "containerId": "module:v3/types.ts",
-    "entityId": "ts:v3/types.ts:ZodObject.pick.key"
+    "entityId": "ts:v3/types.ts:ZodObject.pick.@forofstatement0.key"
   },
   {
     "kind": "declaration",
@@ -28157,18 +28157,18 @@
   },
   {
     "kind": "declaration",
-    "entityId": "ts:v3/types.ts:ZodObject.omit.key",
+    "entityId": "ts:v3/types.ts:ZodObject.omit.@forofstatement0.key",
     "entityType": "variable",
-    "name": "ZodObject.omit.key",
+    "name": "ZodObject.omit.@forofstatement0.key",
     "file": "v3/types.ts",
     "exported": false,
     "structureId": "struct:sha256:eb670730d7c863da",
-    "contentId": "content:sha256:e4f7128c797e1780"
+    "contentId": "content:sha256:fe5e74f291098c68"
   },
   {
     "kind": "contains",
     "containerId": "module:v3/types.ts",
-    "entityId": "ts:v3/types.ts:ZodObject.omit.key"
+    "entityId": "ts:v3/types.ts:ZodObject.omit.@forofstatement0.key"
   },
   {
     "kind": "declaration",
@@ -28187,18 +28187,18 @@
   },
   {
     "kind": "declaration",
-    "entityId": "ts:v3/types.ts:ZodObject.partial.key",
+    "entityId": "ts:v3/types.ts:ZodObject.partial.@forofstatement0.key",
     "entityType": "variable",
-    "name": "ZodObject.partial.key",
+    "name": "ZodObject.partial.@forofstatement0.key",
     "file": "v3/types.ts",
     "exported": false,
     "structureId": "struct:sha256:eb670730d7c863da",
-    "contentId": "content:sha256:7283ffe7da7fd03b"
+    "contentId": "content:sha256:2520cb14d3e6037d"
   },
   {
     "kind": "contains",
     "containerId": "module:v3/types.ts",
-    "entityId": "ts:v3/types.ts:ZodObject.partial.key"
+    "entityId": "ts:v3/types.ts:ZodObject.partial.@forofstatement0.key"
   },
   {
     "kind": "declaration",
@@ -28232,18 +28232,18 @@
   },
   {
     "kind": "declaration",
-    "entityId": "ts:v3/types.ts:ZodObject.required.key",
+    "entityId": "ts:v3/types.ts:ZodObject.required.@forofstatement0.key",
     "entityType": "variable",
-    "name": "ZodObject.required.key",
+    "name": "ZodObject.required.@forofstatement0.key",
     "file": "v3/types.ts",
     "exported": false,
     "structureId": "struct:sha256:eb670730d7c863da",
-    "contentId": "content:sha256:dfa385f227e5afeb"
+    "contentId": "content:sha256:13f76be50ce2f2f5"
   },
   {
     "kind": "contains",
     "containerId": "module:v3/types.ts",
-    "entityId": "ts:v3/types.ts:ZodObject.required.key"
+    "entityId": "ts:v3/types.ts:ZodObject.required.@forofstatement0.key"
   },
   {
     "kind": "declaration",
@@ -28307,18 +28307,33 @@
   },
   {
     "kind": "declaration",
-    "entityId": "ts:v3/types.ts:ZodUnion._parse.handleResults.result",
+    "entityId": "ts:v3/types.ts:ZodUnion._parse.handleResults.@forofstatement0.result",
     "entityType": "variable",
-    "name": "ZodUnion._parse.handleResults.result",
+    "name": "ZodUnion._parse.handleResults.@forofstatement0.result",
     "file": "v3/types.ts",
     "exported": false,
     "structureId": "struct:sha256:eb670730d7c863da",
-    "contentId": "content:sha256:db2652878e4f9f27"
+    "contentId": "content:sha256:92d0a57ac31acc2a"
   },
   {
     "kind": "contains",
     "containerId": "module:v3/types.ts",
-    "entityId": "ts:v3/types.ts:ZodUnion._parse.handleResults.result"
+    "entityId": "ts:v3/types.ts:ZodUnion._parse.handleResults.@forofstatement0.result"
+  },
+  {
+    "kind": "declaration",
+    "entityId": "ts:v3/types.ts:ZodUnion._parse.handleResults.@forofstatement1.result",
+    "entityType": "variable",
+    "name": "ZodUnion._parse.handleResults.@forofstatement1.result",
+    "file": "v3/types.ts",
+    "exported": false,
+    "structureId": "struct:sha256:eb670730d7c863da",
+    "contentId": "content:sha256:3db130f2fbb8f6db"
+  },
+  {
+    "kind": "contains",
+    "containerId": "module:v3/types.ts",
+    "entityId": "ts:v3/types.ts:ZodUnion._parse.handleResults.@forofstatement1.result"
   },
   {
     "kind": "declaration",
@@ -28382,18 +28397,18 @@
   },
   {
     "kind": "declaration",
-    "entityId": "ts:v3/types.ts:ZodUnion._parse.@block[else]0.option",
+    "entityId": "ts:v3/types.ts:ZodUnion._parse.@block[else]0.@forofstatement2.option",
     "entityType": "variable",
-    "name": "ZodUnion._parse.@block[else]0.option",
+    "name": "ZodUnion._parse.@block[else]0.@forofstatement2.option",
     "file": "v3/types.ts",
     "exported": false,
     "structureId": "struct:sha256:eb670730d7c863da",
-    "contentId": "content:sha256:4027aba63e2e72a2"
+    "contentId": "content:sha256:b28731762833b03e"
   },
   {
     "kind": "contains",
     "containerId": "module:v3/types.ts",
-    "entityId": "ts:v3/types.ts:ZodUnion._parse.@block[else]0.option"
+    "entityId": "ts:v3/types.ts:ZodUnion._parse.@block[else]0.@forofstatement2.option"
   },
   {
     "kind": "declaration",
@@ -28532,18 +28547,18 @@
   },
   {
     "kind": "declaration",
-    "entityId": "ts:v3/types.ts:ZodDiscriminatedUnion.create.type",
+    "entityId": "ts:v3/types.ts:ZodDiscriminatedUnion.create.@forofstatement0.type",
     "entityType": "variable",
-    "name": "ZodDiscriminatedUnion.create.type",
+    "name": "ZodDiscriminatedUnion.create.@forofstatement0.type",
     "file": "v3/types.ts",
     "exported": false,
     "structureId": "struct:sha256:eb670730d7c863da",
-    "contentId": "content:sha256:51c6c493f1b7fe3b"
+    "contentId": "content:sha256:876b92b62d66b2b9"
   },
   {
     "kind": "contains",
     "containerId": "module:v3/types.ts",
-    "entityId": "ts:v3/types.ts:ZodDiscriminatedUnion.create.type"
+    "entityId": "ts:v3/types.ts:ZodDiscriminatedUnion.create.@forofstatement0.type"
   },
   {
     "kind": "declaration",
@@ -28562,18 +28577,18 @@
   },
   {
     "kind": "declaration",
-    "entityId": "ts:v3/types.ts:ZodDiscriminatedUnion.create.@block[forof]0.value",
+    "entityId": "ts:v3/types.ts:ZodDiscriminatedUnion.create.@block[forof]0.@forofstatement1.value",
     "entityType": "variable",
-    "name": "ZodDiscriminatedUnion.create.@block[forof]0.value",
+    "name": "ZodDiscriminatedUnion.create.@block[forof]0.@forofstatement1.value",
     "file": "v3/types.ts",
     "exported": false,
     "structureId": "struct:sha256:eb670730d7c863da",
-    "contentId": "content:sha256:c1645f3ff699a00c"
+    "contentId": "content:sha256:22f2786198cdd86a"
   },
   {
     "kind": "contains",
     "containerId": "module:v3/types.ts",
-    "entityId": "ts:v3/types.ts:ZodDiscriminatedUnion.create.@block[forof]0.value"
+    "entityId": "ts:v3/types.ts:ZodDiscriminatedUnion.create.@block[forof]0.@forofstatement1.value"
   },
   {
     "kind": "declaration",
@@ -28652,18 +28667,18 @@
   },
   {
     "kind": "declaration",
-    "entityId": "ts:v3/types.ts:mergeValues.@block[if]1.key",
+    "entityId": "ts:v3/types.ts:mergeValues.@block[if]1.@forofstatement0.key",
     "entityType": "variable",
-    "name": "mergeValues.@block[if]1.key",
+    "name": "mergeValues.@block[if]1.@forofstatement0.key",
     "file": "v3/types.ts",
     "exported": false,
     "structureId": "struct:sha256:eb670730d7c863da",
-    "contentId": "content:sha256:2977cdafdc556d31"
+    "contentId": "content:sha256:bcb172ccc7308947"
   },
   {
     "kind": "contains",
     "containerId": "module:v3/types.ts",
-    "entityId": "ts:v3/types.ts:mergeValues.@block[if]1.key"
+    "entityId": "ts:v3/types.ts:mergeValues.@block[if]1.@forofstatement0.key"
   },
   {
     "kind": "declaration",
@@ -28697,18 +28712,18 @@
   },
   {
     "kind": "declaration",
-    "entityId": "ts:v3/types.ts:mergeValues.@block[if]3.index",
+    "entityId": "ts:v3/types.ts:mergeValues.@block[if]3.@forstatement0.index",
     "entityType": "variable",
-    "name": "mergeValues.@block[if]3.index",
+    "name": "mergeValues.@block[if]3.@forstatement0.index",
     "file": "v3/types.ts",
     "exported": false,
     "structureId": "struct:sha256:396dae39d37f12b4",
-    "contentId": "content:sha256:c04790a6863e2297"
+    "contentId": "content:sha256:ac4476b37dc0386c"
   },
   {
     "kind": "contains",
     "containerId": "module:v3/types.ts",
-    "entityId": "ts:v3/types.ts:mergeValues.@block[if]3.index"
+    "entityId": "ts:v3/types.ts:mergeValues.@block[if]3.@forstatement0.index"
   },
   {
     "kind": "declaration",
@@ -28922,18 +28937,18 @@
   },
   {
     "kind": "declaration",
-    "entityId": "ts:v3/types.ts:ZodRecord._parse.key",
+    "entityId": "ts:v3/types.ts:ZodRecord._parse.@forinstatement0.key",
     "entityType": "variable",
-    "name": "ZodRecord._parse.key",
+    "name": "ZodRecord._parse.@forinstatement0.key",
     "file": "v3/types.ts",
     "exported": false,
     "structureId": "struct:sha256:eb670730d7c863da",
-    "contentId": "content:sha256:75e0c0ee422750a3"
+    "contentId": "content:sha256:a21dbd42eb5cc3dc"
   },
   {
     "kind": "contains",
     "containerId": "module:v3/types.ts",
-    "entityId": "ts:v3/types.ts:ZodRecord._parse.key"
+    "entityId": "ts:v3/types.ts:ZodRecord._parse.@forinstatement0.key"
   },
   {
     "kind": "declaration",
@@ -29012,18 +29027,18 @@
   },
   {
     "kind": "declaration",
-    "entityId": "ts:v3/types.ts:ZodMap._parse.@block[if]1.@arrowfunction[then]0.pair",
+    "entityId": "ts:v3/types.ts:ZodMap._parse.@block[if]1.@arrowfunction[then]0.@forofstatement0.pair",
     "entityType": "variable",
-    "name": "ZodMap._parse.@block[if]1.@arrowfunction[then]0.pair",
+    "name": "ZodMap._parse.@block[if]1.@arrowfunction[then]0.@forofstatement0.pair",
     "file": "v3/types.ts",
     "exported": false,
     "structureId": "struct:sha256:eb670730d7c863da",
-    "contentId": "content:sha256:20a3a391d94f7143"
+    "contentId": "content:sha256:0062f68848f29ecc"
   },
   {
     "kind": "contains",
     "containerId": "module:v3/types.ts",
-    "entityId": "ts:v3/types.ts:ZodMap._parse.@block[if]1.@arrowfunction[then]0.pair"
+    "entityId": "ts:v3/types.ts:ZodMap._parse.@block[if]1.@arrowfunction[then]0.@forofstatement0.pair"
   },
   {
     "kind": "declaration",
@@ -29072,18 +29087,18 @@
   },
   {
     "kind": "declaration",
-    "entityId": "ts:v3/types.ts:ZodMap._parse.@block[else]0.pair",
+    "entityId": "ts:v3/types.ts:ZodMap._parse.@block[else]0.@forofstatement1.pair",
     "entityType": "variable",
-    "name": "ZodMap._parse.@block[else]0.pair",
+    "name": "ZodMap._parse.@block[else]0.@forofstatement1.pair",
     "file": "v3/types.ts",
     "exported": false,
     "structureId": "struct:sha256:eb670730d7c863da",
-    "contentId": "content:sha256:12d95647ffc984ac"
+    "contentId": "content:sha256:028c4b87afa363a8"
   },
   {
     "kind": "contains",
     "containerId": "module:v3/types.ts",
-    "entityId": "ts:v3/types.ts:ZodMap._parse.@block[else]0.pair"
+    "entityId": "ts:v3/types.ts:ZodMap._parse.@block[else]0.@forofstatement1.pair"
   },
   {
     "kind": "declaration",
@@ -29177,18 +29192,18 @@
   },
   {
     "kind": "declaration",
-    "entityId": "ts:v3/types.ts:ZodSet._parse.finalizeSet.element",
+    "entityId": "ts:v3/types.ts:ZodSet._parse.finalizeSet.@forofstatement0.element",
     "entityType": "variable",
-    "name": "ZodSet._parse.finalizeSet.element",
+    "name": "ZodSet._parse.finalizeSet.@forofstatement0.element",
     "file": "v3/types.ts",
     "exported": false,
     "structureId": "struct:sha256:eb670730d7c863da",
-    "contentId": "content:sha256:44141812dadba257"
+    "contentId": "content:sha256:928d5f41ac73f62a"
   },
   {
     "kind": "contains",
     "containerId": "module:v3/types.ts",
-    "entityId": "ts:v3/types.ts:ZodSet._parse.finalizeSet.element"
+    "entityId": "ts:v3/types.ts:ZodSet._parse.finalizeSet.@forofstatement0.element"
   },
   {
     "kind": "declaration",
@@ -29537,18 +29552,18 @@
   },
   {
     "kind": "declaration",
-    "entityId": "ts:v3/types.ts:ZodEnum.enum.val",
+    "entityId": "ts:v3/types.ts:ZodEnum.enum.@forofstatement0.val",
     "entityType": "variable",
-    "name": "ZodEnum.enum.val",
+    "name": "ZodEnum.enum.@forofstatement0.val",
     "file": "v3/types.ts",
     "exported": false,
     "structureId": "struct:sha256:eb670730d7c863da",
-    "contentId": "content:sha256:16dc9ce71946044d"
+    "contentId": "content:sha256:9d16f15770e2deb8"
   },
   {
     "kind": "contains",
     "containerId": "module:v3/types.ts",
-    "entityId": "ts:v3/types.ts:ZodEnum.enum.val"
+    "entityId": "ts:v3/types.ts:ZodEnum.enum.@forofstatement0.val"
   },
   {
     "kind": "declaration",
@@ -29567,18 +29582,18 @@
   },
   {
     "kind": "declaration",
-    "entityId": "ts:v3/types.ts:ZodEnum.Values.val",
+    "entityId": "ts:v3/types.ts:ZodEnum.Values.@forofstatement0.val",
     "entityType": "variable",
-    "name": "ZodEnum.Values.val",
+    "name": "ZodEnum.Values.@forofstatement0.val",
     "file": "v3/types.ts",
     "exported": false,
     "structureId": "struct:sha256:eb670730d7c863da",
-    "contentId": "content:sha256:6cd7cbd4dfd96e9e"
+    "contentId": "content:sha256:c104ea41d9b5f712"
   },
   {
     "kind": "contains",
     "containerId": "module:v3/types.ts",
-    "entityId": "ts:v3/types.ts:ZodEnum.Values.val"
+    "entityId": "ts:v3/types.ts:ZodEnum.Values.@forofstatement0.val"
   },
   {
     "kind": "declaration",
@@ -29597,18 +29612,18 @@
   },
   {
     "kind": "declaration",
-    "entityId": "ts:v3/types.ts:ZodEnum.Enum.val",
+    "entityId": "ts:v3/types.ts:ZodEnum.Enum.@forofstatement0.val",
     "entityType": "variable",
-    "name": "ZodEnum.Enum.val",
+    "name": "ZodEnum.Enum.@forofstatement0.val",
     "file": "v3/types.ts",
     "exported": false,
     "structureId": "struct:sha256:eb670730d7c863da",
-    "contentId": "content:sha256:47a6c48a1fd28a82"
+    "contentId": "content:sha256:1d6007bf263c0128"
   },
   {
     "kind": "contains",
     "containerId": "module:v3/types.ts",
-    "entityId": "ts:v3/types.ts:ZodEnum.Enum.val"
+    "entityId": "ts:v3/types.ts:ZodEnum.Enum.@forofstatement0.val"
   },
   {
     "kind": "declaration",
@@ -76553,18 +76568,18 @@
   },
   {
     "kind": "declaration",
-    "entityId": "ts:v3/ZodError.ts:ZodError.format.processError.issue",
+    "entityId": "ts:v3/ZodError.ts:ZodError.format.processError.@forofstatement0.issue",
     "entityType": "variable",
-    "name": "ZodError.format.processError.issue",
+    "name": "ZodError.format.processError.@forofstatement0.issue",
     "file": "v3/ZodError.ts",
     "exported": false,
     "structureId": "struct:sha256:eb670730d7c863da",
-    "contentId": "content:sha256:4930d1dae614b69b"
+    "contentId": "content:sha256:a0ea039a456efa8e"
   },
   {
     "kind": "contains",
     "containerId": "module:v3/ZodError.ts",
-    "entityId": "ts:v3/ZodError.ts:ZodError.format.processError.issue"
+    "entityId": "ts:v3/ZodError.ts:ZodError.format.processError.@forofstatement0.issue"
   },
   {
     "kind": "declaration",
@@ -76673,18 +76688,18 @@
   },
   {
     "kind": "declaration",
-    "entityId": "ts:v3/ZodError.ts:ZodError.flatten.sub",
+    "entityId": "ts:v3/ZodError.ts:ZodError.flatten.@forofstatement0.sub",
     "entityType": "variable",
-    "name": "ZodError.flatten.sub",
+    "name": "ZodError.flatten.@forofstatement0.sub",
     "file": "v3/ZodError.ts",
     "exported": false,
     "structureId": "struct:sha256:eb670730d7c863da",
-    "contentId": "content:sha256:a109b6a4abdedba1"
+    "contentId": "content:sha256:e01f4e1acbc83002"
   },
   {
     "kind": "contains",
     "containerId": "module:v3/ZodError.ts",
-    "entityId": "ts:v3/ZodError.ts:ZodError.flatten.sub"
+    "entityId": "ts:v3/ZodError.ts:ZodError.flatten.@forofstatement0.sub"
   },
   {
     "kind": "declaration",
@@ -80799,18 +80814,18 @@
   },
   {
     "kind": "declaration",
-    "entityId": "ts:v3/benchmarks/index.ts:suite",
+    "entityId": "ts:v3/benchmarks/index.ts:@forofstatement0.suite",
     "entityType": "variable",
-    "name": "suite",
+    "name": "@forofstatement0.suite",
     "file": "v3/benchmarks/index.ts",
     "exported": false,
     "structureId": "struct:sha256:eb670730d7c863da",
-    "contentId": "content:sha256:18b4ff013cd1f89d"
+    "contentId": "content:sha256:bd9a6df510a6fc6c"
   },
   {
     "kind": "contains",
     "containerId": "module:v3/benchmarks/index.ts",
-    "entityId": "ts:v3/benchmarks/index.ts:suite"
+    "entityId": "ts:v3/benchmarks/index.ts:@forofstatement0.suite"
   },
   {
     "kind": "declaration",
@@ -81467,7 +81482,7 @@
     "kind": "references",
     "callerId": "module:v3/benchmarks/index.ts",
     "name": "suite",
-    "targetId": "ts:v3/benchmarks/index.ts:suite",
+    "targetId": "ts:v3/benchmarks/index.ts:@forofstatement0.suite",
     "ctx": "value",
     "confidence": 0.9,
     "reason": "resolved",
@@ -90392,18 +90407,18 @@
   },
   {
     "kind": "declaration",
-    "entityId": "ts:v3/helpers/parseUtil.ts:makeIssue.map",
+    "entityId": "ts:v3/helpers/parseUtil.ts:makeIssue.@forofstatement0.map",
     "entityType": "variable",
-    "name": "makeIssue.map",
+    "name": "makeIssue.@forofstatement0.map",
     "file": "v3/helpers/parseUtil.ts",
     "exported": false,
     "structureId": "struct:sha256:eb670730d7c863da",
-    "contentId": "content:sha256:a23c9f7d2b908863"
+    "contentId": "content:sha256:e246333d7c0cf20c"
   },
   {
     "kind": "contains",
     "containerId": "module:v3/helpers/parseUtil.ts",
-    "entityId": "ts:v3/helpers/parseUtil.ts:makeIssue.map"
+    "entityId": "ts:v3/helpers/parseUtil.ts:makeIssue.@forofstatement0.map"
   },
   {
     "kind": "declaration",
@@ -90452,18 +90467,18 @@
   },
   {
     "kind": "declaration",
-    "entityId": "ts:v3/helpers/parseUtil.ts:ParseStatus.mergeArray.s",
+    "entityId": "ts:v3/helpers/parseUtil.ts:ParseStatus.mergeArray.@forofstatement0.s",
     "entityType": "variable",
-    "name": "ParseStatus.mergeArray.s",
+    "name": "ParseStatus.mergeArray.@forofstatement0.s",
     "file": "v3/helpers/parseUtil.ts",
     "exported": false,
     "structureId": "struct:sha256:eb670730d7c863da",
-    "contentId": "content:sha256:64f2fdd5c11a8659"
+    "contentId": "content:sha256:477e5185265075a4"
   },
   {
     "kind": "contains",
     "containerId": "module:v3/helpers/parseUtil.ts",
-    "entityId": "ts:v3/helpers/parseUtil.ts:ParseStatus.mergeArray.s"
+    "entityId": "ts:v3/helpers/parseUtil.ts:ParseStatus.mergeArray.@forofstatement0.s"
   },
   {
     "kind": "declaration",
@@ -90482,18 +90497,18 @@
   },
   {
     "kind": "declaration",
-    "entityId": "ts:v3/helpers/parseUtil.ts:ParseStatus.mergeObjectAsync.pair",
+    "entityId": "ts:v3/helpers/parseUtil.ts:ParseStatus.mergeObjectAsync.@forofstatement0.pair",
     "entityType": "variable",
-    "name": "ParseStatus.mergeObjectAsync.pair",
+    "name": "ParseStatus.mergeObjectAsync.@forofstatement0.pair",
     "file": "v3/helpers/parseUtil.ts",
     "exported": false,
     "structureId": "struct:sha256:eb670730d7c863da",
-    "contentId": "content:sha256:6a4e14bff32c90cd"
+    "contentId": "content:sha256:c498bea57543aa25"
   },
   {
     "kind": "contains",
     "containerId": "module:v3/helpers/parseUtil.ts",
-    "entityId": "ts:v3/helpers/parseUtil.ts:ParseStatus.mergeObjectAsync.pair"
+    "entityId": "ts:v3/helpers/parseUtil.ts:ParseStatus.mergeObjectAsync.@forofstatement0.pair"
   },
   {
     "kind": "declaration",
@@ -90542,18 +90557,18 @@
   },
   {
     "kind": "declaration",
-    "entityId": "ts:v3/helpers/parseUtil.ts:ParseStatus.mergeObjectSync.pair",
+    "entityId": "ts:v3/helpers/parseUtil.ts:ParseStatus.mergeObjectSync.@forofstatement0.pair",
     "entityType": "variable",
-    "name": "ParseStatus.mergeObjectSync.pair",
+    "name": "ParseStatus.mergeObjectSync.@forofstatement0.pair",
     "file": "v3/helpers/parseUtil.ts",
     "exported": false,
     "structureId": "struct:sha256:eb670730d7c863da",
-    "contentId": "content:sha256:13a0280eb2c548ba"
+    "contentId": "content:sha256:9463d787679c7e34"
   },
   {
     "kind": "contains",
     "containerId": "module:v3/helpers/parseUtil.ts",
-    "entityId": "ts:v3/helpers/parseUtil.ts:ParseStatus.mergeObjectSync.pair"
+    "entityId": "ts:v3/helpers/parseUtil.ts:ParseStatus.mergeObjectSync.@forofstatement0.pair"
   },
   {
     "kind": "declaration",
@@ -91241,7 +91256,7 @@
     "kind": "calls",
     "callerId": "ts:v3/helpers/parseUtil.ts:makeIssue",
     "calleeName": "map",
-    "calleeId": "ts:v3/helpers/parseUtil.ts:makeIssue.map",
+    "calleeId": "ts:v3/helpers/parseUtil.ts:makeIssue.@forofstatement0.map",
     "confidence": 0.9,
     "reason": "resolved",
     "callerKind": "arrowfunction",
@@ -93096,18 +93111,18 @@
   },
   {
     "kind": "declaration",
-    "entityId": "ts:v3/helpers/util.ts:util.arrayToEnum.item",
+    "entityId": "ts:v3/helpers/util.ts:util.arrayToEnum.@forofstatement0.item",
     "entityType": "variable",
-    "name": "util.arrayToEnum.item",
+    "name": "util.arrayToEnum.@forofstatement0.item",
     "file": "v3/helpers/util.ts",
     "exported": false,
     "structureId": "struct:sha256:eb670730d7c863da",
-    "contentId": "content:sha256:c114e82032c50f39"
+    "contentId": "content:sha256:21a81caa5e58a806"
   },
   {
     "kind": "contains",
     "containerId": "module:v3/helpers/util.ts",
-    "entityId": "ts:v3/helpers/util.ts:util.arrayToEnum.item"
+    "entityId": "ts:v3/helpers/util.ts:util.arrayToEnum.@forofstatement0.item"
   },
   {
     "kind": "declaration",
@@ -93156,18 +93171,18 @@
   },
   {
     "kind": "declaration",
-    "entityId": "ts:v3/helpers/util.ts:util.getValidEnumValues.k",
+    "entityId": "ts:v3/helpers/util.ts:util.getValidEnumValues.@forofstatement0.k",
     "entityType": "variable",
-    "name": "util.getValidEnumValues.k",
+    "name": "util.getValidEnumValues.@forofstatement0.k",
     "file": "v3/helpers/util.ts",
     "exported": false,
     "structureId": "struct:sha256:eb670730d7c863da",
-    "contentId": "content:sha256:ac9d9c3844540618"
+    "contentId": "content:sha256:b96df8abf0034e1c"
   },
   {
     "kind": "contains",
     "containerId": "module:v3/helpers/util.ts",
-    "entityId": "ts:v3/helpers/util.ts:util.getValidEnumValues.k"
+    "entityId": "ts:v3/helpers/util.ts:util.getValidEnumValues.@forofstatement0.k"
   },
   {
     "kind": "declaration",
@@ -93216,18 +93231,18 @@
   },
   {
     "kind": "declaration",
-    "entityId": "ts:v3/helpers/util.ts:util.objectKeys.@arrowfunction1.key",
+    "entityId": "ts:v3/helpers/util.ts:util.objectKeys.@arrowfunction1.@forinstatement0.key",
     "entityType": "variable",
-    "name": "util.objectKeys.@arrowfunction1.key",
+    "name": "util.objectKeys.@arrowfunction1.@forinstatement0.key",
     "file": "v3/helpers/util.ts",
     "exported": false,
     "structureId": "struct:sha256:eb670730d7c863da",
-    "contentId": "content:sha256:933c418028f49ee1"
+    "contentId": "content:sha256:b2b55e5d4745435b"
   },
   {
     "kind": "contains",
     "containerId": "module:v3/helpers/util.ts",
-    "entityId": "ts:v3/helpers/util.ts:util.objectKeys.@arrowfunction1.key"
+    "entityId": "ts:v3/helpers/util.ts:util.objectKeys.@arrowfunction1.@forinstatement0.key"
   },
   {
     "kind": "declaration",
@@ -93246,18 +93261,18 @@
   },
   {
     "kind": "declaration",
-    "entityId": "ts:v3/helpers/util.ts:util.find.item",
+    "entityId": "ts:v3/helpers/util.ts:util.find.@forofstatement0.item",
     "entityType": "variable",
-    "name": "util.find.item",
+    "name": "util.find.@forofstatement0.item",
     "file": "v3/helpers/util.ts",
     "exported": false,
     "structureId": "struct:sha256:eb670730d7c863da",
-    "contentId": "content:sha256:d37391c642ebe65e"
+    "contentId": "content:sha256:aabe96de030ac9eb"
   },
   {
     "kind": "contains",
     "containerId": "module:v3/helpers/util.ts",
-    "entityId": "ts:v3/helpers/util.ts:util.find.item"
+    "entityId": "ts:v3/helpers/util.ts:util.find.@forofstatement0.item"
   },
   {
     "kind": "declaration",
@@ -99659,18 +99674,18 @@
   },
   {
     "kind": "declaration",
-    "entityId": "ts:v4/classic/from-json-schema.ts:checkPropertyNames.guard.@arrowfunction[check]0.key",
+    "entityId": "ts:v4/classic/from-json-schema.ts:checkPropertyNames.guard.@arrowfunction[check]0.@forofstatement0.key",
     "entityType": "variable",
-    "name": "checkPropertyNames.guard.@arrowfunction[check]0.key",
+    "name": "checkPropertyNames.guard.@arrowfunction[check]0.@forofstatement0.key",
     "file": "v4/classic/from-json-schema.ts",
     "exported": false,
     "structureId": "struct:sha256:eb670730d7c863da",
-    "contentId": "content:sha256:8e81f96eabe56967"
+    "contentId": "content:sha256:2ed9544c947a28e8"
   },
   {
     "kind": "contains",
     "containerId": "module:v4/classic/from-json-schema.ts",
-    "entityId": "ts:v4/classic/from-json-schema.ts:checkPropertyNames.guard.@arrowfunction[check]0.key"
+    "entityId": "ts:v4/classic/from-json-schema.ts:checkPropertyNames.guard.@arrowfunction[check]0.@forofstatement0.key"
   },
   {
     "kind": "declaration",
@@ -99929,18 +99944,18 @@
   },
   {
     "kind": "declaration",
-    "entityId": "ts:v4/classic/from-json-schema.ts:convertBaseSchema.@block[caseclause]4.[key, propSchema]",
+    "entityId": "ts:v4/classic/from-json-schema.ts:convertBaseSchema.@block[caseclause]4.@forofstatement0.[key, propSchema]",
     "entityType": "variable",
-    "name": "convertBaseSchema.@block[caseclause]4.[key, propSchema]",
+    "name": "convertBaseSchema.@block[caseclause]4.@forofstatement0.[key, propSchema]",
     "file": "v4/classic/from-json-schema.ts",
     "exported": false,
     "structureId": "struct:sha256:eb670730d7c863da",
-    "contentId": "content:sha256:d128a61ebaf9ad92"
+    "contentId": "content:sha256:6675a9a8e7e89cf3"
   },
   {
     "kind": "contains",
     "containerId": "module:v4/classic/from-json-schema.ts",
-    "entityId": "ts:v4/classic/from-json-schema.ts:convertBaseSchema.@block[caseclause]4.[key, propSchema]"
+    "entityId": "ts:v4/classic/from-json-schema.ts:convertBaseSchema.@block[caseclause]4.@forofstatement0.[key, propSchema]"
   },
   {
     "kind": "declaration",
@@ -100004,18 +100019,18 @@
   },
   {
     "kind": "declaration",
-    "entityId": "ts:v4/classic/from-json-schema.ts:convertBaseSchema.@block[caseclause]4.@block[if]57.pattern",
+    "entityId": "ts:v4/classic/from-json-schema.ts:convertBaseSchema.@block[caseclause]4.@block[if]57.@forofstatement1.pattern",
     "entityType": "variable",
-    "name": "convertBaseSchema.@block[caseclause]4.@block[if]57.pattern",
+    "name": "convertBaseSchema.@block[caseclause]4.@block[if]57.@forofstatement1.pattern",
     "file": "v4/classic/from-json-schema.ts",
     "exported": false,
     "structureId": "struct:sha256:eb670730d7c863da",
-    "contentId": "content:sha256:4608a0716c8c3950"
+    "contentId": "content:sha256:2e8f673eda10a1eb"
   },
   {
     "kind": "contains",
     "containerId": "module:v4/classic/from-json-schema.ts",
-    "entityId": "ts:v4/classic/from-json-schema.ts:convertBaseSchema.@block[caseclause]4.@block[if]57.pattern"
+    "entityId": "ts:v4/classic/from-json-schema.ts:convertBaseSchema.@block[caseclause]4.@block[if]57.@forofstatement1.pattern"
   },
   {
     "kind": "declaration",
@@ -100079,18 +100094,18 @@
   },
   {
     "kind": "declaration",
-    "entityId": "ts:v4/classic/from-json-schema.ts:convertBaseSchema.@block[caseclause]4.@block[if]57.@block[else]0.i",
+    "entityId": "ts:v4/classic/from-json-schema.ts:convertBaseSchema.@block[caseclause]4.@block[if]57.@block[else]0.@forstatement0.i",
     "entityType": "variable",
-    "name": "convertBaseSchema.@block[caseclause]4.@block[if]57.@block[else]0.i",
+    "name": "convertBaseSchema.@block[caseclause]4.@block[if]57.@block[else]0.@forstatement0.i",
     "file": "v4/classic/from-json-schema.ts",
     "exported": false,
     "structureId": "struct:sha256:f64da817576052e9",
-    "contentId": "content:sha256:45a0d874ac05a1ff"
+    "contentId": "content:sha256:2b3bef77d6e581b4"
   },
   {
     "kind": "contains",
     "containerId": "module:v4/classic/from-json-schema.ts",
-    "entityId": "ts:v4/classic/from-json-schema.ts:convertBaseSchema.@block[caseclause]4.@block[if]57.@block[else]0.i"
+    "entityId": "ts:v4/classic/from-json-schema.ts:convertBaseSchema.@block[caseclause]4.@block[if]57.@block[else]0.@forstatement0.i"
   },
   {
     "kind": "declaration",
@@ -100154,18 +100169,18 @@
   },
   {
     "kind": "declaration",
-    "entityId": "ts:v4/classic/from-json-schema.ts:convertBaseSchema.@block[caseclause]4.@block[if]57.@block[if]61.@arrowfunction[check]0.key",
+    "entityId": "ts:v4/classic/from-json-schema.ts:convertBaseSchema.@block[caseclause]4.@block[if]57.@block[if]61.@arrowfunction[check]0.@forofstatement2.key",
     "entityType": "variable",
-    "name": "convertBaseSchema.@block[caseclause]4.@block[if]57.@block[if]61.@arrowfunction[check]0.key",
+    "name": "convertBaseSchema.@block[caseclause]4.@block[if]57.@block[if]61.@arrowfunction[check]0.@forofstatement2.key",
     "file": "v4/classic/from-json-schema.ts",
     "exported": false,
     "structureId": "struct:sha256:eb670730d7c863da",
-    "contentId": "content:sha256:020efc35af0d7848"
+    "contentId": "content:sha256:db0815ea7762121f"
   },
   {
     "kind": "contains",
     "containerId": "module:v4/classic/from-json-schema.ts",
-    "entityId": "ts:v4/classic/from-json-schema.ts:convertBaseSchema.@block[caseclause]4.@block[if]57.@block[if]61.@arrowfunction[check]0.key"
+    "entityId": "ts:v4/classic/from-json-schema.ts:convertBaseSchema.@block[caseclause]4.@block[if]57.@block[if]61.@arrowfunction[check]0.@forofstatement2.key"
   },
   {
     "kind": "declaration",
@@ -100529,18 +100544,18 @@
   },
   {
     "kind": "declaration",
-    "entityId": "ts:v4/classic/from-json-schema.ts:convertSchema.@block[if]3.@block[else]0.i",
+    "entityId": "ts:v4/classic/from-json-schema.ts:convertSchema.@block[if]3.@block[else]0.@forstatement0.i",
     "entityType": "variable",
-    "name": "convertSchema.@block[if]3.@block[else]0.i",
+    "name": "convertSchema.@block[if]3.@block[else]0.@forstatement0.i",
     "file": "v4/classic/from-json-schema.ts",
     "exported": false,
     "structureId": "struct:sha256:966647fed6257e2c",
-    "contentId": "content:sha256:1118b2d7204750da"
+    "contentId": "content:sha256:2517e1f65110cc85"
   },
   {
     "kind": "contains",
     "containerId": "module:v4/classic/from-json-schema.ts",
-    "entityId": "ts:v4/classic/from-json-schema.ts:convertSchema.@block[if]3.@block[else]0.i"
+    "entityId": "ts:v4/classic/from-json-schema.ts:convertSchema.@block[if]3.@block[else]0.@forstatement0.i"
   },
   {
     "kind": "declaration",
@@ -100574,18 +100589,18 @@
   },
   {
     "kind": "declaration",
-    "entityId": "ts:v4/classic/from-json-schema.ts:convertSchema.key",
+    "entityId": "ts:v4/classic/from-json-schema.ts:convertSchema.@forofstatement0.key",
     "entityType": "variable",
-    "name": "convertSchema.key",
+    "name": "convertSchema.@forofstatement0.key",
     "file": "v4/classic/from-json-schema.ts",
     "exported": false,
     "structureId": "struct:sha256:eb670730d7c863da",
-    "contentId": "content:sha256:9a158a47f30d7995"
+    "contentId": "content:sha256:c263edd193c1b1cc"
   },
   {
     "kind": "contains",
     "containerId": "module:v4/classic/from-json-schema.ts",
-    "entityId": "ts:v4/classic/from-json-schema.ts:convertSchema.key"
+    "entityId": "ts:v4/classic/from-json-schema.ts:convertSchema.@forofstatement0.key"
   },
   {
     "kind": "declaration",
@@ -100601,6 +100616,36 @@
     "kind": "contains",
     "containerId": "module:v4/classic/from-json-schema.ts",
     "entityId": "ts:v4/classic/from-json-schema.ts:convertSchema.contentMetadataKeys"
+  },
+  {
+    "kind": "declaration",
+    "entityId": "ts:v4/classic/from-json-schema.ts:convertSchema.@forofstatement1.key",
+    "entityType": "variable",
+    "name": "convertSchema.@forofstatement1.key",
+    "file": "v4/classic/from-json-schema.ts",
+    "exported": false,
+    "structureId": "struct:sha256:eb670730d7c863da",
+    "contentId": "content:sha256:1d0c60839cca3f32"
+  },
+  {
+    "kind": "contains",
+    "containerId": "module:v4/classic/from-json-schema.ts",
+    "entityId": "ts:v4/classic/from-json-schema.ts:convertSchema.@forofstatement1.key"
+  },
+  {
+    "kind": "declaration",
+    "entityId": "ts:v4/classic/from-json-schema.ts:convertSchema.@forofstatement2.key",
+    "entityType": "variable",
+    "name": "convertSchema.@forofstatement2.key",
+    "file": "v4/classic/from-json-schema.ts",
+    "exported": false,
+    "structureId": "struct:sha256:eb670730d7c863da",
+    "contentId": "content:sha256:9b8128488a571c3d"
+  },
+  {
+    "kind": "contains",
+    "containerId": "module:v4/classic/from-json-schema.ts",
+    "entityId": "ts:v4/classic/from-json-schema.ts:convertSchema.@forofstatement2.key"
   },
   {
     "kind": "declaration",
@@ -101399,33 +101444,33 @@
   },
   {
     "kind": "declaration",
-    "entityId": "ts:v4/classic/from-json-schema.ts:convertBaseSchema.@block[caseclause]4.[key, propSchema].key",
+    "entityId": "ts:v4/classic/from-json-schema.ts:convertBaseSchema.@block[caseclause]4.@forofstatement0.[key, propSchema].key",
     "entityType": "binding",
-    "name": "convertBaseSchema.@block[caseclause]4.[key, propSchema].key",
+    "name": "convertBaseSchema.@block[caseclause]4.@forofstatement0.[key, propSchema].key",
     "file": "v4/classic/from-json-schema.ts",
     "exported": false,
     "structureId": "struct:sha256:90bf07132573c33d",
-    "contentId": "content:sha256:a27ce7ff68cc199d"
+    "contentId": "content:sha256:c86af09a7dc0d15e"
   },
   {
     "kind": "contains",
     "containerId": "module:v4/classic/from-json-schema.ts",
-    "entityId": "ts:v4/classic/from-json-schema.ts:convertBaseSchema.@block[caseclause]4.[key, propSchema].key"
+    "entityId": "ts:v4/classic/from-json-schema.ts:convertBaseSchema.@block[caseclause]4.@forofstatement0.[key, propSchema].key"
   },
   {
     "kind": "declaration",
-    "entityId": "ts:v4/classic/from-json-schema.ts:convertBaseSchema.@block[caseclause]4.[key, propSchema].propSchema",
+    "entityId": "ts:v4/classic/from-json-schema.ts:convertBaseSchema.@block[caseclause]4.@forofstatement0.[key, propSchema].propSchema",
     "entityType": "binding",
-    "name": "convertBaseSchema.@block[caseclause]4.[key, propSchema].propSchema",
+    "name": "convertBaseSchema.@block[caseclause]4.@forofstatement0.[key, propSchema].propSchema",
     "file": "v4/classic/from-json-schema.ts",
     "exported": false,
     "structureId": "struct:sha256:90bf07132573c33d",
-    "contentId": "content:sha256:60d6d878fceb8357"
+    "contentId": "content:sha256:7a248964364cf02e"
   },
   {
     "kind": "contains",
     "containerId": "module:v4/classic/from-json-schema.ts",
-    "entityId": "ts:v4/classic/from-json-schema.ts:convertBaseSchema.@block[caseclause]4.[key, propSchema].propSchema"
+    "entityId": "ts:v4/classic/from-json-schema.ts:convertBaseSchema.@block[caseclause]4.@forofstatement0.[key, propSchema].propSchema"
   },
   {
     "kind": "declaration",
@@ -114376,38 +114421,123 @@
   },
   {
     "kind": "declaration",
-    "entityId": "ts:v4/classic/schemas.ts:_function.@typeliteral0.output",
+    "entityId": "ts:v4/classic/schemas.ts:_function.@typeliteral1.input",
     "entityType": "type-property",
-    "name": "_function.@typeliteral0.output",
+    "name": "_function.@typeliteral1.input",
     "file": "v4/classic/schemas.ts",
     "exported": false,
-    "structureId": "struct:sha256:de03d554d1f4cd26",
-    "contentId": "content:sha256:af9bc9393832edbb"
+    "structureId": "struct:sha256:86dbf3a5b6be79f3",
+    "contentId": "content:sha256:ba6e046d130d5fd0"
   },
   {
     "kind": "contains",
     "containerId": "module:v4/classic/schemas.ts",
-    "entityId": "ts:v4/classic/schemas.ts:_function.@typeliteral0.output"
+    "entityId": "ts:v4/classic/schemas.ts:_function.@typeliteral1.input"
   },
   {
     "kind": "declaration",
-    "entityId": "ts:v4/classic/schemas.ts:_function.@typeliteral0.output",
+    "entityId": "ts:v4/classic/schemas.ts:_function.@typeliteral1.output",
     "entityType": "type-property",
-    "name": "_function.@typeliteral0.output",
+    "name": "_function.@typeliteral1.output",
+    "file": "v4/classic/schemas.ts",
+    "exported": false,
+    "structureId": "struct:sha256:de03d554d1f4cd26",
+    "contentId": "content:sha256:3ac1544ec897c99d"
+  },
+  {
+    "kind": "contains",
+    "containerId": "module:v4/classic/schemas.ts",
+    "entityId": "ts:v4/classic/schemas.ts:_function.@typeliteral1.output"
+  },
+  {
+    "kind": "declaration",
+    "entityId": "ts:v4/classic/schemas.ts:_function.@typeliteral2.input",
+    "entityType": "type-property",
+    "name": "_function.@typeliteral2.input",
+    "file": "v4/classic/schemas.ts",
+    "exported": false,
+    "structureId": "struct:sha256:86dbf3a5b6be79f3",
+    "contentId": "content:sha256:ac61f53c6f3b9bcb"
+  },
+  {
+    "kind": "contains",
+    "containerId": "module:v4/classic/schemas.ts",
+    "entityId": "ts:v4/classic/schemas.ts:_function.@typeliteral2.input"
+  },
+  {
+    "kind": "declaration",
+    "entityId": "ts:v4/classic/schemas.ts:_function.@typeliteral3.output",
+    "entityType": "type-property",
+    "name": "_function.@typeliteral3.output",
+    "file": "v4/classic/schemas.ts",
+    "exported": false,
+    "structureId": "struct:sha256:de03d554d1f4cd26",
+    "contentId": "content:sha256:e351397a4b5dec34"
+  },
+  {
+    "kind": "contains",
+    "containerId": "module:v4/classic/schemas.ts",
+    "entityId": "ts:v4/classic/schemas.ts:_function.@typeliteral3.output"
+  },
+  {
+    "kind": "declaration",
+    "entityId": "ts:v4/classic/schemas.ts:_function.@typeliteral4.input",
+    "entityType": "type-property",
+    "name": "_function.@typeliteral4.input",
+    "file": "v4/classic/schemas.ts",
+    "exported": false,
+    "structureId": "struct:sha256:86dbf3a5b6be79f3",
+    "contentId": "content:sha256:fd2c49904bf15808"
+  },
+  {
+    "kind": "contains",
+    "containerId": "module:v4/classic/schemas.ts",
+    "entityId": "ts:v4/classic/schemas.ts:_function.@typeliteral4.input"
+  },
+  {
+    "kind": "declaration",
+    "entityId": "ts:v4/classic/schemas.ts:_function.@typeliteral4.output",
+    "entityType": "type-property",
+    "name": "_function.@typeliteral4.output",
+    "file": "v4/classic/schemas.ts",
+    "exported": false,
+    "structureId": "struct:sha256:de03d554d1f4cd26",
+    "contentId": "content:sha256:3eed2cad34d0bf0e"
+  },
+  {
+    "kind": "contains",
+    "containerId": "module:v4/classic/schemas.ts",
+    "entityId": "ts:v4/classic/schemas.ts:_function.@typeliteral4.output"
+  },
+  {
+    "kind": "declaration",
+    "entityId": "ts:v4/classic/schemas.ts:_function.@typeliteral5.output",
+    "entityType": "type-property",
+    "name": "_function.@typeliteral5.output",
     "file": "v4/classic/schemas.ts",
     "exported": false,
     "structureId": "struct:sha256:20ac279f20b2646d",
-    "contentId": "content:sha256:e4cdfdbb18d4ab8c"
+    "contentId": "content:sha256:19aac6a7b1f13633"
+  },
+  {
+    "kind": "contains",
+    "containerId": "module:v4/classic/schemas.ts",
+    "entityId": "ts:v4/classic/schemas.ts:_function.@typeliteral5.output"
   },
   {
     "kind": "declaration",
-    "entityId": "ts:v4/classic/schemas.ts:_function.@typeliteral0.input",
+    "entityId": "ts:v4/classic/schemas.ts:_function.@typeliteral5.input",
     "entityType": "type-property",
-    "name": "_function.@typeliteral0.input",
+    "name": "_function.@typeliteral5.input",
     "file": "v4/classic/schemas.ts",
     "exported": false,
     "structureId": "struct:sha256:97d1285604ede785",
-    "contentId": "content:sha256:17f47e4bd6310043"
+    "contentId": "content:sha256:36941c34373e2a14"
+  },
+  {
+    "kind": "contains",
+    "containerId": "module:v4/classic/schemas.ts",
+    "entityId": "ts:v4/classic/schemas.ts:_function.@typeliteral5.input"
   },
   {
     "kind": "declaration",
@@ -114861,18 +114991,18 @@
   },
   {
     "kind": "declaration",
-    "entityId": "ts:v4/classic/schemas.ts:ZodEnum.@arrowfunction[$constructor]0.@arrowfunction[extract]0.value",
+    "entityId": "ts:v4/classic/schemas.ts:ZodEnum.@arrowfunction[$constructor]0.@arrowfunction[extract]0.@forofstatement0.value",
     "entityType": "variable",
-    "name": "ZodEnum.@arrowfunction[$constructor]0.@arrowfunction[extract]0.value",
+    "name": "ZodEnum.@arrowfunction[$constructor]0.@arrowfunction[extract]0.@forofstatement0.value",
     "file": "v4/classic/schemas.ts",
     "exported": false,
     "structureId": "struct:sha256:eb670730d7c863da",
-    "contentId": "content:sha256:72724f1589b5bd5c"
+    "contentId": "content:sha256:e1f607e86e672bcd"
   },
   {
     "kind": "contains",
     "containerId": "module:v4/classic/schemas.ts",
-    "entityId": "ts:v4/classic/schemas.ts:ZodEnum.@arrowfunction[$constructor]0.@arrowfunction[extract]0.value"
+    "entityId": "ts:v4/classic/schemas.ts:ZodEnum.@arrowfunction[$constructor]0.@arrowfunction[extract]0.@forofstatement0.value"
   },
   {
     "kind": "declaration",
@@ -114891,18 +115021,18 @@
   },
   {
     "kind": "declaration",
-    "entityId": "ts:v4/classic/schemas.ts:ZodEnum.@arrowfunction[$constructor]0.@arrowfunction[exclude]0.value",
+    "entityId": "ts:v4/classic/schemas.ts:ZodEnum.@arrowfunction[$constructor]0.@arrowfunction[exclude]0.@forofstatement1.value",
     "entityType": "variable",
-    "name": "ZodEnum.@arrowfunction[$constructor]0.@arrowfunction[exclude]0.value",
+    "name": "ZodEnum.@arrowfunction[$constructor]0.@arrowfunction[exclude]0.@forofstatement1.value",
     "file": "v4/classic/schemas.ts",
     "exported": false,
     "structureId": "struct:sha256:eb670730d7c863da",
-    "contentId": "content:sha256:706f866339e69cd0"
+    "contentId": "content:sha256:945326cbd2e43045"
   },
   {
     "kind": "contains",
     "containerId": "module:v4/classic/schemas.ts",
-    "entityId": "ts:v4/classic/schemas.ts:ZodEnum.@arrowfunction[$constructor]0.@arrowfunction[exclude]0.value"
+    "entityId": "ts:v4/classic/schemas.ts:ZodEnum.@arrowfunction[$constructor]0.@arrowfunction[exclude]0.@forofstatement1.value"
   },
   {
     "kind": "declaration",
@@ -192997,18 +193127,18 @@
   },
   {
     "kind": "declaration",
-    "entityId": "ts:v4/core/compile.ts:addConstant.[name, v]",
+    "entityId": "ts:v4/core/compile.ts:addConstant.@forofstatement0.[name, v]",
     "entityType": "variable",
-    "name": "addConstant.[name, v]",
+    "name": "addConstant.@forofstatement0.[name, v]",
     "file": "v4/core/compile.ts",
     "exported": false,
     "structureId": "struct:sha256:eb670730d7c863da",
-    "contentId": "content:sha256:2cf6e6706266257c"
+    "contentId": "content:sha256:031933575a9fedc5"
   },
   {
     "kind": "contains",
     "containerId": "module:v4/core/compile.ts",
-    "entityId": "ts:v4/core/compile.ts:addConstant.[name, v]"
+    "entityId": "ts:v4/core/compile.ts:addConstant.@forofstatement0.[name, v]"
   },
   {
     "kind": "declaration",
@@ -193147,18 +193277,18 @@
   },
   {
     "kind": "declaration",
-    "entityId": "ts:v4/core/compile.ts:compileChild.@catchclause0.@block[catchclause]0.@block[if]0.k",
+    "entityId": "ts:v4/core/compile.ts:compileChild.@catchclause0.@block[catchclause]0.@block[if]0.@forofstatement0.k",
     "entityType": "variable",
-    "name": "compileChild.@catchclause0.@block[catchclause]0.@block[if]0.k",
+    "name": "compileChild.@catchclause0.@block[catchclause]0.@block[if]0.@forofstatement0.k",
     "file": "v4/core/compile.ts",
     "exported": false,
     "structureId": "struct:sha256:eb670730d7c863da",
-    "contentId": "content:sha256:87d02a9a2d83a0cf"
+    "contentId": "content:sha256:10e2ab5dfeb6db1d"
   },
   {
     "kind": "contains",
     "containerId": "module:v4/core/compile.ts",
-    "entityId": "ts:v4/core/compile.ts:compileChild.@catchclause0.@block[catchclause]0.@block[if]0.k"
+    "entityId": "ts:v4/core/compile.ts:compileChild.@catchclause0.@block[catchclause]0.@block[if]0.@forofstatement0.k"
   },
   {
     "kind": "declaration",
@@ -193252,18 +193382,18 @@
   },
   {
     "kind": "declaration",
-    "entityId": "ts:v4/core/compile.ts:generateChecks.check",
+    "entityId": "ts:v4/core/compile.ts:generateChecks.@forofstatement0.check",
     "entityType": "variable",
-    "name": "generateChecks.check",
+    "name": "generateChecks.@forofstatement0.check",
     "file": "v4/core/compile.ts",
     "exported": false,
     "structureId": "struct:sha256:eb670730d7c863da",
-    "contentId": "content:sha256:253b75baecf39525"
+    "contentId": "content:sha256:1ad8093e9e7229a5"
   },
   {
     "kind": "contains",
     "containerId": "module:v4/core/compile.ts",
-    "entityId": "ts:v4/core/compile.ts:generateChecks.check"
+    "entityId": "ts:v4/core/compile.ts:generateChecks.@forofstatement0.check"
   },
   {
     "kind": "declaration",
@@ -194257,18 +194387,18 @@
   },
   {
     "kind": "declaration",
-    "entityId": "ts:v4/core/compile.ts:generateObjectCheck.key",
+    "entityId": "ts:v4/core/compile.ts:generateObjectCheck.@forofstatement0.key",
     "entityType": "variable",
-    "name": "generateObjectCheck.key",
+    "name": "generateObjectCheck.@forofstatement0.key",
     "file": "v4/core/compile.ts",
     "exported": false,
     "structureId": "struct:sha256:eb670730d7c863da",
-    "contentId": "content:sha256:a8e9b8ea5bb3ddd6"
+    "contentId": "content:sha256:0cad37152cecda10"
   },
   {
     "kind": "contains",
     "containerId": "module:v4/core/compile.ts",
-    "entityId": "ts:v4/core/compile.ts:generateObjectCheck.key"
+    "entityId": "ts:v4/core/compile.ts:generateObjectCheck.@forofstatement0.key"
   },
   {
     "kind": "declaration",
@@ -194452,18 +194582,18 @@
   },
   {
     "kind": "declaration",
-    "entityId": "ts:v4/core/compile.ts:generateObjectCheck.@block[else]3.k",
+    "entityId": "ts:v4/core/compile.ts:generateObjectCheck.@block[else]3.@forofstatement1.k",
     "entityType": "variable",
-    "name": "generateObjectCheck.@block[else]3.k",
+    "name": "generateObjectCheck.@block[else]3.@forofstatement1.k",
     "file": "v4/core/compile.ts",
     "exported": false,
     "structureId": "struct:sha256:eb670730d7c863da",
-    "contentId": "content:sha256:b51cc059d4c90241"
+    "contentId": "content:sha256:3304527176cb3226"
   },
   {
     "kind": "contains",
     "containerId": "module:v4/core/compile.ts",
-    "entityId": "ts:v4/core/compile.ts:generateObjectCheck.@block[else]3.k"
+    "entityId": "ts:v4/core/compile.ts:generateObjectCheck.@block[else]3.@forofstatement1.k"
   },
   {
     "kind": "declaration",
@@ -195172,18 +195302,18 @@
   },
   {
     "kind": "declaration",
-    "entityId": "ts:v4/core/compile.ts:generateTupleCheck.i",
+    "entityId": "ts:v4/core/compile.ts:generateTupleCheck.@forstatement0.i",
     "entityType": "variable",
-    "name": "generateTupleCheck.i",
+    "name": "generateTupleCheck.@forstatement0.i",
     "file": "v4/core/compile.ts",
     "exported": false,
     "structureId": "struct:sha256:396dae39d37f12b4",
-    "contentId": "content:sha256:585c4df71d435897"
+    "contentId": "content:sha256:4c813191a55dc274"
   },
   {
     "kind": "contains",
     "containerId": "module:v4/core/compile.ts",
-    "entityId": "ts:v4/core/compile.ts:generateTupleCheck.i"
+    "entityId": "ts:v4/core/compile.ts:generateTupleCheck.@forstatement0.i"
   },
   {
     "kind": "declaration",
@@ -195352,18 +195482,18 @@
   },
   {
     "kind": "declaration",
-    "entityId": "ts:v4/core/compile.ts:getTupleOptStart.i",
+    "entityId": "ts:v4/core/compile.ts:getTupleOptStart.@forstatement0.i",
     "entityType": "variable",
-    "name": "getTupleOptStart.i",
+    "name": "getTupleOptStart.@forstatement0.i",
     "file": "v4/core/compile.ts",
     "exported": false,
     "structureId": "struct:sha256:526258f63b6cb0b6",
-    "contentId": "content:sha256:414c12408c71671b"
+    "contentId": "content:sha256:4d4ffee1be3f8071"
   },
   {
     "kind": "contains",
     "containerId": "module:v4/core/compile.ts",
-    "entityId": "ts:v4/core/compile.ts:getTupleOptStart.i"
+    "entityId": "ts:v4/core/compile.ts:getTupleOptStart.@forstatement0.i"
   },
   {
     "kind": "declaration",
@@ -195472,18 +195602,18 @@
   },
   {
     "kind": "declaration",
-    "entityId": "ts:v4/core/compile.ts:generateUnionCheck.i",
+    "entityId": "ts:v4/core/compile.ts:generateUnionCheck.@forstatement0.i",
     "entityType": "variable",
-    "name": "generateUnionCheck.i",
+    "name": "generateUnionCheck.@forstatement0.i",
     "file": "v4/core/compile.ts",
     "exported": false,
     "structureId": "struct:sha256:396dae39d37f12b4",
-    "contentId": "content:sha256:a08d5e356bb9e306"
+    "contentId": "content:sha256:356c0e0f019d1f7c"
   },
   {
     "kind": "contains",
     "containerId": "module:v4/core/compile.ts",
-    "entityId": "ts:v4/core/compile.ts:generateUnionCheck.i"
+    "entityId": "ts:v4/core/compile.ts:generateUnionCheck.@forstatement0.i"
   },
   {
     "kind": "declaration",
@@ -195577,18 +195707,18 @@
   },
   {
     "kind": "declaration",
-    "entityId": "ts:v4/core/compile.ts:generateDiscriminatedUnionCheck.option",
+    "entityId": "ts:v4/core/compile.ts:generateDiscriminatedUnionCheck.@forofstatement0.option",
     "entityType": "variable",
-    "name": "generateDiscriminatedUnionCheck.option",
+    "name": "generateDiscriminatedUnionCheck.@forofstatement0.option",
     "file": "v4/core/compile.ts",
     "exported": false,
     "structureId": "struct:sha256:eb670730d7c863da",
-    "contentId": "content:sha256:101687dffddd1ce1"
+    "contentId": "content:sha256:867c720991700a3a"
   },
   {
     "kind": "contains",
     "containerId": "module:v4/core/compile.ts",
-    "entityId": "ts:v4/core/compile.ts:generateDiscriminatedUnionCheck.option"
+    "entityId": "ts:v4/core/compile.ts:generateDiscriminatedUnionCheck.@forofstatement0.option"
   },
   {
     "kind": "declaration",
@@ -195607,18 +195737,18 @@
   },
   {
     "kind": "declaration",
-    "entityId": "ts:v4/core/compile.ts:generateDiscriminatedUnionCheck.@block[forof]0.value",
+    "entityId": "ts:v4/core/compile.ts:generateDiscriminatedUnionCheck.@block[forof]0.@forofstatement1.value",
     "entityType": "variable",
-    "name": "generateDiscriminatedUnionCheck.@block[forof]0.value",
+    "name": "generateDiscriminatedUnionCheck.@block[forof]0.@forofstatement1.value",
     "file": "v4/core/compile.ts",
     "exported": false,
     "structureId": "struct:sha256:eb670730d7c863da",
-    "contentId": "content:sha256:5dcd299c84a3c5f3"
+    "contentId": "content:sha256:dd54e54a2f2f3f7b"
   },
   {
     "kind": "contains",
     "containerId": "module:v4/core/compile.ts",
-    "entityId": "ts:v4/core/compile.ts:generateDiscriminatedUnionCheck.@block[forof]0.value"
+    "entityId": "ts:v4/core/compile.ts:generateDiscriminatedUnionCheck.@block[forof]0.@forofstatement1.value"
   },
   {
     "kind": "declaration",
@@ -195877,18 +196007,18 @@
   },
   {
     "kind": "declaration",
-    "entityId": "ts:v4/core/compile.ts:generateRecordCheck.@block[if]0.key",
+    "entityId": "ts:v4/core/compile.ts:generateRecordCheck.@block[if]0.@forofstatement0.key",
     "entityType": "variable",
-    "name": "generateRecordCheck.@block[if]0.key",
+    "name": "generateRecordCheck.@block[if]0.@forofstatement0.key",
     "file": "v4/core/compile.ts",
     "exported": false,
     "structureId": "struct:sha256:eb670730d7c863da",
-    "contentId": "content:sha256:1b064b5b9f104e05"
+    "contentId": "content:sha256:694adee0175b4d64"
   },
   {
     "kind": "contains",
     "containerId": "module:v4/core/compile.ts",
-    "entityId": "ts:v4/core/compile.ts:generateRecordCheck.@block[if]0.key"
+    "entityId": "ts:v4/core/compile.ts:generateRecordCheck.@block[if]0.@forofstatement0.key"
   },
   {
     "kind": "declaration",
@@ -200812,33 +200942,33 @@
   },
   {
     "kind": "declaration",
-    "entityId": "ts:v4/core/compile.ts:addConstant.[name, v].name",
+    "entityId": "ts:v4/core/compile.ts:addConstant.@forofstatement0.[name, v].name",
     "entityType": "binding",
-    "name": "addConstant.[name, v].name",
+    "name": "addConstant.@forofstatement0.[name, v].name",
     "file": "v4/core/compile.ts",
     "exported": false,
     "structureId": "struct:sha256:90bf07132573c33d",
-    "contentId": "content:sha256:d36164270cb7d8b2"
+    "contentId": "content:sha256:a39ebdf08daf3672"
   },
   {
     "kind": "contains",
     "containerId": "module:v4/core/compile.ts",
-    "entityId": "ts:v4/core/compile.ts:addConstant.[name, v].name"
+    "entityId": "ts:v4/core/compile.ts:addConstant.@forofstatement0.[name, v].name"
   },
   {
     "kind": "declaration",
-    "entityId": "ts:v4/core/compile.ts:addConstant.[name, v].v",
+    "entityId": "ts:v4/core/compile.ts:addConstant.@forofstatement0.[name, v].v",
     "entityType": "binding",
-    "name": "addConstant.[name, v].v",
+    "name": "addConstant.@forofstatement0.[name, v].v",
     "file": "v4/core/compile.ts",
     "exported": false,
     "structureId": "struct:sha256:90bf07132573c33d",
-    "contentId": "content:sha256:51c0f792c6446868"
+    "contentId": "content:sha256:c246fca0f083249a"
   },
   {
     "kind": "contains",
     "containerId": "module:v4/core/compile.ts",
-    "entityId": "ts:v4/core/compile.ts:addConstant.[name, v].v"
+    "entityId": "ts:v4/core/compile.ts:addConstant.@forofstatement0.[name, v].v"
   },
   {
     "kind": "declaration",
@@ -213010,18 +213140,18 @@
   },
   {
     "kind": "declaration",
-    "entityId": "ts:v4/core/core.ts:$constructor.init.k",
+    "entityId": "ts:v4/core/core.ts:$constructor.init.@forinstatement0.k",
     "entityType": "variable",
-    "name": "$constructor.init.k",
+    "name": "$constructor.init.@forinstatement0.k",
     "file": "v4/core/core.ts",
     "exported": false,
     "structureId": "struct:sha256:eb670730d7c863da",
-    "contentId": "content:sha256:f610582771445d7e"
+    "contentId": "content:sha256:e095c2e244b3b527"
   },
   {
     "kind": "contains",
     "containerId": "module:v4/core/core.ts",
-    "entityId": "ts:v4/core/core.ts:$constructor.init.k"
+    "entityId": "ts:v4/core/core.ts:$constructor.init.@forinstatement0.k"
   },
   {
     "kind": "declaration",
@@ -213070,18 +213200,18 @@
   },
   {
     "kind": "declaration",
-    "entityId": "ts:v4/core/core.ts:$constructor._.@block[if]0.fn",
+    "entityId": "ts:v4/core/core.ts:$constructor._.@block[if]0.@forofstatement0.fn",
     "entityType": "variable",
-    "name": "$constructor._.@block[if]0.fn",
+    "name": "$constructor._.@block[if]0.@forofstatement0.fn",
     "file": "v4/core/core.ts",
     "exported": false,
     "structureId": "struct:sha256:eb670730d7c863da",
-    "contentId": "content:sha256:b226dc4cfac61a7e"
+    "contentId": "content:sha256:e7ce53afce60b8de"
   },
   {
     "kind": "contains",
     "containerId": "module:v4/core/core.ts",
-    "entityId": "ts:v4/core/core.ts:$constructor._.@block[if]0.fn"
+    "entityId": "ts:v4/core/core.ts:$constructor._.@block[if]0.@forofstatement0.fn"
   },
   {
     "kind": "declaration",
@@ -213498,7 +213628,7 @@
     "kind": "calls",
     "callerId": "ts:v4/core/core.ts:$constructor._",
     "calleeName": "fn",
-    "calleeId": "ts:v4/core/core.ts:$constructor._.@block[if]0.fn",
+    "calleeId": "ts:v4/core/core.ts:$constructor._.@block[if]0.@forofstatement0.fn",
     "confidence": 0.9,
     "reason": "resolved",
     "callerKind": "function",
@@ -214421,18 +214551,18 @@
   },
   {
     "kind": "declaration",
-    "entityId": "ts:v4/core/doc.ts:Doc.write.line",
+    "entityId": "ts:v4/core/doc.ts:Doc.write.@forofstatement0.line",
     "entityType": "variable",
-    "name": "Doc.write.line",
+    "name": "Doc.write.@forofstatement0.line",
     "file": "v4/core/doc.ts",
     "exported": false,
     "structureId": "struct:sha256:eb670730d7c863da",
-    "contentId": "content:sha256:917d8057ea64e9d3"
+    "contentId": "content:sha256:4078c936c931bbd5"
   },
   {
     "kind": "contains",
     "containerId": "module:v4/core/doc.ts",
-    "entityId": "ts:v4/core/doc.ts:Doc.write.line"
+    "entityId": "ts:v4/core/doc.ts:Doc.write.@forofstatement0.line"
   },
   {
     "kind": "declaration",
@@ -217300,18 +217430,18 @@
   },
   {
     "kind": "declaration",
-    "entityId": "ts:v4/core/errors.ts:flattenError.sub",
+    "entityId": "ts:v4/core/errors.ts:flattenError.@forofstatement0.sub",
     "entityType": "variable",
-    "name": "flattenError.sub",
+    "name": "flattenError.@forofstatement0.sub",
     "file": "v4/core/errors.ts",
     "exported": false,
     "structureId": "struct:sha256:eb670730d7c863da",
-    "contentId": "content:sha256:2c3fd0d8d47f081d"
+    "contentId": "content:sha256:006d08982e57ffc0"
   },
   {
     "kind": "contains",
     "containerId": "module:v4/core/errors.ts",
-    "entityId": "ts:v4/core/errors.ts:flattenError.sub"
+    "entityId": "ts:v4/core/errors.ts:flattenError.@forofstatement0.sub"
   },
   {
     "kind": "declaration",
@@ -217345,18 +217475,18 @@
   },
   {
     "kind": "declaration",
-    "entityId": "ts:v4/core/errors.ts:formatError.processError.issue",
+    "entityId": "ts:v4/core/errors.ts:formatError.processError.@forofstatement0.issue",
     "entityType": "variable",
-    "name": "formatError.processError.issue",
+    "name": "formatError.processError.@forofstatement0.issue",
     "file": "v4/core/errors.ts",
     "exported": false,
     "structureId": "struct:sha256:eb670730d7c863da",
-    "contentId": "content:sha256:6455d76b628c5b80"
+    "contentId": "content:sha256:eeb0ef5d0ada7c28"
   },
   {
     "kind": "contains",
     "containerId": "module:v4/core/errors.ts",
-    "entityId": "ts:v4/core/errors.ts:formatError.processError.issue"
+    "entityId": "ts:v4/core/errors.ts:formatError.processError.@forofstatement0.issue"
   },
   {
     "kind": "declaration",
@@ -217480,18 +217610,18 @@
   },
   {
     "kind": "declaration",
-    "entityId": "ts:v4/core/errors.ts:treeifyError.processError.issue",
+    "entityId": "ts:v4/core/errors.ts:treeifyError.processError.@forofstatement0.issue",
     "entityType": "variable",
-    "name": "treeifyError.processError.issue",
+    "name": "treeifyError.processError.@forofstatement0.issue",
     "file": "v4/core/errors.ts",
     "exported": false,
     "structureId": "struct:sha256:eb670730d7c863da",
-    "contentId": "content:sha256:62ffd247eea45071"
+    "contentId": "content:sha256:bc9fd80554873a95"
   },
   {
     "kind": "contains",
     "containerId": "module:v4/core/errors.ts",
-    "entityId": "ts:v4/core/errors.ts:treeifyError.processError.issue"
+    "entityId": "ts:v4/core/errors.ts:treeifyError.processError.@forofstatement0.issue"
   },
   {
     "kind": "declaration",
@@ -217600,18 +217730,18 @@
   },
   {
     "kind": "declaration",
-    "entityId": "ts:v4/core/errors.ts:toDotPath.seg",
+    "entityId": "ts:v4/core/errors.ts:toDotPath.@forofstatement0.seg",
     "entityType": "variable",
-    "name": "toDotPath.seg",
+    "name": "toDotPath.@forofstatement0.seg",
     "file": "v4/core/errors.ts",
     "exported": false,
     "structureId": "struct:sha256:eb670730d7c863da",
-    "contentId": "content:sha256:da7c3f483315e6a0"
+    "contentId": "content:sha256:15bc4897dfc3df78"
   },
   {
     "kind": "contains",
     "containerId": "module:v4/core/errors.ts",
-    "entityId": "ts:v4/core/errors.ts:toDotPath.seg"
+    "entityId": "ts:v4/core/errors.ts:toDotPath.@forofstatement0.seg"
   },
   {
     "kind": "declaration",
@@ -217645,18 +217775,18 @@
   },
   {
     "kind": "declaration",
-    "entityId": "ts:v4/core/errors.ts:prettifyError.issue",
+    "entityId": "ts:v4/core/errors.ts:prettifyError.@forofstatement0.issue",
     "entityType": "variable",
-    "name": "prettifyError.issue",
+    "name": "prettifyError.@forofstatement0.issue",
     "file": "v4/core/errors.ts",
     "exported": false,
     "structureId": "struct:sha256:eb670730d7c863da",
-    "contentId": "content:sha256:1b8934f08a2cd864"
+    "contentId": "content:sha256:ed13ab904d439773"
   },
   {
     "kind": "contains",
     "containerId": "module:v4/core/errors.ts",
-    "entityId": "ts:v4/core/errors.ts:prettifyError.issue"
+    "entityId": "ts:v4/core/errors.ts:prettifyError.@forofstatement0.issue"
   },
   {
     "kind": "declaration",
@@ -230313,6 +230443,21 @@
   },
   {
     "kind": "declaration",
+    "entityId": "ts:v4/core/json-schema-processors.ts:toJSONSchema.@typeliteral2.id",
+    "entityType": "type-property",
+    "name": "toJSONSchema.@typeliteral2.id",
+    "file": "v4/core/json-schema-processors.ts",
+    "exported": false,
+    "structureId": "struct:sha256:77247ac39b4c4a3b",
+    "contentId": "content:sha256:e63de03eb902fd27"
+  },
+  {
+    "kind": "contains",
+    "containerId": "module:v4/core/json-schema-processors.ts",
+    "entityId": "ts:v4/core/json-schema-processors.ts:toJSONSchema.@typeliteral2.id"
+  },
+  {
+    "kind": "declaration",
     "entityId": "ts:v4/core/json-schema-processors.ts:toJSONSchema.@block[if]0.registry.@typeliteral0.id",
     "entityType": "type-property",
     "name": "toJSONSchema.@block[if]0.registry.@typeliteral0.id",
@@ -230523,18 +230668,18 @@
   },
   {
     "kind": "declaration",
-    "entityId": "ts:v4/core/json-schema-processors.ts:literalProcessor.val",
+    "entityId": "ts:v4/core/json-schema-processors.ts:literalProcessor.@forofstatement0.val",
     "entityType": "variable",
-    "name": "literalProcessor.val",
+    "name": "literalProcessor.@forofstatement0.val",
     "file": "v4/core/json-schema-processors.ts",
     "exported": false,
     "structureId": "struct:sha256:eb670730d7c863da",
-    "contentId": "content:sha256:82a739eb94027cfb"
+    "contentId": "content:sha256:8a10760e975ead62"
   },
   {
     "kind": "contains",
     "containerId": "module:v4/core/json-schema-processors.ts",
-    "entityId": "ts:v4/core/json-schema-processors.ts:literalProcessor.val"
+    "entityId": "ts:v4/core/json-schema-processors.ts:literalProcessor.@forofstatement0.val"
   },
   {
     "kind": "declaration",
@@ -230733,18 +230878,18 @@
   },
   {
     "kind": "declaration",
-    "entityId": "ts:v4/core/json-schema-processors.ts:objectProcessor.key",
+    "entityId": "ts:v4/core/json-schema-processors.ts:objectProcessor.@forinstatement0.key",
     "entityType": "variable",
-    "name": "objectProcessor.key",
+    "name": "objectProcessor.@forinstatement0.key",
     "file": "v4/core/json-schema-processors.ts",
     "exported": false,
     "structureId": "struct:sha256:eb670730d7c863da",
-    "contentId": "content:sha256:b4de047a8a76dcb1"
+    "contentId": "content:sha256:a75a7253fea25a02"
   },
   {
     "kind": "contains",
     "containerId": "module:v4/core/json-schema-processors.ts",
-    "entityId": "ts:v4/core/json-schema-processors.ts:objectProcessor.key"
+    "entityId": "ts:v4/core/json-schema-processors.ts:objectProcessor.@forinstatement0.key"
   },
   {
     "kind": "declaration",
@@ -231183,18 +231328,18 @@
   },
   {
     "kind": "declaration",
-    "entityId": "ts:v4/core/json-schema-processors.ts:recordProcessor.@block[if]0.pattern",
+    "entityId": "ts:v4/core/json-schema-processors.ts:recordProcessor.@block[if]0.@forofstatement0.pattern",
     "entityType": "variable",
-    "name": "recordProcessor.@block[if]0.pattern",
+    "name": "recordProcessor.@block[if]0.@forofstatement0.pattern",
     "file": "v4/core/json-schema-processors.ts",
     "exported": false,
     "structureId": "struct:sha256:eb670730d7c863da",
-    "contentId": "content:sha256:d64815f31a1be668"
+    "contentId": "content:sha256:1e1e1f7ddc157425"
   },
   {
     "kind": "contains",
     "containerId": "module:v4/core/json-schema-processors.ts",
-    "entityId": "ts:v4/core/json-schema-processors.ts:recordProcessor.@block[if]0.pattern"
+    "entityId": "ts:v4/core/json-schema-processors.ts:recordProcessor.@block[if]0.@forofstatement0.pattern"
   },
   {
     "kind": "declaration",
@@ -231708,18 +231853,18 @@
   },
   {
     "kind": "declaration",
-    "entityId": "ts:v4/core/json-schema-processors.ts:toJSONSchema.@block[if]0.entry",
+    "entityId": "ts:v4/core/json-schema-processors.ts:toJSONSchema.@block[if]0.@forofstatement0.entry",
     "entityType": "variable",
-    "name": "toJSONSchema.@block[if]0.entry",
+    "name": "toJSONSchema.@block[if]0.@forofstatement0.entry",
     "file": "v4/core/json-schema-processors.ts",
     "exported": false,
     "structureId": "struct:sha256:eb670730d7c863da",
-    "contentId": "content:sha256:65b345328b523ee8"
+    "contentId": "content:sha256:3c8945e9040c7f3b"
   },
   {
     "kind": "contains",
     "containerId": "module:v4/core/json-schema-processors.ts",
-    "entityId": "ts:v4/core/json-schema-processors.ts:toJSONSchema.@block[if]0.entry"
+    "entityId": "ts:v4/core/json-schema-processors.ts:toJSONSchema.@block[if]0.@forofstatement0.entry"
   },
   {
     "kind": "declaration",
@@ -231765,6 +231910,21 @@
     "kind": "contains",
     "containerId": "module:v4/core/json-schema-processors.ts",
     "entityId": "ts:v4/core/json-schema-processors.ts:toJSONSchema.@block[if]0.external"
+  },
+  {
+    "kind": "declaration",
+    "entityId": "ts:v4/core/json-schema-processors.ts:toJSONSchema.@block[if]0.@forofstatement1.entry",
+    "entityType": "variable",
+    "name": "toJSONSchema.@block[if]0.@forofstatement1.entry",
+    "file": "v4/core/json-schema-processors.ts",
+    "exported": false,
+    "structureId": "struct:sha256:eb670730d7c863da",
+    "contentId": "content:sha256:a426d61796fc2a12"
+  },
+  {
+    "kind": "contains",
+    "containerId": "module:v4/core/json-schema-processors.ts",
+    "entityId": "ts:v4/core/json-schema-processors.ts:toJSONSchema.@block[if]0.@forofstatement1.entry"
   },
   {
     "kind": "declaration",
@@ -241894,18 +242054,33 @@
   },
   {
     "kind": "declaration",
-    "entityId": "ts:v4/core/memoizer.ts:isRecursive.@block[else]0.key",
+    "entityId": "ts:v4/core/memoizer.ts:isRecursive.@block[else]0.@forinstatement0.key",
     "entityType": "variable",
-    "name": "isRecursive.@block[else]0.key",
+    "name": "isRecursive.@block[else]0.@forinstatement0.key",
     "file": "v4/core/memoizer.ts",
     "exported": false,
     "structureId": "struct:sha256:eb670730d7c863da",
-    "contentId": "content:sha256:0c61d5550a159727"
+    "contentId": "content:sha256:e0ea6b67c948e5c8"
   },
   {
     "kind": "contains",
     "containerId": "module:v4/core/memoizer.ts",
-    "entityId": "ts:v4/core/memoizer.ts:isRecursive.@block[else]0.key"
+    "entityId": "ts:v4/core/memoizer.ts:isRecursive.@block[else]0.@forinstatement0.key"
+  },
+  {
+    "kind": "declaration",
+    "entityId": "ts:v4/core/memoizer.ts:isRecursive.@block[else]0.@forinstatement1.key",
+    "entityType": "variable",
+    "name": "isRecursive.@block[else]0.@forinstatement1.key",
+    "file": "v4/core/memoizer.ts",
+    "exported": false,
+    "structureId": "struct:sha256:eb670730d7c863da",
+    "contentId": "content:sha256:e7b890bcda2b1088"
+  },
+  {
+    "kind": "contains",
+    "containerId": "module:v4/core/memoizer.ts",
+    "entityId": "ts:v4/core/memoizer.ts:isRecursive.@block[else]0.@forinstatement1.key"
   },
   {
     "kind": "declaration",
@@ -241924,18 +242099,18 @@
   },
   {
     "kind": "declaration",
-    "entityId": "ts:v4/core/memoizer.ts:isRecursive.@block[else]0.@block[forin]0.el",
+    "entityId": "ts:v4/core/memoizer.ts:isRecursive.@block[else]0.@block[forin]0.@forofstatement0.el",
     "entityType": "variable",
-    "name": "isRecursive.@block[else]0.@block[forin]0.el",
+    "name": "isRecursive.@block[else]0.@block[forin]0.@forofstatement0.el",
     "file": "v4/core/memoizer.ts",
     "exported": false,
     "structureId": "struct:sha256:eb670730d7c863da",
-    "contentId": "content:sha256:02ee5a8945dfea0a"
+    "contentId": "content:sha256:48e08d247c7bfec6"
   },
   {
     "kind": "contains",
     "containerId": "module:v4/core/memoizer.ts",
-    "entityId": "ts:v4/core/memoizer.ts:isRecursive.@block[else]0.@block[forin]0.el"
+    "entityId": "ts:v4/core/memoizer.ts:isRecursive.@block[else]0.@block[forin]0.@forofstatement0.el"
   },
   {
     "kind": "declaration",
@@ -259060,33 +259235,33 @@
   },
   {
     "kind": "declaration",
-    "entityId": "ts:v4/core/schemas.ts:$ZodType.@arrowfunction[$constructor]0.ch",
+    "entityId": "ts:v4/core/schemas.ts:$ZodType.@arrowfunction[$constructor]0.@forofstatement0.ch",
     "entityType": "variable",
-    "name": "$ZodType.@arrowfunction[$constructor]0.ch",
+    "name": "$ZodType.@arrowfunction[$constructor]0.@forofstatement0.ch",
     "file": "v4/core/schemas.ts",
     "exported": false,
     "structureId": "struct:sha256:eb670730d7c863da",
-    "contentId": "content:sha256:c3761df36b95d15a"
+    "contentId": "content:sha256:9ef8410065d53221"
   },
   {
     "kind": "contains",
     "containerId": "module:v4/core/schemas.ts",
-    "entityId": "ts:v4/core/schemas.ts:$ZodType.@arrowfunction[$constructor]0.ch"
+    "entityId": "ts:v4/core/schemas.ts:$ZodType.@arrowfunction[$constructor]0.@forofstatement0.ch"
   },
   {
     "kind": "declaration",
-    "entityId": "ts:v4/core/schemas.ts:$ZodType.@arrowfunction[$constructor]0.@block[forof]0.fn",
+    "entityId": "ts:v4/core/schemas.ts:$ZodType.@arrowfunction[$constructor]0.@block[forof]0.@forofstatement1.fn",
     "entityType": "variable",
-    "name": "$ZodType.@arrowfunction[$constructor]0.@block[forof]0.fn",
+    "name": "$ZodType.@arrowfunction[$constructor]0.@block[forof]0.@forofstatement1.fn",
     "file": "v4/core/schemas.ts",
     "exported": false,
     "structureId": "struct:sha256:eb670730d7c863da",
-    "contentId": "content:sha256:b996986feb15784a"
+    "contentId": "content:sha256:a47b639dd4a64c19"
   },
   {
     "kind": "contains",
     "containerId": "module:v4/core/schemas.ts",
-    "entityId": "ts:v4/core/schemas.ts:$ZodType.@arrowfunction[$constructor]0.@block[forof]0.fn"
+    "entityId": "ts:v4/core/schemas.ts:$ZodType.@arrowfunction[$constructor]0.@block[forof]0.@forofstatement1.fn"
   },
   {
     "kind": "declaration",
@@ -259135,18 +259310,18 @@
   },
   {
     "kind": "declaration",
-    "entityId": "ts:v4/core/schemas.ts:$ZodType.@arrowfunction[$constructor]0.@block[else]0.runChecks.ch",
+    "entityId": "ts:v4/core/schemas.ts:$ZodType.@arrowfunction[$constructor]0.@block[else]0.runChecks.@forofstatement0.ch",
     "entityType": "variable",
-    "name": "$ZodType.@arrowfunction[$constructor]0.@block[else]0.runChecks.ch",
+    "name": "$ZodType.@arrowfunction[$constructor]0.@block[else]0.runChecks.@forofstatement0.ch",
     "file": "v4/core/schemas.ts",
     "exported": false,
     "structureId": "struct:sha256:eb670730d7c863da",
-    "contentId": "content:sha256:829258f172223720"
+    "contentId": "content:sha256:9b0d7c84daa1c355"
   },
   {
     "kind": "contains",
     "containerId": "module:v4/core/schemas.ts",
-    "entityId": "ts:v4/core/schemas.ts:$ZodType.@arrowfunction[$constructor]0.@block[else]0.runChecks.ch"
+    "entityId": "ts:v4/core/schemas.ts:$ZodType.@arrowfunction[$constructor]0.@block[else]0.runChecks.@forofstatement0.ch"
   },
   {
     "kind": "declaration",
@@ -259885,18 +260060,18 @@
   },
   {
     "kind": "declaration",
-    "entityId": "ts:v4/core/schemas.ts:$ZodArray.@arrowfunction[$constructor]0.@arrowfunction[parse]0.i",
+    "entityId": "ts:v4/core/schemas.ts:$ZodArray.@arrowfunction[$constructor]0.@arrowfunction[parse]0.@forstatement0.i",
     "entityType": "variable",
-    "name": "$ZodArray.@arrowfunction[$constructor]0.@arrowfunction[parse]0.i",
+    "name": "$ZodArray.@arrowfunction[$constructor]0.@arrowfunction[parse]0.@forstatement0.i",
     "file": "v4/core/schemas.ts",
     "exported": false,
     "structureId": "struct:sha256:396dae39d37f12b4",
-    "contentId": "content:sha256:d040df6092175987"
+    "contentId": "content:sha256:9f50c5bbbfcb838f"
   },
   {
     "kind": "contains",
     "containerId": "module:v4/core/schemas.ts",
-    "entityId": "ts:v4/core/schemas.ts:$ZodArray.@arrowfunction[$constructor]0.@arrowfunction[parse]0.i"
+    "entityId": "ts:v4/core/schemas.ts:$ZodArray.@arrowfunction[$constructor]0.@arrowfunction[parse]0.@forstatement0.i"
   },
   {
     "kind": "declaration",
@@ -259975,18 +260150,18 @@
   },
   {
     "kind": "declaration",
-    "entityId": "ts:v4/core/schemas.ts:normalizeDef.k",
+    "entityId": "ts:v4/core/schemas.ts:normalizeDef.@forofstatement0.k",
     "entityType": "variable",
-    "name": "normalizeDef.k",
+    "name": "normalizeDef.@forofstatement0.k",
     "file": "v4/core/schemas.ts",
     "exported": false,
     "structureId": "struct:sha256:eb670730d7c863da",
-    "contentId": "content:sha256:3c62bb9f9ca7d473"
+    "contentId": "content:sha256:31b66ac1ea0b6d88"
   },
   {
     "kind": "contains",
     "containerId": "module:v4/core/schemas.ts",
-    "entityId": "ts:v4/core/schemas.ts:normalizeDef.k"
+    "entityId": "ts:v4/core/schemas.ts:normalizeDef.@forofstatement0.k"
   },
   {
     "kind": "declaration",
@@ -260095,18 +260270,18 @@
   },
   {
     "kind": "declaration",
-    "entityId": "ts:v4/core/schemas.ts:handleCatchall.key",
+    "entityId": "ts:v4/core/schemas.ts:handleCatchall.@forinstatement0.key",
     "entityType": "variable",
-    "name": "handleCatchall.key",
+    "name": "handleCatchall.@forinstatement0.key",
     "file": "v4/core/schemas.ts",
     "exported": false,
     "structureId": "struct:sha256:eb670730d7c863da",
-    "contentId": "content:sha256:7d56e7ed0fb26384"
+    "contentId": "content:sha256:9a07969dab0d3db6"
   },
   {
     "kind": "contains",
     "containerId": "module:v4/core/schemas.ts",
-    "entityId": "ts:v4/core/schemas.ts:handleCatchall.key"
+    "entityId": "ts:v4/core/schemas.ts:handleCatchall.@forinstatement0.key"
   },
   {
     "kind": "declaration",
@@ -260230,18 +260405,18 @@
   },
   {
     "kind": "declaration",
-    "entityId": "ts:v4/core/schemas.ts:$ZodObject.@arrowfunction[$constructor]0.@arrowfunction[defineLazyInternal]0.key",
+    "entityId": "ts:v4/core/schemas.ts:$ZodObject.@arrowfunction[$constructor]0.@arrowfunction[defineLazyInternal]0.@forinstatement0.key",
     "entityType": "variable",
-    "name": "$ZodObject.@arrowfunction[$constructor]0.@arrowfunction[defineLazyInternal]0.key",
+    "name": "$ZodObject.@arrowfunction[$constructor]0.@arrowfunction[defineLazyInternal]0.@forinstatement0.key",
     "file": "v4/core/schemas.ts",
     "exported": false,
     "structureId": "struct:sha256:eb670730d7c863da",
-    "contentId": "content:sha256:dafdbf8761bcf385"
+    "contentId": "content:sha256:f6e30d537aa9577e"
   },
   {
     "kind": "contains",
     "containerId": "module:v4/core/schemas.ts",
-    "entityId": "ts:v4/core/schemas.ts:$ZodObject.@arrowfunction[$constructor]0.@arrowfunction[defineLazyInternal]0.key"
+    "entityId": "ts:v4/core/schemas.ts:$ZodObject.@arrowfunction[$constructor]0.@arrowfunction[defineLazyInternal]0.@forinstatement0.key"
   },
   {
     "kind": "declaration",
@@ -260260,18 +260435,18 @@
   },
   {
     "kind": "declaration",
-    "entityId": "ts:v4/core/schemas.ts:$ZodObject.@arrowfunction[$constructor]0.@arrowfunction[defineLazyInternal]0.@block[forin]0.@block[if]1.v",
+    "entityId": "ts:v4/core/schemas.ts:$ZodObject.@arrowfunction[$constructor]0.@arrowfunction[defineLazyInternal]0.@block[forin]0.@block[if]1.@forofstatement0.v",
     "entityType": "variable",
-    "name": "$ZodObject.@arrowfunction[$constructor]0.@arrowfunction[defineLazyInternal]0.@block[forin]0.@block[if]1.v",
+    "name": "$ZodObject.@arrowfunction[$constructor]0.@arrowfunction[defineLazyInternal]0.@block[forin]0.@block[if]1.@forofstatement0.v",
     "file": "v4/core/schemas.ts",
     "exported": false,
     "structureId": "struct:sha256:eb670730d7c863da",
-    "contentId": "content:sha256:8e059b0757324369"
+    "contentId": "content:sha256:f15dee2dc064d7c8"
   },
   {
     "kind": "contains",
     "containerId": "module:v4/core/schemas.ts",
-    "entityId": "ts:v4/core/schemas.ts:$ZodObject.@arrowfunction[$constructor]0.@arrowfunction[defineLazyInternal]0.@block[forin]0.@block[if]1.v"
+    "entityId": "ts:v4/core/schemas.ts:$ZodObject.@arrowfunction[$constructor]0.@arrowfunction[defineLazyInternal]0.@block[forin]0.@block[if]1.@forofstatement0.v"
   },
   {
     "kind": "declaration",
@@ -260380,18 +260555,18 @@
   },
   {
     "kind": "declaration",
-    "entityId": "ts:v4/core/schemas.ts:$ZodObject.@arrowfunction[$constructor]0.@arrowfunction[parse]0.key",
+    "entityId": "ts:v4/core/schemas.ts:$ZodObject.@arrowfunction[$constructor]0.@arrowfunction[parse]0.@forofstatement1.key",
     "entityType": "variable",
-    "name": "$ZodObject.@arrowfunction[$constructor]0.@arrowfunction[parse]0.key",
+    "name": "$ZodObject.@arrowfunction[$constructor]0.@arrowfunction[parse]0.@forofstatement1.key",
     "file": "v4/core/schemas.ts",
     "exported": false,
     "structureId": "struct:sha256:eb670730d7c863da",
-    "contentId": "content:sha256:75ca92150b9a4919"
+    "contentId": "content:sha256:60909a86ceff47a4"
   },
   {
     "kind": "contains",
     "containerId": "module:v4/core/schemas.ts",
-    "entityId": "ts:v4/core/schemas.ts:$ZodObject.@arrowfunction[$constructor]0.@arrowfunction[parse]0.key"
+    "entityId": "ts:v4/core/schemas.ts:$ZodObject.@arrowfunction[$constructor]0.@arrowfunction[parse]0.@forofstatement1.key"
   },
   {
     "kind": "declaration",
@@ -260620,18 +260795,33 @@
   },
   {
     "kind": "declaration",
-    "entityId": "ts:v4/core/schemas.ts:$ZodObjectJIT.@arrowfunction[$constructor]0.generateFastpass.key",
+    "entityId": "ts:v4/core/schemas.ts:$ZodObjectJIT.@arrowfunction[$constructor]0.generateFastpass.@forofstatement0.key",
     "entityType": "variable",
-    "name": "$ZodObjectJIT.@arrowfunction[$constructor]0.generateFastpass.key",
+    "name": "$ZodObjectJIT.@arrowfunction[$constructor]0.generateFastpass.@forofstatement0.key",
     "file": "v4/core/schemas.ts",
     "exported": false,
     "structureId": "struct:sha256:eb670730d7c863da",
-    "contentId": "content:sha256:0800e91061e2d12b"
+    "contentId": "content:sha256:c6ca4f3ec8e4129b"
   },
   {
     "kind": "contains",
     "containerId": "module:v4/core/schemas.ts",
-    "entityId": "ts:v4/core/schemas.ts:$ZodObjectJIT.@arrowfunction[$constructor]0.generateFastpass.key"
+    "entityId": "ts:v4/core/schemas.ts:$ZodObjectJIT.@arrowfunction[$constructor]0.generateFastpass.@forofstatement0.key"
+  },
+  {
+    "kind": "declaration",
+    "entityId": "ts:v4/core/schemas.ts:$ZodObjectJIT.@arrowfunction[$constructor]0.generateFastpass.@forofstatement1.key",
+    "entityType": "variable",
+    "name": "$ZodObjectJIT.@arrowfunction[$constructor]0.generateFastpass.@forofstatement1.key",
+    "file": "v4/core/schemas.ts",
+    "exported": false,
+    "structureId": "struct:sha256:eb670730d7c863da",
+    "contentId": "content:sha256:54090b2593bb5f81"
+  },
+  {
+    "kind": "contains",
+    "containerId": "module:v4/core/schemas.ts",
+    "entityId": "ts:v4/core/schemas.ts:$ZodObjectJIT.@arrowfunction[$constructor]0.generateFastpass.@forofstatement1.key"
   },
   {
     "kind": "declaration",
@@ -260890,18 +261080,18 @@
   },
   {
     "kind": "declaration",
-    "entityId": "ts:v4/core/schemas.ts:handleUnionResults.result",
+    "entityId": "ts:v4/core/schemas.ts:handleUnionResults.@forofstatement0.result",
     "entityType": "variable",
-    "name": "handleUnionResults.result",
+    "name": "handleUnionResults.@forofstatement0.result",
     "file": "v4/core/schemas.ts",
     "exported": false,
     "structureId": "struct:sha256:eb670730d7c863da",
-    "contentId": "content:sha256:cfab4fa10321b496"
+    "contentId": "content:sha256:a58fcfa5253ee8c6"
   },
   {
     "kind": "contains",
     "containerId": "module:v4/core/schemas.ts",
-    "entityId": "ts:v4/core/schemas.ts:handleUnionResults.result"
+    "entityId": "ts:v4/core/schemas.ts:handleUnionResults.@forofstatement0.result"
   },
   {
     "kind": "declaration",
@@ -260980,18 +261170,18 @@
   },
   {
     "kind": "declaration",
-    "entityId": "ts:v4/core/schemas.ts:$ZodUnion.@arrowfunction[$constructor]0.@arrowfunction[parse]0.option",
+    "entityId": "ts:v4/core/schemas.ts:$ZodUnion.@arrowfunction[$constructor]0.@arrowfunction[parse]0.@forofstatement0.option",
     "entityType": "variable",
-    "name": "$ZodUnion.@arrowfunction[$constructor]0.@arrowfunction[parse]0.option",
+    "name": "$ZodUnion.@arrowfunction[$constructor]0.@arrowfunction[parse]0.@forofstatement0.option",
     "file": "v4/core/schemas.ts",
     "exported": false,
     "structureId": "struct:sha256:eb670730d7c863da",
-    "contentId": "content:sha256:f4316a0e1d175bb9"
+    "contentId": "content:sha256:9b26478fba4bdad1"
   },
   {
     "kind": "contains",
     "containerId": "module:v4/core/schemas.ts",
-    "entityId": "ts:v4/core/schemas.ts:$ZodUnion.@arrowfunction[$constructor]0.@arrowfunction[parse]0.option"
+    "entityId": "ts:v4/core/schemas.ts:$ZodUnion.@arrowfunction[$constructor]0.@arrowfunction[parse]0.@forofstatement0.option"
   },
   {
     "kind": "declaration",
@@ -261025,18 +261215,18 @@
   },
   {
     "kind": "declaration",
-    "entityId": "ts:v4/core/schemas.ts:handleExclusiveUnionResults.i",
+    "entityId": "ts:v4/core/schemas.ts:handleExclusiveUnionResults.@forstatement0.i",
     "entityType": "variable",
-    "name": "handleExclusiveUnionResults.i",
+    "name": "handleExclusiveUnionResults.@forstatement0.i",
     "file": "v4/core/schemas.ts",
     "exported": false,
     "structureId": "struct:sha256:396dae39d37f12b4",
-    "contentId": "content:sha256:03933892d561a45a"
+    "contentId": "content:sha256:4ac1eb0b5ed146fb"
   },
   {
     "kind": "contains",
     "containerId": "module:v4/core/schemas.ts",
-    "entityId": "ts:v4/core/schemas.ts:handleExclusiveUnionResults.i"
+    "entityId": "ts:v4/core/schemas.ts:handleExclusiveUnionResults.@forstatement0.i"
   },
   {
     "kind": "declaration",
@@ -261085,18 +261275,18 @@
   },
   {
     "kind": "declaration",
-    "entityId": "ts:v4/core/schemas.ts:$ZodXor.@arrowfunction[$constructor]0.@arrowfunction[parse]0.option",
+    "entityId": "ts:v4/core/schemas.ts:$ZodXor.@arrowfunction[$constructor]0.@arrowfunction[parse]0.@forofstatement0.option",
     "entityType": "variable",
-    "name": "$ZodXor.@arrowfunction[$constructor]0.@arrowfunction[parse]0.option",
+    "name": "$ZodXor.@arrowfunction[$constructor]0.@arrowfunction[parse]0.@forofstatement0.option",
     "file": "v4/core/schemas.ts",
     "exported": false,
     "structureId": "struct:sha256:eb670730d7c863da",
-    "contentId": "content:sha256:d7e5b976ba97b4ae"
+    "contentId": "content:sha256:9ff00d171d6b4453"
   },
   {
     "kind": "contains",
     "containerId": "module:v4/core/schemas.ts",
-    "entityId": "ts:v4/core/schemas.ts:$ZodXor.@arrowfunction[$constructor]0.@arrowfunction[parse]0.option"
+    "entityId": "ts:v4/core/schemas.ts:$ZodXor.@arrowfunction[$constructor]0.@arrowfunction[parse]0.@forofstatement0.option"
   },
   {
     "kind": "declaration",
@@ -261160,33 +261350,33 @@
   },
   {
     "kind": "declaration",
-    "entityId": "ts:v4/core/schemas.ts:getDiscriminatedOption.@block[if]0.option",
+    "entityId": "ts:v4/core/schemas.ts:getDiscriminatedOption.@block[if]0.@forofstatement0.option",
     "entityType": "variable",
-    "name": "getDiscriminatedOption.@block[if]0.option",
+    "name": "getDiscriminatedOption.@block[if]0.@forofstatement0.option",
     "file": "v4/core/schemas.ts",
     "exported": false,
     "structureId": "struct:sha256:eb670730d7c863da",
-    "contentId": "content:sha256:567aae0e1b858159"
+    "contentId": "content:sha256:1fe8b14663b40f88"
   },
   {
     "kind": "contains",
     "containerId": "module:v4/core/schemas.ts",
-    "entityId": "ts:v4/core/schemas.ts:getDiscriminatedOption.@block[if]0.option"
+    "entityId": "ts:v4/core/schemas.ts:getDiscriminatedOption.@block[if]0.@forofstatement0.option"
   },
   {
     "kind": "declaration",
-    "entityId": "ts:v4/core/schemas.ts:getDiscriminatedOption.@block[if]0.@block[forof]0.v",
+    "entityId": "ts:v4/core/schemas.ts:getDiscriminatedOption.@block[if]0.@block[forof]0.@forofstatement1.v",
     "entityType": "variable",
-    "name": "getDiscriminatedOption.@block[if]0.@block[forof]0.v",
+    "name": "getDiscriminatedOption.@block[if]0.@block[forof]0.@forofstatement1.v",
     "file": "v4/core/schemas.ts",
     "exported": false,
     "structureId": "struct:sha256:eb670730d7c863da",
-    "contentId": "content:sha256:29c738ff14fe127f"
+    "contentId": "content:sha256:61d9ae09456548ae"
   },
   {
     "kind": "contains",
     "containerId": "module:v4/core/schemas.ts",
-    "entityId": "ts:v4/core/schemas.ts:getDiscriminatedOption.@block[if]0.@block[forof]0.v"
+    "entityId": "ts:v4/core/schemas.ts:getDiscriminatedOption.@block[if]0.@block[forof]0.@forofstatement1.v"
   },
   {
     "kind": "declaration",
@@ -261220,18 +261410,18 @@
   },
   {
     "kind": "declaration",
-    "entityId": "ts:v4/core/schemas.ts:$ZodDiscriminatedUnion.@arrowfunction[$constructor]0.@arrowfunction[defineLazyInternal]0.option",
+    "entityId": "ts:v4/core/schemas.ts:$ZodDiscriminatedUnion.@arrowfunction[$constructor]0.@arrowfunction[defineLazyInternal]0.@forofstatement0.option",
     "entityType": "variable",
-    "name": "$ZodDiscriminatedUnion.@arrowfunction[$constructor]0.@arrowfunction[defineLazyInternal]0.option",
+    "name": "$ZodDiscriminatedUnion.@arrowfunction[$constructor]0.@arrowfunction[defineLazyInternal]0.@forofstatement0.option",
     "file": "v4/core/schemas.ts",
     "exported": false,
     "structureId": "struct:sha256:eb670730d7c863da",
-    "contentId": "content:sha256:72a334dc48bc37fd"
+    "contentId": "content:sha256:041bd2ccf761a9d1"
   },
   {
     "kind": "contains",
     "containerId": "module:v4/core/schemas.ts",
-    "entityId": "ts:v4/core/schemas.ts:$ZodDiscriminatedUnion.@arrowfunction[$constructor]0.@arrowfunction[defineLazyInternal]0.option"
+    "entityId": "ts:v4/core/schemas.ts:$ZodDiscriminatedUnion.@arrowfunction[$constructor]0.@arrowfunction[defineLazyInternal]0.@forofstatement0.option"
   },
   {
     "kind": "declaration",
@@ -261250,33 +261440,33 @@
   },
   {
     "kind": "declaration",
-    "entityId": "ts:v4/core/schemas.ts:$ZodDiscriminatedUnion.@arrowfunction[$constructor]0.@arrowfunction[defineLazyInternal]0.@block[forof]0.[k, v]",
+    "entityId": "ts:v4/core/schemas.ts:$ZodDiscriminatedUnion.@arrowfunction[$constructor]0.@arrowfunction[defineLazyInternal]0.@block[forof]0.@forofstatement1.[k, v]",
     "entityType": "variable",
-    "name": "$ZodDiscriminatedUnion.@arrowfunction[$constructor]0.@arrowfunction[defineLazyInternal]0.@block[forof]0.[k, v]",
+    "name": "$ZodDiscriminatedUnion.@arrowfunction[$constructor]0.@arrowfunction[defineLazyInternal]0.@block[forof]0.@forofstatement1.[k, v]",
     "file": "v4/core/schemas.ts",
     "exported": false,
     "structureId": "struct:sha256:eb670730d7c863da",
-    "contentId": "content:sha256:56cc9f2e5ea84e13"
+    "contentId": "content:sha256:9a4a0ead6ec2bde6"
   },
   {
     "kind": "contains",
     "containerId": "module:v4/core/schemas.ts",
-    "entityId": "ts:v4/core/schemas.ts:$ZodDiscriminatedUnion.@arrowfunction[$constructor]0.@arrowfunction[defineLazyInternal]0.@block[forof]0.[k, v]"
+    "entityId": "ts:v4/core/schemas.ts:$ZodDiscriminatedUnion.@arrowfunction[$constructor]0.@arrowfunction[defineLazyInternal]0.@block[forof]0.@forofstatement1.[k, v]"
   },
   {
     "kind": "declaration",
-    "entityId": "ts:v4/core/schemas.ts:$ZodDiscriminatedUnion.@arrowfunction[$constructor]0.@arrowfunction[defineLazyInternal]0.@block[forof]0.@block[forof]1.val",
+    "entityId": "ts:v4/core/schemas.ts:$ZodDiscriminatedUnion.@arrowfunction[$constructor]0.@arrowfunction[defineLazyInternal]0.@block[forof]0.@block[forof]1.@forofstatement2.val",
     "entityType": "variable",
-    "name": "$ZodDiscriminatedUnion.@arrowfunction[$constructor]0.@arrowfunction[defineLazyInternal]0.@block[forof]0.@block[forof]1.val",
+    "name": "$ZodDiscriminatedUnion.@arrowfunction[$constructor]0.@arrowfunction[defineLazyInternal]0.@block[forof]0.@block[forof]1.@forofstatement2.val",
     "file": "v4/core/schemas.ts",
     "exported": false,
     "structureId": "struct:sha256:eb670730d7c863da",
-    "contentId": "content:sha256:7c22d6804a179869"
+    "contentId": "content:sha256:da3f26a1dd8e1489"
   },
   {
     "kind": "contains",
     "containerId": "module:v4/core/schemas.ts",
-    "entityId": "ts:v4/core/schemas.ts:$ZodDiscriminatedUnion.@arrowfunction[$constructor]0.@arrowfunction[defineLazyInternal]0.@block[forof]0.@block[forof]1.val"
+    "entityId": "ts:v4/core/schemas.ts:$ZodDiscriminatedUnion.@arrowfunction[$constructor]0.@arrowfunction[defineLazyInternal]0.@block[forof]0.@block[forof]1.@forofstatement2.val"
   },
   {
     "kind": "declaration",
@@ -261340,18 +261530,18 @@
   },
   {
     "kind": "declaration",
-    "entityId": "ts:v4/core/schemas.ts:$ZodDiscriminatedUnion.@arrowfunction[$constructor]0.disc.@arrowfunction[cached]0.o",
+    "entityId": "ts:v4/core/schemas.ts:$ZodDiscriminatedUnion.@arrowfunction[$constructor]0.disc.@arrowfunction[cached]0.@forofstatement0.o",
     "entityType": "variable",
-    "name": "$ZodDiscriminatedUnion.@arrowfunction[$constructor]0.disc.@arrowfunction[cached]0.o",
+    "name": "$ZodDiscriminatedUnion.@arrowfunction[$constructor]0.disc.@arrowfunction[cached]0.@forofstatement0.o",
     "file": "v4/core/schemas.ts",
     "exported": false,
     "structureId": "struct:sha256:eb670730d7c863da",
-    "contentId": "content:sha256:1bc6e70fe2dbda07"
+    "contentId": "content:sha256:792a2eca0b018d09"
   },
   {
     "kind": "contains",
     "containerId": "module:v4/core/schemas.ts",
-    "entityId": "ts:v4/core/schemas.ts:$ZodDiscriminatedUnion.@arrowfunction[$constructor]0.disc.@arrowfunction[cached]0.o"
+    "entityId": "ts:v4/core/schemas.ts:$ZodDiscriminatedUnion.@arrowfunction[$constructor]0.disc.@arrowfunction[cached]0.@forofstatement0.o"
   },
   {
     "kind": "declaration",
@@ -261370,18 +261560,18 @@
   },
   {
     "kind": "declaration",
-    "entityId": "ts:v4/core/schemas.ts:$ZodDiscriminatedUnion.@arrowfunction[$constructor]0.disc.@arrowfunction[cached]0.@block[forof]0.v",
+    "entityId": "ts:v4/core/schemas.ts:$ZodDiscriminatedUnion.@arrowfunction[$constructor]0.disc.@arrowfunction[cached]0.@block[forof]0.@forofstatement1.v",
     "entityType": "variable",
-    "name": "$ZodDiscriminatedUnion.@arrowfunction[$constructor]0.disc.@arrowfunction[cached]0.@block[forof]0.v",
+    "name": "$ZodDiscriminatedUnion.@arrowfunction[$constructor]0.disc.@arrowfunction[cached]0.@block[forof]0.@forofstatement1.v",
     "file": "v4/core/schemas.ts",
     "exported": false,
     "structureId": "struct:sha256:eb670730d7c863da",
-    "contentId": "content:sha256:ca8918dec0acf2ea"
+    "contentId": "content:sha256:7e09f807b8cbc08d"
   },
   {
     "kind": "contains",
     "containerId": "module:v4/core/schemas.ts",
-    "entityId": "ts:v4/core/schemas.ts:$ZodDiscriminatedUnion.@arrowfunction[$constructor]0.disc.@arrowfunction[cached]0.@block[forof]0.v"
+    "entityId": "ts:v4/core/schemas.ts:$ZodDiscriminatedUnion.@arrowfunction[$constructor]0.disc.@arrowfunction[cached]0.@block[forof]0.@forofstatement1.v"
   },
   {
     "kind": "declaration",
@@ -261520,18 +261710,18 @@
   },
   {
     "kind": "declaration",
-    "entityId": "ts:v4/core/schemas.ts:mergeValues.@block[if]2.key",
+    "entityId": "ts:v4/core/schemas.ts:mergeValues.@block[if]2.@forofstatement0.key",
     "entityType": "variable",
-    "name": "mergeValues.@block[if]2.key",
+    "name": "mergeValues.@block[if]2.@forofstatement0.key",
     "file": "v4/core/schemas.ts",
     "exported": false,
     "structureId": "struct:sha256:eb670730d7c863da",
-    "contentId": "content:sha256:1714c4eeb8bbb474"
+    "contentId": "content:sha256:a5214999229d1cb9"
   },
   {
     "kind": "contains",
     "containerId": "module:v4/core/schemas.ts",
-    "entityId": "ts:v4/core/schemas.ts:mergeValues.@block[if]2.key"
+    "entityId": "ts:v4/core/schemas.ts:mergeValues.@block[if]2.@forofstatement0.key"
   },
   {
     "kind": "declaration",
@@ -261565,18 +261755,18 @@
   },
   {
     "kind": "declaration",
-    "entityId": "ts:v4/core/schemas.ts:mergeValues.@block[if]4.index",
+    "entityId": "ts:v4/core/schemas.ts:mergeValues.@block[if]4.@forstatement0.index",
     "entityType": "variable",
-    "name": "mergeValues.@block[if]4.index",
+    "name": "mergeValues.@block[if]4.@forstatement0.index",
     "file": "v4/core/schemas.ts",
     "exported": false,
     "structureId": "struct:sha256:396dae39d37f12b4",
-    "contentId": "content:sha256:8d34dcc9ddcba2c1"
+    "contentId": "content:sha256:d626723547e536f1"
   },
   {
     "kind": "contains",
     "containerId": "module:v4/core/schemas.ts",
-    "entityId": "ts:v4/core/schemas.ts:mergeValues.@block[if]4.index"
+    "entityId": "ts:v4/core/schemas.ts:mergeValues.@block[if]4.@forstatement0.index"
   },
   {
     "kind": "declaration",
@@ -261715,33 +261905,48 @@
   },
   {
     "kind": "declaration",
-    "entityId": "ts:v4/core/schemas.ts:handleIntersectionResults.collect.k",
+    "entityId": "ts:v4/core/schemas.ts:handleIntersectionResults.collect.@forofstatement0.k",
     "entityType": "variable",
-    "name": "handleIntersectionResults.collect.k",
+    "name": "handleIntersectionResults.collect.@forofstatement0.k",
     "file": "v4/core/schemas.ts",
     "exported": false,
     "structureId": "struct:sha256:eb670730d7c863da",
-    "contentId": "content:sha256:42d27841fa77b1e9"
+    "contentId": "content:sha256:a95ee0296da9230f"
   },
   {
     "kind": "contains",
     "containerId": "module:v4/core/schemas.ts",
-    "entityId": "ts:v4/core/schemas.ts:handleIntersectionResults.collect.k"
+    "entityId": "ts:v4/core/schemas.ts:handleIntersectionResults.collect.@forofstatement0.k"
   },
   {
     "kind": "declaration",
-    "entityId": "ts:v4/core/schemas.ts:handleIntersectionResults.iss",
+    "entityId": "ts:v4/core/schemas.ts:handleIntersectionResults.@forofstatement1.iss",
     "entityType": "variable",
-    "name": "handleIntersectionResults.iss",
+    "name": "handleIntersectionResults.@forofstatement1.iss",
     "file": "v4/core/schemas.ts",
     "exported": false,
     "structureId": "struct:sha256:eb670730d7c863da",
-    "contentId": "content:sha256:1de79661eaaeb7bc"
+    "contentId": "content:sha256:f855772a1e28865a"
   },
   {
     "kind": "contains",
     "containerId": "module:v4/core/schemas.ts",
-    "entityId": "ts:v4/core/schemas.ts:handleIntersectionResults.iss"
+    "entityId": "ts:v4/core/schemas.ts:handleIntersectionResults.@forofstatement1.iss"
+  },
+  {
+    "kind": "declaration",
+    "entityId": "ts:v4/core/schemas.ts:handleIntersectionResults.@forofstatement2.iss",
+    "entityType": "variable",
+    "name": "handleIntersectionResults.@forofstatement2.iss",
+    "file": "v4/core/schemas.ts",
+    "exported": false,
+    "structureId": "struct:sha256:eb670730d7c863da",
+    "contentId": "content:sha256:96e11378d09420c3"
+  },
+  {
+    "kind": "contains",
+    "containerId": "module:v4/core/schemas.ts",
+    "entityId": "ts:v4/core/schemas.ts:handleIntersectionResults.@forofstatement2.iss"
   },
   {
     "kind": "declaration",
@@ -261775,18 +261980,18 @@
   },
   {
     "kind": "declaration",
-    "entityId": "ts:v4/core/schemas.ts:handleIntersectionResults.@block[if]2.k",
+    "entityId": "ts:v4/core/schemas.ts:handleIntersectionResults.@block[if]2.@forofstatement3.k",
     "entityType": "variable",
-    "name": "handleIntersectionResults.@block[if]2.k",
+    "name": "handleIntersectionResults.@block[if]2.@forofstatement3.k",
     "file": "v4/core/schemas.ts",
     "exported": false,
     "structureId": "struct:sha256:eb670730d7c863da",
-    "contentId": "content:sha256:c9fe32150fa24ef1"
+    "contentId": "content:sha256:71e187b20742c966"
   },
   {
     "kind": "contains",
     "containerId": "module:v4/core/schemas.ts",
-    "entityId": "ts:v4/core/schemas.ts:handleIntersectionResults.@block[if]2.k"
+    "entityId": "ts:v4/core/schemas.ts:handleIntersectionResults.@block[if]2.@forofstatement3.k"
   },
   {
     "kind": "declaration",
@@ -261910,18 +262115,18 @@
   },
   {
     "kind": "declaration",
-    "entityId": "ts:v4/core/schemas.ts:$ZodTuple.@arrowfunction[$constructor]0.@arrowfunction[parse]0.i",
+    "entityId": "ts:v4/core/schemas.ts:$ZodTuple.@arrowfunction[$constructor]0.@arrowfunction[parse]0.@forstatement0.i",
     "entityType": "variable",
-    "name": "$ZodTuple.@arrowfunction[$constructor]0.@arrowfunction[parse]0.i",
+    "name": "$ZodTuple.@arrowfunction[$constructor]0.@arrowfunction[parse]0.@forstatement0.i",
     "file": "v4/core/schemas.ts",
     "exported": false,
     "structureId": "struct:sha256:396dae39d37f12b4",
-    "contentId": "content:sha256:226a74af7043657f"
+    "contentId": "content:sha256:4298dbf2b8040a0f"
   },
   {
     "kind": "contains",
     "containerId": "module:v4/core/schemas.ts",
-    "entityId": "ts:v4/core/schemas.ts:$ZodTuple.@arrowfunction[$constructor]0.@arrowfunction[parse]0.i"
+    "entityId": "ts:v4/core/schemas.ts:$ZodTuple.@arrowfunction[$constructor]0.@arrowfunction[parse]0.@forstatement0.i"
   },
   {
     "kind": "declaration",
@@ -261970,18 +262175,18 @@
   },
   {
     "kind": "declaration",
-    "entityId": "ts:v4/core/schemas.ts:$ZodTuple.@arrowfunction[$constructor]0.@arrowfunction[parse]0.@block[if]5.el",
+    "entityId": "ts:v4/core/schemas.ts:$ZodTuple.@arrowfunction[$constructor]0.@arrowfunction[parse]0.@block[if]5.@forofstatement0.el",
     "entityType": "variable",
-    "name": "$ZodTuple.@arrowfunction[$constructor]0.@arrowfunction[parse]0.@block[if]5.el",
+    "name": "$ZodTuple.@arrowfunction[$constructor]0.@arrowfunction[parse]0.@block[if]5.@forofstatement0.el",
     "file": "v4/core/schemas.ts",
     "exported": false,
     "structureId": "struct:sha256:eb670730d7c863da",
-    "contentId": "content:sha256:08999412257ad996"
+    "contentId": "content:sha256:65daba529cfe2037"
   },
   {
     "kind": "contains",
     "containerId": "module:v4/core/schemas.ts",
-    "entityId": "ts:v4/core/schemas.ts:$ZodTuple.@arrowfunction[$constructor]0.@arrowfunction[parse]0.@block[if]5.el"
+    "entityId": "ts:v4/core/schemas.ts:$ZodTuple.@arrowfunction[$constructor]0.@arrowfunction[parse]0.@block[if]5.@forofstatement0.el"
   },
   {
     "kind": "declaration",
@@ -262000,18 +262205,18 @@
   },
   {
     "kind": "declaration",
-    "entityId": "ts:v4/core/schemas.ts:getTupleOptStart.i",
+    "entityId": "ts:v4/core/schemas.ts:getTupleOptStart.@forstatement0.i",
     "entityType": "variable",
-    "name": "getTupleOptStart.i",
+    "name": "getTupleOptStart.@forstatement0.i",
     "file": "v4/core/schemas.ts",
     "exported": false,
     "structureId": "struct:sha256:526258f63b6cb0b6",
-    "contentId": "content:sha256:414c12408c71671b"
+    "contentId": "content:sha256:4d4ffee1be3f8071"
   },
   {
     "kind": "contains",
     "containerId": "module:v4/core/schemas.ts",
-    "entityId": "ts:v4/core/schemas.ts:getTupleOptStart.i"
+    "entityId": "ts:v4/core/schemas.ts:getTupleOptStart.@forstatement0.i"
   },
   {
     "kind": "declaration",
@@ -262030,18 +262235,18 @@
   },
   {
     "kind": "declaration",
-    "entityId": "ts:v4/core/schemas.ts:handleTupleResults.i",
+    "entityId": "ts:v4/core/schemas.ts:handleTupleResults.@forstatement0.i",
     "entityType": "variable",
-    "name": "handleTupleResults.i",
+    "name": "handleTupleResults.@forstatement0.i",
     "file": "v4/core/schemas.ts",
     "exported": false,
     "structureId": "struct:sha256:396dae39d37f12b4",
-    "contentId": "content:sha256:52c40c46af1ae117"
+    "contentId": "content:sha256:d9e9360e3b3ddf77"
   },
   {
     "kind": "contains",
     "containerId": "module:v4/core/schemas.ts",
-    "entityId": "ts:v4/core/schemas.ts:handleTupleResults.i"
+    "entityId": "ts:v4/core/schemas.ts:handleTupleResults.@forstatement0.i"
   },
   {
     "kind": "declaration",
@@ -262075,13 +262280,18 @@
   },
   {
     "kind": "declaration",
-    "entityId": "ts:v4/core/schemas.ts:handleTupleResults.i",
+    "entityId": "ts:v4/core/schemas.ts:handleTupleResults.@forstatement1.i",
     "entityType": "variable",
-    "name": "handleTupleResults.i",
+    "name": "handleTupleResults.@forstatement1.i",
     "file": "v4/core/schemas.ts",
     "exported": false,
     "structureId": "struct:sha256:9b1a7f9ab28436c2",
-    "contentId": "content:sha256:e594a56640a2f479"
+    "contentId": "content:sha256:e9442af2e805ee54"
+  },
+  {
+    "kind": "contains",
+    "containerId": "module:v4/core/schemas.ts",
+    "entityId": "ts:v4/core/schemas.ts:handleTupleResults.@forstatement1.i"
   },
   {
     "kind": "declaration",
@@ -262160,18 +262370,18 @@
   },
   {
     "kind": "declaration",
-    "entityId": "ts:v4/core/schemas.ts:$ZodRecord.@arrowfunction[$constructor]0.@arrowfunction[parse]0.@block[if]1.key",
+    "entityId": "ts:v4/core/schemas.ts:$ZodRecord.@arrowfunction[$constructor]0.@arrowfunction[parse]0.@block[if]1.@forofstatement0.key",
     "entityType": "variable",
-    "name": "$ZodRecord.@arrowfunction[$constructor]0.@arrowfunction[parse]0.@block[if]1.key",
+    "name": "$ZodRecord.@arrowfunction[$constructor]0.@arrowfunction[parse]0.@block[if]1.@forofstatement0.key",
     "file": "v4/core/schemas.ts",
     "exported": false,
     "structureId": "struct:sha256:eb670730d7c863da",
-    "contentId": "content:sha256:11ca79d722092dcb"
+    "contentId": "content:sha256:f832e21abc62f2ef"
   },
   {
     "kind": "contains",
     "containerId": "module:v4/core/schemas.ts",
-    "entityId": "ts:v4/core/schemas.ts:$ZodRecord.@arrowfunction[$constructor]0.@arrowfunction[parse]0.@block[if]1.key"
+    "entityId": "ts:v4/core/schemas.ts:$ZodRecord.@arrowfunction[$constructor]0.@arrowfunction[parse]0.@block[if]1.@forofstatement0.key"
   },
   {
     "kind": "declaration",
@@ -262235,6 +262445,21 @@
   },
   {
     "kind": "declaration",
+    "entityId": "ts:v4/core/schemas.ts:$ZodRecord.@arrowfunction[$constructor]0.@arrowfunction[parse]0.@block[if]1.@forinstatement0.key",
+    "entityType": "variable",
+    "name": "$ZodRecord.@arrowfunction[$constructor]0.@arrowfunction[parse]0.@block[if]1.@forinstatement0.key",
+    "file": "v4/core/schemas.ts",
+    "exported": false,
+    "structureId": "struct:sha256:eb670730d7c863da",
+    "contentId": "content:sha256:8da051fe5c65d650"
+  },
+  {
+    "kind": "contains",
+    "containerId": "module:v4/core/schemas.ts",
+    "entityId": "ts:v4/core/schemas.ts:$ZodRecord.@arrowfunction[$constructor]0.@arrowfunction[parse]0.@block[if]1.@forinstatement0.key"
+  },
+  {
+    "kind": "declaration",
     "entityId": "ts:v4/core/schemas.ts:$ZodRecord.@arrowfunction[$constructor]0.@arrowfunction[parse]0.@block[else]2.unrecognized",
     "entityType": "variable",
     "name": "$ZodRecord.@arrowfunction[$constructor]0.@arrowfunction[parse]0.@block[else]2.unrecognized",
@@ -262250,18 +262475,18 @@
   },
   {
     "kind": "declaration",
-    "entityId": "ts:v4/core/schemas.ts:$ZodRecord.@arrowfunction[$constructor]0.@arrowfunction[parse]0.@block[else]2.key",
+    "entityId": "ts:v4/core/schemas.ts:$ZodRecord.@arrowfunction[$constructor]0.@arrowfunction[parse]0.@block[else]2.@forofstatement1.key",
     "entityType": "variable",
-    "name": "$ZodRecord.@arrowfunction[$constructor]0.@arrowfunction[parse]0.@block[else]2.key",
+    "name": "$ZodRecord.@arrowfunction[$constructor]0.@arrowfunction[parse]0.@block[else]2.@forofstatement1.key",
     "file": "v4/core/schemas.ts",
     "exported": false,
     "structureId": "struct:sha256:eb670730d7c863da",
-    "contentId": "content:sha256:19f039b20ffe60ed"
+    "contentId": "content:sha256:cbf0e049141e08e7"
   },
   {
     "kind": "contains",
     "containerId": "module:v4/core/schemas.ts",
-    "entityId": "ts:v4/core/schemas.ts:$ZodRecord.@arrowfunction[$constructor]0.@arrowfunction[parse]0.@block[else]2.key"
+    "entityId": "ts:v4/core/schemas.ts:$ZodRecord.@arrowfunction[$constructor]0.@arrowfunction[parse]0.@block[else]2.@forofstatement1.key"
   },
   {
     "kind": "declaration",
@@ -262385,18 +262610,18 @@
   },
   {
     "kind": "declaration",
-    "entityId": "ts:v4/core/schemas.ts:$ZodMap.@arrowfunction[$constructor]0.@arrowfunction[parse]0.[key, value]",
+    "entityId": "ts:v4/core/schemas.ts:$ZodMap.@arrowfunction[$constructor]0.@arrowfunction[parse]0.@forofstatement0.[key, value]",
     "entityType": "variable",
-    "name": "$ZodMap.@arrowfunction[$constructor]0.@arrowfunction[parse]0.[key, value]",
+    "name": "$ZodMap.@arrowfunction[$constructor]0.@arrowfunction[parse]0.@forofstatement0.[key, value]",
     "file": "v4/core/schemas.ts",
     "exported": false,
     "structureId": "struct:sha256:eb670730d7c863da",
-    "contentId": "content:sha256:ec203792de7eb968"
+    "contentId": "content:sha256:7dc3146d0fd7086a"
   },
   {
     "kind": "contains",
     "containerId": "module:v4/core/schemas.ts",
-    "entityId": "ts:v4/core/schemas.ts:$ZodMap.@arrowfunction[$constructor]0.@arrowfunction[parse]0.[key, value]"
+    "entityId": "ts:v4/core/schemas.ts:$ZodMap.@arrowfunction[$constructor]0.@arrowfunction[parse]0.@forofstatement0.[key, value]"
   },
   {
     "kind": "declaration",
@@ -262475,18 +262700,18 @@
   },
   {
     "kind": "declaration",
-    "entityId": "ts:v4/core/schemas.ts:$ZodSet.@arrowfunction[$constructor]0.@arrowfunction[parse]0.item",
+    "entityId": "ts:v4/core/schemas.ts:$ZodSet.@arrowfunction[$constructor]0.@arrowfunction[parse]0.@forofstatement0.item",
     "entityType": "variable",
-    "name": "$ZodSet.@arrowfunction[$constructor]0.@arrowfunction[parse]0.item",
+    "name": "$ZodSet.@arrowfunction[$constructor]0.@arrowfunction[parse]0.@forofstatement0.item",
     "file": "v4/core/schemas.ts",
     "exported": false,
     "structureId": "struct:sha256:eb670730d7c863da",
-    "contentId": "content:sha256:e4555d5c4c1499e9"
+    "contentId": "content:sha256:b0a7f856ae1d0bc7"
   },
   {
     "kind": "contains",
     "containerId": "module:v4/core/schemas.ts",
-    "entityId": "ts:v4/core/schemas.ts:$ZodSet.@arrowfunction[$constructor]0.@arrowfunction[parse]0.item"
+    "entityId": "ts:v4/core/schemas.ts:$ZodSet.@arrowfunction[$constructor]0.@arrowfunction[parse]0.@forofstatement0.item"
   },
   {
     "kind": "declaration",
@@ -262910,18 +263135,18 @@
   },
   {
     "kind": "declaration",
-    "entityId": "ts:v4/core/schemas.ts:$ZodTemplateLiteral.@arrowfunction[$constructor]0.part",
+    "entityId": "ts:v4/core/schemas.ts:$ZodTemplateLiteral.@arrowfunction[$constructor]0.@forofstatement0.part",
     "entityType": "variable",
-    "name": "$ZodTemplateLiteral.@arrowfunction[$constructor]0.part",
+    "name": "$ZodTemplateLiteral.@arrowfunction[$constructor]0.@forofstatement0.part",
     "file": "v4/core/schemas.ts",
     "exported": false,
     "structureId": "struct:sha256:eb670730d7c863da",
-    "contentId": "content:sha256:627595a9716559af"
+    "contentId": "content:sha256:38ed36f6cd61cd3b"
   },
   {
     "kind": "contains",
     "containerId": "module:v4/core/schemas.ts",
-    "entityId": "ts:v4/core/schemas.ts:$ZodTemplateLiteral.@arrowfunction[$constructor]0.part"
+    "entityId": "ts:v4/core/schemas.ts:$ZodTemplateLiteral.@arrowfunction[$constructor]0.@forofstatement0.part"
   },
   {
     "kind": "declaration",
@@ -274115,33 +274340,33 @@
   },
   {
     "kind": "declaration",
-    "entityId": "ts:v4/core/schemas.ts:$ZodDiscriminatedUnion.@arrowfunction[$constructor]0.@arrowfunction[defineLazyInternal]0.@block[forof]0.[k, v].k",
+    "entityId": "ts:v4/core/schemas.ts:$ZodDiscriminatedUnion.@arrowfunction[$constructor]0.@arrowfunction[defineLazyInternal]0.@block[forof]0.@forofstatement1.[k, v].k",
     "entityType": "binding",
-    "name": "$ZodDiscriminatedUnion.@arrowfunction[$constructor]0.@arrowfunction[defineLazyInternal]0.@block[forof]0.[k, v].k",
+    "name": "$ZodDiscriminatedUnion.@arrowfunction[$constructor]0.@arrowfunction[defineLazyInternal]0.@block[forof]0.@forofstatement1.[k, v].k",
     "file": "v4/core/schemas.ts",
     "exported": false,
     "structureId": "struct:sha256:90bf07132573c33d",
-    "contentId": "content:sha256:283bad99d548d524"
+    "contentId": "content:sha256:cb07d03d5c7b8a31"
   },
   {
     "kind": "contains",
     "containerId": "module:v4/core/schemas.ts",
-    "entityId": "ts:v4/core/schemas.ts:$ZodDiscriminatedUnion.@arrowfunction[$constructor]0.@arrowfunction[defineLazyInternal]0.@block[forof]0.[k, v].k"
+    "entityId": "ts:v4/core/schemas.ts:$ZodDiscriminatedUnion.@arrowfunction[$constructor]0.@arrowfunction[defineLazyInternal]0.@block[forof]0.@forofstatement1.[k, v].k"
   },
   {
     "kind": "declaration",
-    "entityId": "ts:v4/core/schemas.ts:$ZodDiscriminatedUnion.@arrowfunction[$constructor]0.@arrowfunction[defineLazyInternal]0.@block[forof]0.[k, v].v",
+    "entityId": "ts:v4/core/schemas.ts:$ZodDiscriminatedUnion.@arrowfunction[$constructor]0.@arrowfunction[defineLazyInternal]0.@block[forof]0.@forofstatement1.[k, v].v",
     "entityType": "binding",
-    "name": "$ZodDiscriminatedUnion.@arrowfunction[$constructor]0.@arrowfunction[defineLazyInternal]0.@block[forof]0.[k, v].v",
+    "name": "$ZodDiscriminatedUnion.@arrowfunction[$constructor]0.@arrowfunction[defineLazyInternal]0.@block[forof]0.@forofstatement1.[k, v].v",
     "file": "v4/core/schemas.ts",
     "exported": false,
     "structureId": "struct:sha256:90bf07132573c33d",
-    "contentId": "content:sha256:f0bdab9a804bc975"
+    "contentId": "content:sha256:65fa8711a10b0eea"
   },
   {
     "kind": "contains",
     "containerId": "module:v4/core/schemas.ts",
-    "entityId": "ts:v4/core/schemas.ts:$ZodDiscriminatedUnion.@arrowfunction[$constructor]0.@arrowfunction[defineLazyInternal]0.@block[forof]0.[k, v].v"
+    "entityId": "ts:v4/core/schemas.ts:$ZodDiscriminatedUnion.@arrowfunction[$constructor]0.@arrowfunction[defineLazyInternal]0.@block[forof]0.@forofstatement1.[k, v].v"
   },
   {
     "kind": "declaration",
@@ -274205,33 +274430,33 @@
   },
   {
     "kind": "declaration",
-    "entityId": "ts:v4/core/schemas.ts:$ZodMap.@arrowfunction[$constructor]0.@arrowfunction[parse]0.[key, value].key",
+    "entityId": "ts:v4/core/schemas.ts:$ZodMap.@arrowfunction[$constructor]0.@arrowfunction[parse]0.@forofstatement0.[key, value].key",
     "entityType": "binding",
-    "name": "$ZodMap.@arrowfunction[$constructor]0.@arrowfunction[parse]0.[key, value].key",
+    "name": "$ZodMap.@arrowfunction[$constructor]0.@arrowfunction[parse]0.@forofstatement0.[key, value].key",
     "file": "v4/core/schemas.ts",
     "exported": false,
     "structureId": "struct:sha256:90bf07132573c33d",
-    "contentId": "content:sha256:b33329b5449bf2c1"
+    "contentId": "content:sha256:ad552cb6eee8995b"
   },
   {
     "kind": "contains",
     "containerId": "module:v4/core/schemas.ts",
-    "entityId": "ts:v4/core/schemas.ts:$ZodMap.@arrowfunction[$constructor]0.@arrowfunction[parse]0.[key, value].key"
+    "entityId": "ts:v4/core/schemas.ts:$ZodMap.@arrowfunction[$constructor]0.@arrowfunction[parse]0.@forofstatement0.[key, value].key"
   },
   {
     "kind": "declaration",
-    "entityId": "ts:v4/core/schemas.ts:$ZodMap.@arrowfunction[$constructor]0.@arrowfunction[parse]0.[key, value].value",
+    "entityId": "ts:v4/core/schemas.ts:$ZodMap.@arrowfunction[$constructor]0.@arrowfunction[parse]0.@forofstatement0.[key, value].value",
     "entityType": "binding",
-    "name": "$ZodMap.@arrowfunction[$constructor]0.@arrowfunction[parse]0.[key, value].value",
+    "name": "$ZodMap.@arrowfunction[$constructor]0.@arrowfunction[parse]0.@forofstatement0.[key, value].value",
     "file": "v4/core/schemas.ts",
     "exported": false,
     "structureId": "struct:sha256:90bf07132573c33d",
-    "contentId": "content:sha256:e62613516ab47585"
+    "contentId": "content:sha256:d1ab5d2e26a25d72"
   },
   {
     "kind": "contains",
     "containerId": "module:v4/core/schemas.ts",
-    "entityId": "ts:v4/core/schemas.ts:$ZodMap.@arrowfunction[$constructor]0.@arrowfunction[parse]0.[key, value].value"
+    "entityId": "ts:v4/core/schemas.ts:$ZodMap.@arrowfunction[$constructor]0.@arrowfunction[parse]0.@forofstatement0.[key, value].value"
   },
   {
     "kind": "declaration",
@@ -277733,7 +277958,7 @@
     "kind": "calls",
     "callerId": "ts:v4/core/schemas.ts:$ZodType",
     "calleeName": "fn",
-    "calleeId": "ts:v4/core/schemas.ts:$ZodType.@arrowfunction[$constructor]0.@block[forof]0.fn",
+    "calleeId": "ts:v4/core/schemas.ts:$ZodType.@arrowfunction[$constructor]0.@block[forof]0.@forofstatement1.fn",
     "confidence": 0.9,
     "reason": "resolved",
     "callerKind": "variable",
@@ -305606,33 +305831,33 @@
   },
   {
     "kind": "declaration",
-    "entityId": "ts:v4/core/to-json-schema.ts:assignProps.source",
+    "entityId": "ts:v4/core/to-json-schema.ts:assignProps.@forofstatement0.source",
     "entityType": "variable",
-    "name": "assignProps.source",
+    "name": "assignProps.@forofstatement0.source",
     "file": "v4/core/to-json-schema.ts",
     "exported": false,
     "structureId": "struct:sha256:eb670730d7c863da",
-    "contentId": "content:sha256:c4abd346b6a63756"
+    "contentId": "content:sha256:84253f36fce055e5"
   },
   {
     "kind": "contains",
     "containerId": "module:v4/core/to-json-schema.ts",
-    "entityId": "ts:v4/core/to-json-schema.ts:assignProps.source"
+    "entityId": "ts:v4/core/to-json-schema.ts:assignProps.@forofstatement0.source"
   },
   {
     "kind": "declaration",
-    "entityId": "ts:v4/core/to-json-schema.ts:assignProps.@block[forof]0.key",
+    "entityId": "ts:v4/core/to-json-schema.ts:assignProps.@block[forof]0.@forofstatement1.key",
     "entityType": "variable",
-    "name": "assignProps.@block[forof]0.key",
+    "name": "assignProps.@block[forof]0.@forofstatement1.key",
     "file": "v4/core/to-json-schema.ts",
     "exported": false,
     "structureId": "struct:sha256:eb670730d7c863da",
-    "contentId": "content:sha256:d0257f8b4d03b2a4"
+    "contentId": "content:sha256:e0b670b5e45702c6"
   },
   {
     "kind": "contains",
     "containerId": "module:v4/core/to-json-schema.ts",
-    "entityId": "ts:v4/core/to-json-schema.ts:assignProps.@block[forof]0.key"
+    "entityId": "ts:v4/core/to-json-schema.ts:assignProps.@block[forof]0.@forofstatement1.key"
   },
   {
     "kind": "declaration",
@@ -305861,18 +306086,18 @@
   },
   {
     "kind": "declaration",
-    "entityId": "ts:v4/core/to-json-schema.ts:extractDefs.entry",
+    "entityId": "ts:v4/core/to-json-schema.ts:extractDefs.@forofstatement0.entry",
     "entityType": "variable",
-    "name": "extractDefs.entry",
+    "name": "extractDefs.@forofstatement0.entry",
     "file": "v4/core/to-json-schema.ts",
     "exported": false,
     "structureId": "struct:sha256:eb670730d7c863da",
-    "contentId": "content:sha256:520dd7f803ab0a0d"
+    "contentId": "content:sha256:fa7c0c85280cf8a9"
   },
   {
     "kind": "contains",
     "containerId": "module:v4/core/to-json-schema.ts",
-    "entityId": "ts:v4/core/to-json-schema.ts:extractDefs.entry"
+    "entityId": "ts:v4/core/to-json-schema.ts:extractDefs.@forofstatement0.entry"
   },
   {
     "kind": "declaration",
@@ -306086,33 +306311,33 @@
   },
   {
     "kind": "declaration",
-    "entityId": "ts:v4/core/to-json-schema.ts:extractDefs.extractToDef.key",
+    "entityId": "ts:v4/core/to-json-schema.ts:extractDefs.extractToDef.@forinstatement0.key",
     "entityType": "variable",
-    "name": "extractDefs.extractToDef.key",
+    "name": "extractDefs.extractToDef.@forinstatement0.key",
     "file": "v4/core/to-json-schema.ts",
     "exported": false,
     "structureId": "struct:sha256:eb670730d7c863da",
-    "contentId": "content:sha256:ad67c6b316d09099"
+    "contentId": "content:sha256:94a24dde17c8b17c"
   },
   {
     "kind": "contains",
     "containerId": "module:v4/core/to-json-schema.ts",
-    "entityId": "ts:v4/core/to-json-schema.ts:extractDefs.extractToDef.key"
+    "entityId": "ts:v4/core/to-json-schema.ts:extractDefs.extractToDef.@forinstatement0.key"
   },
   {
     "kind": "declaration",
-    "entityId": "ts:v4/core/to-json-schema.ts:extractDefs.@block[if]6.entry",
+    "entityId": "ts:v4/core/to-json-schema.ts:extractDefs.@block[if]6.@forofstatement1.entry",
     "entityType": "variable",
-    "name": "extractDefs.@block[if]6.entry",
+    "name": "extractDefs.@block[if]6.@forofstatement1.entry",
     "file": "v4/core/to-json-schema.ts",
     "exported": false,
     "structureId": "struct:sha256:eb670730d7c863da",
-    "contentId": "content:sha256:7467e9b341deb016"
+    "contentId": "content:sha256:9a9da2e7b7222dd6"
   },
   {
     "kind": "contains",
     "containerId": "module:v4/core/to-json-schema.ts",
-    "entityId": "ts:v4/core/to-json-schema.ts:extractDefs.@block[if]6.entry"
+    "entityId": "ts:v4/core/to-json-schema.ts:extractDefs.@block[if]6.@forofstatement1.entry"
   },
   {
     "kind": "declaration",
@@ -306128,6 +306353,21 @@
     "kind": "contains",
     "containerId": "module:v4/core/to-json-schema.ts",
     "entityId": "ts:v4/core/to-json-schema.ts:extractDefs.@block[if]6.@block[forof]1.seen"
+  },
+  {
+    "kind": "declaration",
+    "entityId": "ts:v4/core/to-json-schema.ts:extractDefs.@forofstatement2.entry",
+    "entityType": "variable",
+    "name": "extractDefs.@forofstatement2.entry",
+    "file": "v4/core/to-json-schema.ts",
+    "exported": false,
+    "structureId": "struct:sha256:eb670730d7c863da",
+    "contentId": "content:sha256:99815919b2e5850d"
+  },
+  {
+    "kind": "contains",
+    "containerId": "module:v4/core/to-json-schema.ts",
+    "entityId": "ts:v4/core/to-json-schema.ts:extractDefs.@forofstatement2.entry"
   },
   {
     "kind": "declaration",
@@ -306206,18 +306446,18 @@
   },
   {
     "kind": "declaration",
-    "entityId": "ts:v4/core/to-json-schema.ts:compactTypeUnion.option",
+    "entityId": "ts:v4/core/to-json-schema.ts:compactTypeUnion.@forofstatement0.option",
     "entityType": "variable",
-    "name": "compactTypeUnion.option",
+    "name": "compactTypeUnion.@forofstatement0.option",
     "file": "v4/core/to-json-schema.ts",
     "exported": false,
     "structureId": "struct:sha256:eb670730d7c863da",
-    "contentId": "content:sha256:1daa0cbd48a62aa3"
+    "contentId": "content:sha256:0609f7fc3cdeba54"
   },
   {
     "kind": "contains",
     "containerId": "module:v4/core/to-json-schema.ts",
-    "entityId": "ts:v4/core/to-json-schema.ts:compactTypeUnion.option"
+    "entityId": "ts:v4/core/to-json-schema.ts:compactTypeUnion.@forofstatement0.option"
   },
   {
     "kind": "declaration",
@@ -306251,18 +306491,18 @@
   },
   {
     "kind": "declaration",
-    "entityId": "ts:v4/core/to-json-schema.ts:compactTypeUnion.@block[forof]0.member",
+    "entityId": "ts:v4/core/to-json-schema.ts:compactTypeUnion.@block[forof]0.@forofstatement1.member",
     "entityType": "variable",
-    "name": "compactTypeUnion.@block[forof]0.member",
+    "name": "compactTypeUnion.@block[forof]0.@forofstatement1.member",
     "file": "v4/core/to-json-schema.ts",
     "exported": false,
     "structureId": "struct:sha256:eb670730d7c863da",
-    "contentId": "content:sha256:2f1172f69cc0b0fd"
+    "contentId": "content:sha256:408bd315330a5011"
   },
   {
     "kind": "contains",
     "containerId": "module:v4/core/to-json-schema.ts",
-    "entityId": "ts:v4/core/to-json-schema.ts:compactTypeUnion.@block[forof]0.member"
+    "entityId": "ts:v4/core/to-json-schema.ts:compactTypeUnion.@block[forof]0.@forofstatement1.member"
   },
   {
     "kind": "declaration",
@@ -306401,33 +306641,33 @@
   },
   {
     "kind": "declaration",
-    "entityId": "ts:v4/core/to-json-schema.ts:finalize.flattenRef.@block[if]0.@block[if]2.key",
+    "entityId": "ts:v4/core/to-json-schema.ts:finalize.flattenRef.@block[if]0.@block[if]2.@forinstatement0.key",
     "entityType": "variable",
-    "name": "finalize.flattenRef.@block[if]0.@block[if]2.key",
+    "name": "finalize.flattenRef.@block[if]0.@block[if]2.@forinstatement0.key",
     "file": "v4/core/to-json-schema.ts",
     "exported": false,
     "structureId": "struct:sha256:eb670730d7c863da",
-    "contentId": "content:sha256:869ee1d0e4a88356"
+    "contentId": "content:sha256:3029f3471d8c0449"
   },
   {
     "kind": "contains",
     "containerId": "module:v4/core/to-json-schema.ts",
-    "entityId": "ts:v4/core/to-json-schema.ts:finalize.flattenRef.@block[if]0.@block[if]2.key"
+    "entityId": "ts:v4/core/to-json-schema.ts:finalize.flattenRef.@block[if]0.@block[if]2.@forinstatement0.key"
   },
   {
     "kind": "declaration",
-    "entityId": "ts:v4/core/to-json-schema.ts:finalize.flattenRef.@block[if]0.@block[if]4.key",
+    "entityId": "ts:v4/core/to-json-schema.ts:finalize.flattenRef.@block[if]0.@block[if]4.@forinstatement1.key",
     "entityType": "variable",
-    "name": "finalize.flattenRef.@block[if]0.@block[if]4.key",
+    "name": "finalize.flattenRef.@block[if]0.@block[if]4.@forinstatement1.key",
     "file": "v4/core/to-json-schema.ts",
     "exported": false,
     "structureId": "struct:sha256:eb670730d7c863da",
-    "contentId": "content:sha256:cd2d84371ec3d17b"
+    "contentId": "content:sha256:15d21588a361b61b"
   },
   {
     "kind": "contains",
     "containerId": "module:v4/core/to-json-schema.ts",
-    "entityId": "ts:v4/core/to-json-schema.ts:finalize.flattenRef.@block[if]0.@block[if]4.key"
+    "entityId": "ts:v4/core/to-json-schema.ts:finalize.flattenRef.@block[if]0.@block[if]4.@forinstatement1.key"
   },
   {
     "kind": "declaration",
@@ -306461,48 +306701,48 @@
   },
   {
     "kind": "declaration",
-    "entityId": "ts:v4/core/to-json-schema.ts:finalize.flattenRef.@block[if]6.@block[if]7.@block[if]8.key",
+    "entityId": "ts:v4/core/to-json-schema.ts:finalize.flattenRef.@block[if]6.@block[if]7.@block[if]8.@forinstatement2.key",
     "entityType": "variable",
-    "name": "finalize.flattenRef.@block[if]6.@block[if]7.@block[if]8.key",
+    "name": "finalize.flattenRef.@block[if]6.@block[if]7.@block[if]8.@forinstatement2.key",
     "file": "v4/core/to-json-schema.ts",
     "exported": false,
     "structureId": "struct:sha256:eb670730d7c863da",
-    "contentId": "content:sha256:8c2dc52fe9b5ee86"
+    "contentId": "content:sha256:9644ce851368de58"
   },
   {
     "kind": "contains",
     "containerId": "module:v4/core/to-json-schema.ts",
-    "entityId": "ts:v4/core/to-json-schema.ts:finalize.flattenRef.@block[if]6.@block[if]7.@block[if]8.key"
+    "entityId": "ts:v4/core/to-json-schema.ts:finalize.flattenRef.@block[if]6.@block[if]7.@block[if]8.@forinstatement2.key"
   },
   {
     "kind": "declaration",
-    "entityId": "ts:v4/core/to-json-schema.ts:finalize.@block[if]10.entry",
+    "entityId": "ts:v4/core/to-json-schema.ts:finalize.@block[if]10.@forofstatement0.entry",
     "entityType": "variable",
-    "name": "finalize.@block[if]10.entry",
+    "name": "finalize.@block[if]10.@forofstatement0.entry",
     "file": "v4/core/to-json-schema.ts",
     "exported": false,
     "structureId": "struct:sha256:eb670730d7c863da",
-    "contentId": "content:sha256:2b96e530f4e2368a"
+    "contentId": "content:sha256:4b50f2dec90016df"
   },
   {
     "kind": "contains",
     "containerId": "module:v4/core/to-json-schema.ts",
-    "entityId": "ts:v4/core/to-json-schema.ts:finalize.@block[if]10.entry"
+    "entityId": "ts:v4/core/to-json-schema.ts:finalize.@block[if]10.@forofstatement0.entry"
   },
   {
     "kind": "declaration",
-    "entityId": "ts:v4/core/to-json-schema.ts:finalize.@block[if]10.@block[if]11.entry",
+    "entityId": "ts:v4/core/to-json-schema.ts:finalize.@block[if]10.@block[if]11.@forofstatement1.entry",
     "entityType": "variable",
-    "name": "finalize.@block[if]10.@block[if]11.entry",
+    "name": "finalize.@block[if]10.@block[if]11.@forofstatement1.entry",
     "file": "v4/core/to-json-schema.ts",
     "exported": false,
     "structureId": "struct:sha256:eb670730d7c863da",
-    "contentId": "content:sha256:8ea581173474f257"
+    "contentId": "content:sha256:694047fdcf0a7794"
   },
   {
     "kind": "contains",
     "containerId": "module:v4/core/to-json-schema.ts",
-    "entityId": "ts:v4/core/to-json-schema.ts:finalize.@block[if]10.@block[if]11.entry"
+    "entityId": "ts:v4/core/to-json-schema.ts:finalize.@block[if]10.@block[if]11.@forofstatement1.entry"
   },
   {
     "kind": "declaration",
@@ -306566,18 +306806,18 @@
   },
   {
     "kind": "declaration",
-    "entityId": "ts:v4/core/to-json-schema.ts:finalize.@block[if]17.entry",
+    "entityId": "ts:v4/core/to-json-schema.ts:finalize.@block[if]17.@forofstatement2.entry",
     "entityType": "variable",
-    "name": "finalize.@block[if]17.entry",
+    "name": "finalize.@block[if]17.@forofstatement2.entry",
     "file": "v4/core/to-json-schema.ts",
     "exported": false,
     "structureId": "struct:sha256:eb670730d7c863da",
-    "contentId": "content:sha256:bcb3c61be316d5b2"
+    "contentId": "content:sha256:0dbe3646f39a3cf0"
   },
   {
     "kind": "contains",
     "containerId": "module:v4/core/to-json-schema.ts",
-    "entityId": "ts:v4/core/to-json-schema.ts:finalize.@block[if]17.entry"
+    "entityId": "ts:v4/core/to-json-schema.ts:finalize.@block[if]17.@forofstatement2.entry"
   },
   {
     "kind": "declaration",
@@ -306656,48 +306896,48 @@
   },
   {
     "kind": "declaration",
-    "entityId": "ts:v4/core/to-json-schema.ts:isTransforming.@block[if]4.key",
+    "entityId": "ts:v4/core/to-json-schema.ts:isTransforming.@block[if]4.@forinstatement0.key",
     "entityType": "variable",
-    "name": "isTransforming.@block[if]4.key",
+    "name": "isTransforming.@block[if]4.@forinstatement0.key",
     "file": "v4/core/to-json-schema.ts",
     "exported": false,
     "structureId": "struct:sha256:eb670730d7c863da",
-    "contentId": "content:sha256:dbcf88f655c88e84"
+    "contentId": "content:sha256:9dd6344bfdf8cd23"
   },
   {
     "kind": "contains",
     "containerId": "module:v4/core/to-json-schema.ts",
-    "entityId": "ts:v4/core/to-json-schema.ts:isTransforming.@block[if]4.key"
+    "entityId": "ts:v4/core/to-json-schema.ts:isTransforming.@block[if]4.@forinstatement0.key"
   },
   {
     "kind": "declaration",
-    "entityId": "ts:v4/core/to-json-schema.ts:isTransforming.@block[if]5.option",
+    "entityId": "ts:v4/core/to-json-schema.ts:isTransforming.@block[if]5.@forofstatement0.option",
     "entityType": "variable",
-    "name": "isTransforming.@block[if]5.option",
+    "name": "isTransforming.@block[if]5.@forofstatement0.option",
     "file": "v4/core/to-json-schema.ts",
     "exported": false,
     "structureId": "struct:sha256:eb670730d7c863da",
-    "contentId": "content:sha256:3e5b6d6d9c522075"
+    "contentId": "content:sha256:9c43f0b5da6cc015"
   },
   {
     "kind": "contains",
     "containerId": "module:v4/core/to-json-schema.ts",
-    "entityId": "ts:v4/core/to-json-schema.ts:isTransforming.@block[if]5.option"
+    "entityId": "ts:v4/core/to-json-schema.ts:isTransforming.@block[if]5.@forofstatement0.option"
   },
   {
     "kind": "declaration",
-    "entityId": "ts:v4/core/to-json-schema.ts:isTransforming.@block[if]6.item",
+    "entityId": "ts:v4/core/to-json-schema.ts:isTransforming.@block[if]6.@forofstatement1.item",
     "entityType": "variable",
-    "name": "isTransforming.@block[if]6.item",
+    "name": "isTransforming.@block[if]6.@forofstatement1.item",
     "file": "v4/core/to-json-schema.ts",
     "exported": false,
     "structureId": "struct:sha256:eb670730d7c863da",
-    "contentId": "content:sha256:923c8956d2273572"
+    "contentId": "content:sha256:a4a3770b2b6cf008"
   },
   {
     "kind": "contains",
     "containerId": "module:v4/core/to-json-schema.ts",
-    "entityId": "ts:v4/core/to-json-schema.ts:isTransforming.@block[if]6.item"
+    "entityId": "ts:v4/core/to-json-schema.ts:isTransforming.@block[if]6.@forofstatement1.item"
   },
   {
     "kind": "declaration",
@@ -313430,18 +313670,18 @@
   },
   {
     "kind": "declaration",
-    "entityId": "ts:v4/core/util.ts:mergeDefs.def",
+    "entityId": "ts:v4/core/util.ts:mergeDefs.@forofstatement0.def",
     "entityType": "variable",
-    "name": "mergeDefs.def",
+    "name": "mergeDefs.@forofstatement0.def",
     "file": "v4/core/util.ts",
     "exported": false,
     "structureId": "struct:sha256:eb670730d7c863da",
-    "contentId": "content:sha256:6ddd4db5bb2821ad"
+    "contentId": "content:sha256:baa67803b6f9084d"
   },
   {
     "kind": "contains",
     "containerId": "module:v4/core/util.ts",
-    "entityId": "ts:v4/core/util.ts:mergeDefs.def"
+    "entityId": "ts:v4/core/util.ts:mergeDefs.@forofstatement0.def"
   },
   {
     "kind": "declaration",
@@ -313505,18 +313745,18 @@
   },
   {
     "kind": "declaration",
-    "entityId": "ts:v4/core/util.ts:promiseAllObject.@arrowfunction[then]0.i",
+    "entityId": "ts:v4/core/util.ts:promiseAllObject.@arrowfunction[then]0.@forstatement0.i",
     "entityType": "variable",
-    "name": "promiseAllObject.@arrowfunction[then]0.i",
+    "name": "promiseAllObject.@arrowfunction[then]0.@forstatement0.i",
     "file": "v4/core/util.ts",
     "exported": false,
     "structureId": "struct:sha256:396dae39d37f12b4",
-    "contentId": "content:sha256:133e53f1b0240096"
+    "contentId": "content:sha256:41f6c01216f6a431"
   },
   {
     "kind": "contains",
     "containerId": "module:v4/core/util.ts",
-    "entityId": "ts:v4/core/util.ts:promiseAllObject.@arrowfunction[then]0.i"
+    "entityId": "ts:v4/core/util.ts:promiseAllObject.@arrowfunction[then]0.@forstatement0.i"
   },
   {
     "kind": "declaration",
@@ -313550,18 +313790,18 @@
   },
   {
     "kind": "declaration",
-    "entityId": "ts:v4/core/util.ts:randomString.i",
+    "entityId": "ts:v4/core/util.ts:randomString.@forstatement0.i",
     "entityType": "variable",
-    "name": "randomString.i",
+    "name": "randomString.@forstatement0.i",
     "file": "v4/core/util.ts",
     "exported": false,
     "structureId": "struct:sha256:396dae39d37f12b4",
-    "contentId": "content:sha256:539bb3c8cc029be5"
+    "contentId": "content:sha256:9de648f599d221c3"
   },
   {
     "kind": "contains",
     "containerId": "module:v4/core/util.ts",
-    "entityId": "ts:v4/core/util.ts:randomString.i"
+    "entityId": "ts:v4/core/util.ts:randomString.@forstatement0.i"
   },
   {
     "kind": "declaration",
@@ -313640,18 +313880,18 @@
   },
   {
     "kind": "declaration",
-    "entityId": "ts:v4/core/util.ts:numKeys.key",
+    "entityId": "ts:v4/core/util.ts:numKeys.@forinstatement0.key",
     "entityType": "variable",
-    "name": "numKeys.key",
+    "name": "numKeys.@forinstatement0.key",
     "file": "v4/core/util.ts",
     "exported": false,
     "structureId": "struct:sha256:eb670730d7c863da",
-    "contentId": "content:sha256:619c83e36f2b1bd4"
+    "contentId": "content:sha256:6eacc8b9b323f607"
   },
   {
     "kind": "contains",
     "containerId": "module:v4/core/util.ts",
-    "entityId": "ts:v4/core/util.ts:numKeys.key"
+    "entityId": "ts:v4/core/util.ts:numKeys.@forinstatement0.key"
   },
   {
     "kind": "declaration",
@@ -313790,18 +314030,18 @@
   },
   {
     "kind": "declaration",
-    "entityId": "ts:v4/core/util.ts:pick.def.@objectliteral[mergeDefs]0.shape.key",
+    "entityId": "ts:v4/core/util.ts:pick.def.@objectliteral[mergeDefs]0.shape.@forinstatement0.key",
     "entityType": "variable",
-    "name": "pick.def.@objectliteral[mergeDefs]0.shape.key",
+    "name": "pick.def.@objectliteral[mergeDefs]0.shape.@forinstatement0.key",
     "file": "v4/core/util.ts",
     "exported": false,
     "structureId": "struct:sha256:eb670730d7c863da",
-    "contentId": "content:sha256:02d0f51233cadaf3"
+    "contentId": "content:sha256:7e35eb5df2088b47"
   },
   {
     "kind": "contains",
     "containerId": "module:v4/core/util.ts",
-    "entityId": "ts:v4/core/util.ts:pick.def.@objectliteral[mergeDefs]0.shape.key"
+    "entityId": "ts:v4/core/util.ts:pick.def.@objectliteral[mergeDefs]0.shape.@forinstatement0.key"
   },
   {
     "kind": "declaration",
@@ -313880,18 +314120,18 @@
   },
   {
     "kind": "declaration",
-    "entityId": "ts:v4/core/util.ts:omit.def.@objectliteral[mergeDefs]0.shape.key",
+    "entityId": "ts:v4/core/util.ts:omit.def.@objectliteral[mergeDefs]0.shape.@forinstatement0.key",
     "entityType": "variable",
-    "name": "omit.def.@objectliteral[mergeDefs]0.shape.key",
+    "name": "omit.def.@objectliteral[mergeDefs]0.shape.@forinstatement0.key",
     "file": "v4/core/util.ts",
     "exported": false,
     "structureId": "struct:sha256:eb670730d7c863da",
-    "contentId": "content:sha256:46f6b072db5063a4"
+    "contentId": "content:sha256:cf5521ba9e8b6828"
   },
   {
     "kind": "contains",
     "containerId": "module:v4/core/util.ts",
-    "entityId": "ts:v4/core/util.ts:omit.def.@objectliteral[mergeDefs]0.shape.key"
+    "entityId": "ts:v4/core/util.ts:omit.def.@objectliteral[mergeDefs]0.shape.@forinstatement0.key"
   },
   {
     "kind": "declaration",
@@ -313940,18 +314180,18 @@
   },
   {
     "kind": "declaration",
-    "entityId": "ts:v4/core/util.ts:extend.@block[if]1.key",
+    "entityId": "ts:v4/core/util.ts:extend.@block[if]1.@forinstatement0.key",
     "entityType": "variable",
-    "name": "extend.@block[if]1.key",
+    "name": "extend.@block[if]1.@forinstatement0.key",
     "file": "v4/core/util.ts",
     "exported": false,
     "structureId": "struct:sha256:eb670730d7c863da",
-    "contentId": "content:sha256:266834ec6e3405b8"
+    "contentId": "content:sha256:026243622c82564d"
   },
   {
     "kind": "contains",
     "containerId": "module:v4/core/util.ts",
-    "entityId": "ts:v4/core/util.ts:extend.@block[if]1.key"
+    "entityId": "ts:v4/core/util.ts:extend.@block[if]1.@forinstatement0.key"
   },
   {
     "kind": "declaration",
@@ -314135,33 +314375,33 @@
   },
   {
     "kind": "declaration",
-    "entityId": "ts:v4/core/util.ts:partial.def.@objectliteral[mergeDefs]0.shape.@block[if]0.key",
+    "entityId": "ts:v4/core/util.ts:partial.def.@objectliteral[mergeDefs]0.shape.@block[if]0.@forinstatement0.key",
     "entityType": "variable",
-    "name": "partial.def.@objectliteral[mergeDefs]0.shape.@block[if]0.key",
+    "name": "partial.def.@objectliteral[mergeDefs]0.shape.@block[if]0.@forinstatement0.key",
     "file": "v4/core/util.ts",
     "exported": false,
     "structureId": "struct:sha256:eb670730d7c863da",
-    "contentId": "content:sha256:887ab7b861fd0525"
+    "contentId": "content:sha256:3227144f8ed3a20e"
   },
   {
     "kind": "contains",
     "containerId": "module:v4/core/util.ts",
-    "entityId": "ts:v4/core/util.ts:partial.def.@objectliteral[mergeDefs]0.shape.@block[if]0.key"
+    "entityId": "ts:v4/core/util.ts:partial.def.@objectliteral[mergeDefs]0.shape.@block[if]0.@forinstatement0.key"
   },
   {
     "kind": "declaration",
-    "entityId": "ts:v4/core/util.ts:partial.def.@objectliteral[mergeDefs]0.shape.@block[else]0.key",
+    "entityId": "ts:v4/core/util.ts:partial.def.@objectliteral[mergeDefs]0.shape.@block[else]0.@forinstatement1.key",
     "entityType": "variable",
-    "name": "partial.def.@objectliteral[mergeDefs]0.shape.@block[else]0.key",
+    "name": "partial.def.@objectliteral[mergeDefs]0.shape.@block[else]0.@forinstatement1.key",
     "file": "v4/core/util.ts",
     "exported": false,
     "structureId": "struct:sha256:eb670730d7c863da",
-    "contentId": "content:sha256:fa889c00ae7c9ca2"
+    "contentId": "content:sha256:8ddbfbcaa0342c5c"
   },
   {
     "kind": "contains",
     "containerId": "module:v4/core/util.ts",
-    "entityId": "ts:v4/core/util.ts:partial.def.@objectliteral[mergeDefs]0.shape.@block[else]0.key"
+    "entityId": "ts:v4/core/util.ts:partial.def.@objectliteral[mergeDefs]0.shape.@block[else]0.@forinstatement1.key"
   },
   {
     "kind": "declaration",
@@ -314210,78 +314450,78 @@
   },
   {
     "kind": "declaration",
-    "entityId": "ts:v4/core/util.ts:required.def.@objectliteral[mergeDefs]0.shape.@block[if]0.key",
+    "entityId": "ts:v4/core/util.ts:required.def.@objectliteral[mergeDefs]0.shape.@block[if]0.@forinstatement0.key",
     "entityType": "variable",
-    "name": "required.def.@objectliteral[mergeDefs]0.shape.@block[if]0.key",
+    "name": "required.def.@objectliteral[mergeDefs]0.shape.@block[if]0.@forinstatement0.key",
     "file": "v4/core/util.ts",
     "exported": false,
     "structureId": "struct:sha256:eb670730d7c863da",
-    "contentId": "content:sha256:d8150c8dc31d48a0"
+    "contentId": "content:sha256:33ed1039400145b7"
   },
   {
     "kind": "contains",
     "containerId": "module:v4/core/util.ts",
-    "entityId": "ts:v4/core/util.ts:required.def.@objectliteral[mergeDefs]0.shape.@block[if]0.key"
+    "entityId": "ts:v4/core/util.ts:required.def.@objectliteral[mergeDefs]0.shape.@block[if]0.@forinstatement0.key"
   },
   {
     "kind": "declaration",
-    "entityId": "ts:v4/core/util.ts:required.def.@objectliteral[mergeDefs]0.shape.@block[else]0.key",
+    "entityId": "ts:v4/core/util.ts:required.def.@objectliteral[mergeDefs]0.shape.@block[else]0.@forinstatement1.key",
     "entityType": "variable",
-    "name": "required.def.@objectliteral[mergeDefs]0.shape.@block[else]0.key",
+    "name": "required.def.@objectliteral[mergeDefs]0.shape.@block[else]0.@forinstatement1.key",
     "file": "v4/core/util.ts",
     "exported": false,
     "structureId": "struct:sha256:eb670730d7c863da",
-    "contentId": "content:sha256:bf579dc2c64fab30"
+    "contentId": "content:sha256:37cd65b6ea3a6658"
   },
   {
     "kind": "contains",
     "containerId": "module:v4/core/util.ts",
-    "entityId": "ts:v4/core/util.ts:required.def.@objectliteral[mergeDefs]0.shape.@block[else]0.key"
+    "entityId": "ts:v4/core/util.ts:required.def.@objectliteral[mergeDefs]0.shape.@block[else]0.@forinstatement1.key"
   },
   {
     "kind": "declaration",
-    "entityId": "ts:v4/core/util.ts:aborted.i",
+    "entityId": "ts:v4/core/util.ts:aborted.@forstatement0.i",
     "entityType": "variable",
-    "name": "aborted.i",
+    "name": "aborted.@forstatement0.i",
     "file": "v4/core/util.ts",
     "exported": false,
     "structureId": "struct:sha256:e168cf592964ea43",
-    "contentId": "content:sha256:b9039ed53f6ef837"
+    "contentId": "content:sha256:d40cd13df5d3163c"
   },
   {
     "kind": "contains",
     "containerId": "module:v4/core/util.ts",
-    "entityId": "ts:v4/core/util.ts:aborted.i"
+    "entityId": "ts:v4/core/util.ts:aborted.@forstatement0.i"
   },
   {
     "kind": "declaration",
-    "entityId": "ts:v4/core/util.ts:explicitlyAborted.i",
+    "entityId": "ts:v4/core/util.ts:explicitlyAborted.@forstatement0.i",
     "entityType": "variable",
-    "name": "explicitlyAborted.i",
+    "name": "explicitlyAborted.@forstatement0.i",
     "file": "v4/core/util.ts",
     "exported": false,
     "structureId": "struct:sha256:e168cf592964ea43",
-    "contentId": "content:sha256:9e632cd0d7098988"
+    "contentId": "content:sha256:2d49dcd5ba3bea05"
   },
   {
     "kind": "contains",
     "containerId": "module:v4/core/util.ts",
-    "entityId": "ts:v4/core/util.ts:explicitlyAborted.i"
+    "entityId": "ts:v4/core/util.ts:explicitlyAborted.@forstatement0.i"
   },
   {
     "kind": "declaration",
-    "entityId": "ts:v4/core/util.ts:attachSchema.i",
+    "entityId": "ts:v4/core/util.ts:attachSchema.@forstatement0.i",
     "entityType": "variable",
-    "name": "attachSchema.i",
+    "name": "attachSchema.@forstatement0.i",
     "file": "v4/core/util.ts",
     "exported": false,
     "structureId": "struct:sha256:b9ea490a3b25c2a7",
-    "contentId": "content:sha256:f10e79c43675c652"
+    "contentId": "content:sha256:d26e12e49a30e5bc"
   },
   {
     "kind": "contains",
     "containerId": "module:v4/core/util.ts",
-    "entityId": "ts:v4/core/util.ts:attachSchema.i"
+    "entityId": "ts:v4/core/util.ts:attachSchema.@forstatement0.i"
   },
   {
     "kind": "declaration",
@@ -314390,18 +314630,18 @@
   },
   {
     "kind": "declaration",
-    "entityId": "ts:v4/core/util.ts:codePointLength.i",
+    "entityId": "ts:v4/core/util.ts:codePointLength.@forstatement0.i",
     "entityType": "variable",
-    "name": "codePointLength.i",
+    "name": "codePointLength.@forstatement0.i",
     "file": "v4/core/util.ts",
     "exported": false,
     "structureId": "struct:sha256:396dae39d37f12b4",
-    "contentId": "content:sha256:05a2bf59477e1a76"
+    "contentId": "content:sha256:9561189c1d9347e6"
   },
   {
     "kind": "contains",
     "containerId": "module:v4/core/util.ts",
-    "entityId": "ts:v4/core/util.ts:codePointLength.i"
+    "entityId": "ts:v4/core/util.ts:codePointLength.@forstatement0.i"
   },
   {
     "kind": "declaration",
@@ -314480,18 +314720,18 @@
   },
   {
     "kind": "declaration",
-    "entityId": "ts:v4/core/util.ts:base64ToUint8Array.i",
+    "entityId": "ts:v4/core/util.ts:base64ToUint8Array.@forstatement0.i",
     "entityType": "variable",
-    "name": "base64ToUint8Array.i",
+    "name": "base64ToUint8Array.@forstatement0.i",
     "file": "v4/core/util.ts",
     "exported": false,
     "structureId": "struct:sha256:396dae39d37f12b4",
-    "contentId": "content:sha256:8ca03c2c95491920"
+    "contentId": "content:sha256:65da17fe40fe11c6"
   },
   {
     "kind": "contains",
     "containerId": "module:v4/core/util.ts",
-    "entityId": "ts:v4/core/util.ts:base64ToUint8Array.i"
+    "entityId": "ts:v4/core/util.ts:base64ToUint8Array.@forstatement0.i"
   },
   {
     "kind": "declaration",
@@ -314510,18 +314750,18 @@
   },
   {
     "kind": "declaration",
-    "entityId": "ts:v4/core/util.ts:uint8ArrayToBase64.i",
+    "entityId": "ts:v4/core/util.ts:uint8ArrayToBase64.@forstatement0.i",
     "entityType": "variable",
-    "name": "uint8ArrayToBase64.i",
+    "name": "uint8ArrayToBase64.@forstatement0.i",
     "file": "v4/core/util.ts",
     "exported": false,
     "structureId": "struct:sha256:396dae39d37f12b4",
-    "contentId": "content:sha256:29f67e5ff58a9ecb"
+    "contentId": "content:sha256:4be6eefc9d81c2b9"
   },
   {
     "kind": "contains",
     "containerId": "module:v4/core/util.ts",
-    "entityId": "ts:v4/core/util.ts:uint8ArrayToBase64.i"
+    "entityId": "ts:v4/core/util.ts:uint8ArrayToBase64.@forstatement0.i"
   },
   {
     "kind": "declaration",
@@ -314585,18 +314825,18 @@
   },
   {
     "kind": "declaration",
-    "entityId": "ts:v4/core/util.ts:hexToUint8Array.i",
+    "entityId": "ts:v4/core/util.ts:hexToUint8Array.@forstatement0.i",
     "entityType": "variable",
-    "name": "hexToUint8Array.i",
+    "name": "hexToUint8Array.@forstatement0.i",
     "file": "v4/core/util.ts",
     "exported": false,
     "structureId": "struct:sha256:396dae39d37f12b4",
-    "contentId": "content:sha256:89bfb31f451ce0bf"
+    "contentId": "content:sha256:e20c9a06c41d0699"
   },
   {
     "kind": "contains",
     "containerId": "module:v4/core/util.ts",
-    "entityId": "ts:v4/core/util.ts:hexToUint8Array.i"
+    "entityId": "ts:v4/core/util.ts:hexToUint8Array.@forstatement0.i"
   },
   {
     "kind": "declaration",
@@ -314675,18 +314915,18 @@
   },
   {
     "kind": "declaration",
-    "entityId": "ts:v4/core/util.ts:installLazyMethods.key",
+    "entityId": "ts:v4/core/util.ts:installLazyMethods.@forinstatement0.key",
     "entityType": "variable",
-    "name": "installLazyMethods.key",
+    "name": "installLazyMethods.@forinstatement0.key",
     "file": "v4/core/util.ts",
     "exported": false,
     "structureId": "struct:sha256:eb670730d7c863da",
-    "contentId": "content:sha256:03b2296ef68c2628"
+    "contentId": "content:sha256:a49ebbdbbb3362bb"
   },
   {
     "kind": "contains",
     "containerId": "module:v4/core/util.ts",
-    "entityId": "ts:v4/core/util.ts:installLazyMethods.key"
+    "entityId": "ts:v4/core/util.ts:installLazyMethods.@forinstatement0.key"
   },
   {
     "kind": "declaration",
@@ -314735,18 +314975,18 @@
   },
   {
     "kind": "declaration",
-    "entityId": "ts:v4/core/util.ts:installLazyProps.key",
+    "entityId": "ts:v4/core/util.ts:installLazyProps.@forinstatement0.key",
     "entityType": "variable",
-    "name": "installLazyProps.key",
+    "name": "installLazyProps.@forinstatement0.key",
     "file": "v4/core/util.ts",
     "exported": false,
     "structureId": "struct:sha256:eb670730d7c863da",
-    "contentId": "content:sha256:d801d555223ca34b"
+    "contentId": "content:sha256:1aa253e53b9a6be4"
   },
   {
     "kind": "contains",
     "containerId": "module:v4/core/util.ts",
-    "entityId": "ts:v4/core/util.ts:installLazyProps.key"
+    "entityId": "ts:v4/core/util.ts:installLazyProps.@forinstatement0.key"
   },
   {
     "kind": "declaration",
@@ -324094,18 +324334,18 @@
   },
   {
     "kind": "declaration",
-    "entityId": "ts:v4/core/visit.ts:visit.mapInner.@block[caseclause]0.k",
+    "entityId": "ts:v4/core/visit.ts:visit.mapInner.@block[caseclause]0.@forofstatement0.k",
     "entityType": "variable",
-    "name": "visit.mapInner.@block[caseclause]0.k",
+    "name": "visit.mapInner.@block[caseclause]0.@forofstatement0.k",
     "file": "v4/core/visit.ts",
     "exported": false,
     "structureId": "struct:sha256:eb670730d7c863da",
-    "contentId": "content:sha256:b47627ff2f77ed67"
+    "contentId": "content:sha256:7181e4b70424e4e3"
   },
   {
     "kind": "contains",
     "containerId": "module:v4/core/visit.ts",
-    "entityId": "ts:v4/core/visit.ts:visit.mapInner.@block[caseclause]0.k"
+    "entityId": "ts:v4/core/visit.ts:visit.mapInner.@block[caseclause]0.@forofstatement0.k"
   },
   {
     "kind": "declaration",
@@ -324199,18 +324439,18 @@
   },
   {
     "kind": "declaration",
-    "entityId": "ts:v4/core/visit.ts:visit.mapInner.@block[caseclause]2.item",
+    "entityId": "ts:v4/core/visit.ts:visit.mapInner.@block[caseclause]2.@forofstatement1.item",
     "entityType": "variable",
-    "name": "visit.mapInner.@block[caseclause]2.item",
+    "name": "visit.mapInner.@block[caseclause]2.@forofstatement1.item",
     "file": "v4/core/visit.ts",
     "exported": false,
     "structureId": "struct:sha256:eb670730d7c863da",
-    "contentId": "content:sha256:ac106855e8768a2b"
+    "contentId": "content:sha256:0ea0ba90e699fb35"
   },
   {
     "kind": "contains",
     "containerId": "module:v4/core/visit.ts",
-    "entityId": "ts:v4/core/visit.ts:visit.mapInner.@block[caseclause]2.item"
+    "entityId": "ts:v4/core/visit.ts:visit.mapInner.@block[caseclause]2.@forofstatement1.item"
   },
   {
     "kind": "declaration",
@@ -324334,18 +324574,18 @@
   },
   {
     "kind": "declaration",
-    "entityId": "ts:v4/core/visit.ts:visit.mapInner.@block[caseclause]5.opt",
+    "entityId": "ts:v4/core/visit.ts:visit.mapInner.@block[caseclause]5.@forofstatement2.opt",
     "entityType": "variable",
-    "name": "visit.mapInner.@block[caseclause]5.opt",
+    "name": "visit.mapInner.@block[caseclause]5.@forofstatement2.opt",
     "file": "v4/core/visit.ts",
     "exported": false,
     "structureId": "struct:sha256:eb670730d7c863da",
-    "contentId": "content:sha256:66cc923ab9707706"
+    "contentId": "content:sha256:2578a4e00a1560a9"
   },
   {
     "kind": "contains",
     "containerId": "module:v4/core/visit.ts",
-    "entityId": "ts:v4/core/visit.ts:visit.mapInner.@block[caseclause]5.opt"
+    "entityId": "ts:v4/core/visit.ts:visit.mapInner.@block[caseclause]5.@forofstatement2.opt"
   },
   {
     "kind": "declaration",
@@ -415985,38 +416225,123 @@
   },
   {
     "kind": "declaration",
-    "entityId": "ts:v4/mini/schemas.ts:_function.@typeliteral0.output",
+    "entityId": "ts:v4/mini/schemas.ts:_function.@typeliteral1.input",
     "entityType": "type-property",
-    "name": "_function.@typeliteral0.output",
+    "name": "_function.@typeliteral1.input",
     "file": "v4/mini/schemas.ts",
     "exported": false,
-    "structureId": "struct:sha256:de03d554d1f4cd26",
-    "contentId": "content:sha256:af9bc9393832edbb"
+    "structureId": "struct:sha256:86dbf3a5b6be79f3",
+    "contentId": "content:sha256:ba6e046d130d5fd0"
   },
   {
     "kind": "contains",
     "containerId": "module:v4/mini/schemas.ts",
-    "entityId": "ts:v4/mini/schemas.ts:_function.@typeliteral0.output"
+    "entityId": "ts:v4/mini/schemas.ts:_function.@typeliteral1.input"
   },
   {
     "kind": "declaration",
-    "entityId": "ts:v4/mini/schemas.ts:_function.@typeliteral0.output",
+    "entityId": "ts:v4/mini/schemas.ts:_function.@typeliteral1.output",
     "entityType": "type-property",
-    "name": "_function.@typeliteral0.output",
+    "name": "_function.@typeliteral1.output",
+    "file": "v4/mini/schemas.ts",
+    "exported": false,
+    "structureId": "struct:sha256:de03d554d1f4cd26",
+    "contentId": "content:sha256:3ac1544ec897c99d"
+  },
+  {
+    "kind": "contains",
+    "containerId": "module:v4/mini/schemas.ts",
+    "entityId": "ts:v4/mini/schemas.ts:_function.@typeliteral1.output"
+  },
+  {
+    "kind": "declaration",
+    "entityId": "ts:v4/mini/schemas.ts:_function.@typeliteral2.input",
+    "entityType": "type-property",
+    "name": "_function.@typeliteral2.input",
+    "file": "v4/mini/schemas.ts",
+    "exported": false,
+    "structureId": "struct:sha256:86dbf3a5b6be79f3",
+    "contentId": "content:sha256:ac61f53c6f3b9bcb"
+  },
+  {
+    "kind": "contains",
+    "containerId": "module:v4/mini/schemas.ts",
+    "entityId": "ts:v4/mini/schemas.ts:_function.@typeliteral2.input"
+  },
+  {
+    "kind": "declaration",
+    "entityId": "ts:v4/mini/schemas.ts:_function.@typeliteral3.output",
+    "entityType": "type-property",
+    "name": "_function.@typeliteral3.output",
+    "file": "v4/mini/schemas.ts",
+    "exported": false,
+    "structureId": "struct:sha256:de03d554d1f4cd26",
+    "contentId": "content:sha256:e351397a4b5dec34"
+  },
+  {
+    "kind": "contains",
+    "containerId": "module:v4/mini/schemas.ts",
+    "entityId": "ts:v4/mini/schemas.ts:_function.@typeliteral3.output"
+  },
+  {
+    "kind": "declaration",
+    "entityId": "ts:v4/mini/schemas.ts:_function.@typeliteral4.input",
+    "entityType": "type-property",
+    "name": "_function.@typeliteral4.input",
+    "file": "v4/mini/schemas.ts",
+    "exported": false,
+    "structureId": "struct:sha256:86dbf3a5b6be79f3",
+    "contentId": "content:sha256:fd2c49904bf15808"
+  },
+  {
+    "kind": "contains",
+    "containerId": "module:v4/mini/schemas.ts",
+    "entityId": "ts:v4/mini/schemas.ts:_function.@typeliteral4.input"
+  },
+  {
+    "kind": "declaration",
+    "entityId": "ts:v4/mini/schemas.ts:_function.@typeliteral4.output",
+    "entityType": "type-property",
+    "name": "_function.@typeliteral4.output",
+    "file": "v4/mini/schemas.ts",
+    "exported": false,
+    "structureId": "struct:sha256:de03d554d1f4cd26",
+    "contentId": "content:sha256:3eed2cad34d0bf0e"
+  },
+  {
+    "kind": "contains",
+    "containerId": "module:v4/mini/schemas.ts",
+    "entityId": "ts:v4/mini/schemas.ts:_function.@typeliteral4.output"
+  },
+  {
+    "kind": "declaration",
+    "entityId": "ts:v4/mini/schemas.ts:_function.@typeliteral5.output",
+    "entityType": "type-property",
+    "name": "_function.@typeliteral5.output",
     "file": "v4/mini/schemas.ts",
     "exported": false,
     "structureId": "struct:sha256:bb8dba96b81c1d45",
-    "contentId": "content:sha256:0d57b80268477fe1"
+    "contentId": "content:sha256:0aa128697ff99c8a"
+  },
+  {
+    "kind": "contains",
+    "containerId": "module:v4/mini/schemas.ts",
+    "entityId": "ts:v4/mini/schemas.ts:_function.@typeliteral5.output"
   },
   {
     "kind": "declaration",
-    "entityId": "ts:v4/mini/schemas.ts:_function.@typeliteral0.input",
+    "entityId": "ts:v4/mini/schemas.ts:_function.@typeliteral5.input",
     "entityType": "type-property",
-    "name": "_function.@typeliteral0.input",
+    "name": "_function.@typeliteral5.input",
     "file": "v4/mini/schemas.ts",
     "exported": false,
     "structureId": "struct:sha256:f44e18c007e42449",
-    "contentId": "content:sha256:8661b6f894e5f2d8"
+    "contentId": "content:sha256:6940c9e553caa2e9"
+  },
+  {
+    "kind": "contains",
+    "containerId": "module:v4/mini/schemas.ts",
+    "entityId": "ts:v4/mini/schemas.ts:_function.@typeliteral5.input"
   },
   {
     "kind": "declaration",
