@@ -14,6 +14,254 @@ no longer exists upstream, and upstream has since force-pushed `main` so
 `e516c3b` is not an ancestor of it. `prototype/zod-repo/` is gitignored, so a
 fresh clone does not reproduce the corpus either.
 
+## Update (2026-11-15): the identity invariant could not see same-type collisions
+
+"0 within-space collisions, enforced" was wrong. The check grouped each id's
+declarations by their *set of entityTypes* and flagged a set of size 2 or more
+within one declaration space. Two entities of the same type sharing an id give
+a set of size 1, so they were never counted. Deduplication hid them further:
+two colliding declarations with identical bodies collapse into one fact.
+
+The check now also records the compiler symbol behind every declaration it
+emits and fails when one `(id, entityType)` covers more than one symbol.
+Overloads and get/set pairs share a symbol, so they stay one entity (50 such
+ids). Run against the unchanged identity layer it found **14 colliding ids
+covering 39 entities**, from two causes:
+
+- **`for` headers.** `for (let i ...)` binds `i` on the statement, outside the
+  body block that already had a segment, so two loops in one function shared
+  `handleTupleResults.i`. A `for` / `for-in` / `for-of` header now contributes
+  a segment (`@forstatement0`) to what it declares; the body is unchanged.
+- **Overload signatures.** Each overload is its own node carrying the same
+  name, so the anonymous-segment index restarted at 0 under each one and every
+  `_function(params: {...})` overload yielded `_function.@typeliteral0.input`.
+  The index now runs across all same-kind declarations of the anchor's symbol
+  in the file.
+
+After the fix: 17,370 declarations (was 17,350), 17,000 ids (was 16,975),
+50,614 facts, 0 collisions under both checks, 270 cross-space merges. 165 ids
+were retired and 190 introduced, 173 of them `for`-header bindings. Edge
+closure (6,414 of 6,553, 97.9%), reference closure, `questions.ts` output and
+the runtime join are all unchanged; `facts.runtime.json` re-resolves to the
+same bytes.
+
+**Full history, rerun on the fixed identity layer** (389 commits, 297 pairs,
+with the bare `catch` blocks also removed from the extractor):
+
+- Every one of the 389 historical commits extracts with exit 0 and passes both
+  invariants, including the new symbol check. The removed catches were dead
+  across the whole history, not only at `e516c3b`.
+- The oracle join stays at 100.0%.
+
+| | before | after |
+|---|---|---|
+| rename_owner, positional | 80 across 27 commits | 80 across 27 |
+| rename_owner, real owner move | 154 across 13 | 154 across 13 |
+| removed | 2,723 | 2,749 |
+| added | 5,840 | 5,880 |
+| unchanged | 2,859,980 obs. | 2,865,699 |
+| body edit | 2,113 | 2,112 |
+| `structureId` aliasing on body edit | 6.0% (127) | 6.0% (127) |
+| `contentId` aliasing on body edit | 3.1% (66) | 3.1% (66) |
+| `structureId` removed id reappears, events | 1,210 across 82 | 1,214 across 82 |
+| unchanged obs. whose `structureId` / `contentId` is shared | 48.7% / 18.7% | 48.8% / 18.6% |
+
+The `for`-header segment is positional, and it added no drift: both
+`rename_owner` rows are unchanged. The 5,719 extra unchanged observations are
+about 19 entities per pair. The likely source is entities that used to share
+an id: the oracle marks a repeated key `dup` and skips it, and they now have
+keys of their own. That attribution was not checked against the old cache,
+which no longer exists. No conclusion in ADR-0001 moves.
+
+## Update (2026-10-19c): every anonymous function is an entity
+
+ADR-0001's first precondition for runtime ingestion read: give ids to functions
+bound by property assignment, because only 34.4% of runtime edges (127 of 369
+zod->zod) joined *exactly*. The rest fell back to an enclosing constructor.
+Checked before building, by the syntactic position of every non-exact frame
+endpoint (309):
+
+| position of the function at the frame | endpoints |
+|---|---|
+| argument to `$constructor` (a schema's init callback) | 133 (43%) |
+| right-hand side of `=` (`inst._zod.parse`, `_zod.run`, `_zod.check`) | 86 (28%) |
+| argument to another call (`map`, `push`, `cached`, ...) | 46 |
+| returned, or nested in another arrow | 37 |
+| no function at the position | 7 |
+
+Property assignment alone could have reached 180 exact edges (48.8%). Ids for
+every anonymous function could reach 342 (92.7%). The other 27 touch module
+top-level code and can never be exact. The precondition as written was too
+narrow, so the second option was built.
+
+**What changed.** An unbound arrow or function expression is declared as an
+`anonymous-function`. Its id is the scope prefix its own locals already carry,
+so it is unique by construction: 916 entities, with ids rising from 16,059 to
+16,975, and still 0 within-space collisions and 270 cross-space. Static
+attribution is deliberately unchanged:
+- `callSite` skips anonymous functions, so calls inside one stay attributed to
+  the nearest named entity. That entity is recorded on the declaration as
+  `ownerId`, and the closure invariant covers it.
+- `resolveEntity`'s walk-out also skips them. The first build moved 7
+  `mapper(issue)` edges from the parameter `mapper` onto its default value
+  `(issue) => issue.message`. That is wrong for a parameter whose value the
+  caller supplies, and it is fixed.
+
+The result is purely additive: 916 declarations plus 916 `contains`, and every
+one of the 48,737 existing facts is byte-identical and in the same order.
+`questions.ts` and `analyze.ts` output is byte-identical. The history harness is
+byte-identical on the three worst-drift commits, rerun on a fresh cache with a
+100.0% join. That holds structurally for all commits: `anonymous-function` is
+not an oracle type, and `buildRecords` filters to the oracle types before
+keying.
+
+**Measured without re-tracing.** `trace.ts` gained `TRACE_RESOLVE=1`, which
+re-derives ids and tiers from the frames `facts.runtime.json` already stores.
+Sampling is nondeterministic, so this is the only repeatable way to measure an
+identity change against runtime data. On the pre-change code it reproduces the
+committed file byte-for-byte. That took one detail: the trace caches
+resolutions by position, so a named frame at `file:1:0` inherits the module
+result.
+
+| zod->zod runtime edges | before | after |
+|---|---|---|
+| both endpoints exact | 127 (34.4%) | **342 (92.7%)** |
+| caller tiers | exact 205, enclosing 142, line 2, module 20 | exact 347, line 2, module 20 |
+| callee tiers | exact 291, enclosing 160, line 2, module 92, none 3 | exact 451, line 2, module 92, none 3 |
+
+`trace-analyze.ts` compares runtime with static at static's granularity, so it
+rolls an anonymous endpoint up to its `ownerId`. A rolled-up endpoint is an
+attribution, so it does not count as exact in the downstream graphs. The first
+attempt counted it, and the exact-only closures inflated to the 354-entity
+`$constructor` hub. With that rule every downstream line is unchanged, and only
+the headline and the tier tallies move. It adds one line computed on the
+functions' own ids: wrapper `parse.fn` -> `_parse.fn` -> memoizer `wrapped` ->
+`$ZodObjectJIT.@arrowfunction[$constructor]0.@arrowfunction[parse]0`, **3
+hops, every one exact**. The earlier 3-hop path existed only by attribution to
+`$ZodObjectJIT`.
+
+**What it does not change.** Blast radius for the public `parse` is still 1.
+`ZodType.parse` is a bodyless interface member and is never a frame, and its
+callers are outside the corpus. Preconditions (2), deterministic capture with
+call-site positions, and (3), the workload's code in the fact base, are
+untouched. Runtime ingestion stays conditional. One of its three
+preconditions is now met.
+
+## Update (2026-10-19b): `zod/v3` is not an external package
+
+`resolveImport` treated every bare specifier as external. That was recorded
+as a tsconfig `paths` gap, but zod has no `paths`. Its benchmarks import
+`zod/v3`, which resolves through the package's own `exports` map under the
+`@zod/source` custom condition (`customConditions` in its tsconfig) to
+`src/v3/index.ts`. Reading `compilerOptions.paths` would not have fixed it.
+Bare specifiers now go to the compiler (`getModuleSpecifierSourceFile()`),
+which honours `paths`, `exports` and conditions alike. Anything it resolves
+outside the source root, or into node_modules, stays `external:`. Relative
+imports keep their existing resolver.
+
+The fact base changes by exactly six facts: the six `import { z } from
+"zod/v3"` edges in `v3/benchmarks/` now name `v3/index.ts` instead of
+`external:zod/v3`. Every other fact is identical, and the extractor's
+invariants and closure are unchanged. Downstream:
+
+- **analyze2.ts:** the flagged-import rate goes from 1 of 148 (0.7%) to 1 of
+  154 (0.6%), because the six new value imports all have evidence once barrels
+  are followed.
+- **analyze.ts:** external package imports go from 15 to 9 (`benchmark` only).
+- **questions.ts Q4:** "dead weight" rises from 14 of 188 to 20 of 194. Q4
+  does not follow barrels transitively. `z` is a namespace re-exported by
+  `v3/index.ts`, so its uses land in `v3/types.ts`, never in the barrel
+  itself. That is the same artifact as Q4's existing `v4/classic/coerce.ts ->
+  v4/core/index.ts [core]` sample, and Q4's verdict already says it needs all
+  three evidence kinds together.
+
+## Update (2026-10-19): positional drift was half the story, and it is fixed
+
+The full-history run's headline about `entityId`, "263 of 269 owner-name
+changes (98%) are positional drift, only 6 real", was a harness mislabel.
+`history.ts` called a `rename_owner` positional whenever either name
+*contained* an anonymous segment such as `@objectliteral0`, whether or not the
+index moved. The worst commit cited for it is the counterexample. All 75
+entities in `773a486` are `_zodTypeMethods.@objectliteral0.check` →
+`ZodType.@objectliteral0.check`: the index did not move, the named owner did.
+A change now counts as positional only if the two names are equal once every
+anonymous segment's index is stripped.
+
+Rescored from the same cache, every other line of output is byte-identical:
+
+| rename_owner | entities | commits |
+|---|---|---|
+| positional drift (only an anonymous index moved) | **140 (52%)** | 38 |
+| real owner move | **129 (48%)** | 9 |
+
+111 of the 129 come from two Zod refactors. `3063993` ("move methods to the
+prototype") moved every schema's method object out of its init callback into
+`_zodTypeMethods`-style factories. `773a486` ("declare a trait's members on
+`$constructor`") then moved them into `$constructor`'s members argument. A
+path-based id cannot survive either move, and should not pretend to.
+
+**The fix.** An anonymous segment now carries its *slot*: the property it is
+assigned to, the function it is an argument of, `return`, or the statement
+that owns a block. Its index counts only same-kind, same-slot rivals under the
+nearest named ancestor, as in
+`$ZodCheckLessThan.@arrowfunction[$constructor]0.@arrowfunction[check]0` and
+`finalize.@block[if]7`. Before, the index counted every same-kind node under the
+anchor. So when `6f04836` removed one callback per check, every
+`inst._zod.check = (payload) => ...` after it was renumbered. At `e516c3b` the
+extractor's invariants are unchanged:
+- 0 within-space collisions
+- 270 cross-space merges
+- closure of 6,414 of 6,553 call edges and 9,229 of 9,286 reference edges
+- 16,059 ids over 16,329 entities
+
+4,815 of the 5,687 ids with an anonymous segment now carry a slot.
+`facts.runtime.json` was rewritten to the new ids, not re-traced: `questions.ts`
+output is byte-identical, and `trace-analyze.ts` differs only in id strings.
+
+Full history, old segments against slot-keyed:
+
+| | old | slot-keyed |
+|---|---|---|
+| rename_owner, positional | 140 across 38 commits | **80** across 27 |
+| rename_owner, real owner move | 129 across 9 | 154 across 13 |
+| removed | 3,266 | **2,723** |
+| added | 6,381 | **5,840** |
+| unchanged | 2,859,426 obs. | 2,859,980 |
+| body edit | 2,070 | 2,113 |
+
+The bigger effect is not in `rename_owner`. The drift figure was called a
+lower bound because entities under 12 nodes, or edited in the same commit,
+drift into removed-plus-added instead, and that is where most of it was.
+Removed and added each fall by about 540 entities, which now count as
+unchanged (+554) or as body edits (+43).
+
+Owner moves rise by 25 because some changes that only looked like index shifts
+were real moves. `6f04836` moved `_ZodString`'s methods out of `$constructor`'s
+argument and into a `util.derived(inst, {...})` call.
+
+The 80 that remain are same-slot rivals, mostly `case` and `if` blocks in the
+locale files' `switch` statements (15 in `d3355f7`). The `shortcut:` on
+`anonSegment` records that limit.
+
+**The content-hash figures move with the oracle.** The oracle names entities
+with the same `declName`, so it now matches entities it used to lose to drift,
+and more edits are observed. `contentId` also hashes the qualified name.
+ADR-0001's table carries the new values:
+
+| measure over 297 pairs | `structureId` | `contentId` |
+|---|---|---|
+| aliasing on body edit, raw | 3.9% (81) → **6.0% (127)** | 1.5% (32) → **3.1% (66)** |
+| ...where the old id was unique in the parent | 0.43% (9) → 0.80% (17) | 0% → 0% |
+| removed id reappears, distinct events | 1,428 across 100 → 1,210 across 82 | 31 across 12 → 11 across 4 |
+| strict transfers, clear (body ≥ 12 nodes) | 3 of 891 → 4 of 798 | 1 → 0 |
+| unchanged observations whose id is shared | 48.7% → 48.7% | 20.1% → 18.7% |
+
+The rise in aliasing is concentrated in `d3355f7`, the locale refactor, which
+contributes 49 of the 127 and 32 of the 66 (one 32-entity `contentId`
+cluster). Its entities used to sit in removed-plus-added, so their hashes were
+never scored on an edit. No conclusion changes, and the case against content
+hashes as identity gets slightly stronger.
+
 ## Update (2026-10-09c): runtime tracing spike
 
 Question: does a runtime trace recover the edges static analysis cannot (the
@@ -44,7 +292,8 @@ the callers of the public method cannot be added by any trace.**
   the corpus). 366 of the 369 have both ends in declared ids (99.2%), but only
   127 (34.4%) join exactly: the rest are anonymous functions
   (`inst._zod.parse = ...` assignments have no entity, so they attribute to the
-  enclosing constructor, `$ZodObjectJIT`) or module top level. By distinct id
+  enclosing constructor, `$ZodObjectJIT`) or module top level. Since
+  2026-10-19c anonymous functions are entities and 342 (92.7%) join exactly. By distinct id
   pair, 92 of 354 joined pairs (26%) are in static facts; 262 are not, of which
   13 are self-loops, 15 involve a module, 234 are function->function and only
   80 of those have both ends exact.
@@ -252,12 +501,26 @@ entity-level change with an oracle independent of any id scheme — matching on 
 normalized body fingerprint that excludes name and path. 389 commits extracted,
 297 adjacent pairs scored, every src-touching commit on first-parent history.
 
+The oracle's join to the declaration facts is now complete — 100% of entity
+keys on every commit, where it read 99.4% when these numbers were first
+published. The gap was a bug in the harness, not in the extractor: `history.ts`
+kept its own hand-copy of `declName`, and that copy called
+`SyntaxKind.DefaultKeyword` without importing `SyntaxKind`, so the
+ReferenceError fell into its own `catch` and no `export default` was ever named
+`default` there. Routing the harness through the shared identity layer recovers
+those entities. The table below is restated on the fixed oracle, and the only
+figure that moved is the `unchanged` count, 2,842,894 to 2,859,426: the 16,532
+recovered observations plus 14 in `added` are the whole effect. Every change
+category below — body edits, renames, owner renames, moves — holds to the
+entity, and so does every figure in §4: aliasing on edit, removed-id
+reappearance, strict transfers, and the shared-id percentages.
+
 | Category | Entities | Commits containing it |
 |---|---|---|
-| unchanged | 2,842,894 obs. | 297 |
+| unchanged | 2,859,426 obs. | 297 |
 | **body edit** | **2,070** | **247** |
 | rename | 51 | **5 independent events** |
-| rename_owner | 269 | 43 — but **263 (98%) are positional drift**, only 6 real |
+| rename_owner | 269 | 43 — 140 positional drift (38 commits), 129 real owner moves (9); first published as "263 (98%) positional", a mislabel, see 2026-10-19 |
 | move | **0** | 0 |
 | rename + move | 0 | 0 |
 
@@ -270,13 +533,14 @@ overwhelming change mode: a scheme that breaks on body edits loses identity
 roughly **400x** more often here than one that breaks on renames.
 
 **The biggest surprise is about `entityId`, not the content hashes.** Its
-dominant instability is not renames at all: of 269 owner-name changes, **263
-(98%) across 43 commits are a positional anonymous-scope index shifting
-because a sibling was inserted earlier in the file** — `@arrowfunction0`
-becoming `@arrowfunction1`. Only 6 are real owner renames. The `shortcut:`
-comment on `anonSegment` flagged this risk when scope qualification was added
-the same day; this is it, measured, and it is a lower bound because sub-12-node
-entities with the same drift land in removed-plus-added.
+dominant instability is not renames: of 269 owner-name changes, 140 (38
+commits) are a positional anonymous-scope index shifting because a sibling was
+inserted or removed earlier, as in `@arrowfunction2` becoming `@arrowfunction1`. The
+other 129 (9 commits) are real owner moves. This was first published as "263
+(98%) positional, only 6 real", which was a classifier mislabel; the 2026-10-19
+update has the correction and the fix, which keys anonymous segments on their
+syntactic slot. The figure is a lower bound, because sub-12-node entities with
+the same drift land in removed-plus-added.
 
 Note that git's own rename detection finds **zero file-level renames across all
 298 src-touching commits**, which is why the oracle had to work at entity level.
@@ -306,7 +570,8 @@ corpus has none.
 
 The survival columns are tautological. These two are not.
 
-**Full-run figures supersede the sample below.** Over 297 pairs: aliasing on
+**Full-run figures supersede the sample below, and are themselves restated
+on slot-keyed ids in the 2026-10-19 update.** Over 297 pairs: aliasing on
 body edit is 3.9% raw for `structureId` (0.43% where the old id was unique in
 the parent) and 1.5% for `contentId` (0% unique) — the 6.5% below was a
 24-pair artifact. Removed-id reappearance is 1,428 distinct events across 100

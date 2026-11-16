@@ -1,7 +1,16 @@
-// SPIKE SNAPSHOT of extract.ts (identity + enclosing-entity logic), copied
-// verbatim so trace.ts computes ids with the SAME functions the extractor uses,
-// without editing extract.ts (it runs on import and exports nothing).
-// Source ranges: extract.ts 96-310, 398-416, 312. Re-copy by hand if extract.ts identity logic changes.
+// THE identity layer: every entity id in the fact base and in the runtime
+// trace, and the entity names the history oracle joins on, come from this
+// module. ADR-0001 states the rule — one function produces entity ids, and
+// both declaration emission and edge resolution route through it, so closure
+// holds by construction. Before f1c1455 the two sides built ids separately and
+// 135 call edges dangled on a string-format disagreement. The rule then held
+// inside extract.ts while ids.ts and history.ts kept hand-copies of it:
+// ids.ts's copy was still in sync when it was deleted, history.ts's had
+// drifted — its isDefaultExport called `SyntaxKind.DefaultKeyword` without
+// importing SyntaxKind and swallowed the ReferenceError in its own catch, so
+// no `export default` was ever named `default` there.
+// Callers must setRoot() before computing any id: the `ts:` namespace is
+// relative to the analysed source root.
 import { Node, SyntaxKind } from "ts-morph";
 import * as path from "path";
 
@@ -37,40 +46,63 @@ function eid(file: string, name: string) {
     : `ts:${slug(path.relative(ROOT, file))}:${name}`;
 }
 
-// The class or interface a member belongs to. Members are qualified by owner
-// because a bare method name is not unique within a file — Zod declares
-// `_parse` on many types in one module.
-const isMember = (node: any) =>
-  Node.isMethodDeclaration(node) || Node.isMethodSignature(node)
-  || Node.isPropertyDeclaration(node) || Node.isPropertySignature(node)
-  || Node.isGetAccessorDeclaration(node) || Node.isSetAccessorDeclaration(node);
-
 // An anonymous function that is not bound to a name — a callback passed
 // straight into a call, as in `$constructor("ZodString", (inst, def) => {...})`.
 // Its parameters and locals need some disambiguator or they collide with every
 // other callback's `inst` in the same file.
-// shortcut: positional index among same-kind siblings of the parent node. Shifts
-// if a sibling callback is inserted before it; a stable scheme would need the
-// enclosing call's callee name, which is not always resolvable at this point.
-// Index among same-kind anonymous nodes under the nearest NAMED ancestor, in
-// document order. Indexing within the immediate parent gave every sibling in a
-// promise chain the same segment: `.then(() => {...}).then((x) => {...})` has
-// two arrows with different parents, each index 0 in its own parent, so a local
-// in the first collided with a parameter of the second.
-// shortcut: still positional, so inserting an earlier sibling shifts it. A
-// stable scheme needs the enclosing call's callee name, which is not always
-// resolvable here.
+//
+// The segment is the node's kind, its syntactic slot, and an index among
+// same-kind, same-slot nodes under the nearest NAMED ancestor, in document
+// order. Indexing within the immediate parent gave every sibling in a promise
+// chain the same segment: `.then(() => {...}).then((x) => {...})` has two
+// arrows with different parents, each index 0 in its own parent. Indexing
+// among ALL same-kind nodes under the anchor then made the index shift whenever
+// any earlier sibling was inserted — 6f04836 removed one callback per check and
+// renumbered every `inst._zod.check = (payload) => ...` after it.
+// shortcut: still positional within a slot, so an earlier rival in the SAME
+// slot (a second `.push(() => ...)`, another `if`) shifts it; revisit if the
+// history harness's ro_positional count says that drift matters.
 function anonSegment(node: any): string {
   const kindTag = `@${node.getKindName().replace(/Expression$|Declaration$/, "").toLowerCase()}`;
+  const slot = anonSlot(node);
+  const tag = slot ? `${kindTag}[${slot}]` : kindTag;
   let anchor: any = null;
   for (let a = node.getParent?.(); a; a = a.getParent?.()) {
     if (Node.isSourceFile(a)) { anchor = a; break; }
     if (namedSegment(a)) { anchor = a; break; }
   }
-  if (!anchor) return `${kindTag}0`;
-  const sibs = anchor.getDescendantsOfKind?.(node.getKind()) ?? [];
+  if (!anchor) return `${tag}0`;
+  // Overload signatures are separate nodes carrying one name, so indexing
+  // under a single one restarts at 0 in each: every `_function(params: {...})`
+  // overload yielded `_function.@typeliteral0`. Index across all same-kind
+  // declarations of the anchor's symbol in this file instead.
+  const file = anchor.getSourceFile();
+  const own = Node.isSourceFile(anchor) ? [] : (anchor.getSymbol?.()?.getDeclarations() ?? [])
+    .filter((d: any) => d.getKind() === anchor.getKind() && d.getSourceFile() === file);
+  const anchors = own.includes(anchor) ? own.sort((a: any, b: any) => a.getStart() - b.getStart()) : [anchor];
+  const sibs = anchors.flatMap((a: any) => a.getDescendantsOfKind?.(node.getKind()) ?? []).filter((c: any) => anonSlot(c) === slot);
   const i = sibs.findIndex((c: any) => c === node);
-  return `${kindTag}${i < 0 ? 0 : i}`;
+  return `${tag}${i < 0 ? 0 : i}`;
+}
+
+// The slot an anonymous node fills: the property or variable it is assigned to
+// (`inst._zod.check = ...` -> check), the function it is an argument of
+// (`$constructor(...)` -> $constructor), `return`, or for a nested block the
+// statement that owns it (if / else / for / try / finally ...). "" if none.
+function anonSlot(node: any): string {
+  const p = node.getParent?.();
+  if (!p) return "";
+  const nameOf = (e: any) => Node.isPropertyAccessExpression(e) ? e.getName() : Node.isIdentifier(e) ? e.getText() : "";
+  let s = "";
+  if (Node.isBinaryExpression(p) && p.getOperatorToken().getKind() === SyntaxKind.EqualsToken && p.getRight() === node) s = nameOf(p.getLeft());
+  else if ((Node.isCallExpression(p) || Node.isNewExpression(p)) && (p.getArguments() ?? []).includes(node)) s = nameOf(p.getExpression());
+  else if (Node.isReturnStatement(p)) s = "return";
+  else if (Node.isBlock(node)) {
+    s = Node.isIfStatement(p) ? (p.getElseStatement() === node ? "else" : "if")
+      : Node.isTryStatement(p) ? (p.getFinallyBlock() === node ? "finally" : "try")
+      : p.getKindName().replace(/Statement$/, "").toLowerCase();
+  }
+  return s.replace(/[^\w$]/g, "_");
 }
 
 // One segment of the lexical scope path, for ancestors that introduce a scope.
@@ -136,9 +168,14 @@ function scopeSegment(a: any): string | null {
 
 function scopePath(node: any): string[] {
   const out: string[] = [];
-  for (let a = node.getParent?.(); a; a = a.getParent?.()) {
+  for (let from = node, a = node.getParent?.(); a; from = a, a = a.getParent?.()) {
     if (Node.isSourceFile(a)) break;
-    const seg = scopeSegment(a);
+    // `for (let i ...)` binds i on the statement, outside its body block, so two
+    // loops in one function shared `fn.i`. Only the header gets the segment:
+    // the body is already a nested block.
+    const header = (Node.isForStatement(a) || Node.isForInStatement(a) || Node.isForOfStatement(a))
+      && a.getStatement() !== from;
+    const seg = header ? anonSegment(a) : scopeSegment(a);
     if (seg) out.unshift(seg);
   }
   return out;
@@ -147,11 +184,20 @@ function scopePath(node: any): string[] {
 // `export default function () {}` and `export default {...}` have no name.
 // 11 of the 12 remaining flagged imports and 3 unresolved calls traced to this.
 function isDefaultExport(node: any): boolean {
-  try {
-    if (node.hasModifier?.(SyntaxKind.DefaultKeyword)) return true;
-    const p = node.getParent?.();
-    return !!p && Node.isExportAssignment(p);
-  } catch { return false; }
+  if (node.hasModifier?.(SyntaxKind.DefaultKeyword)) return true;
+  const p = node.getParent?.();
+  return !!p && Node.isExportAssignment(p);
+}
+
+// An arrow or function expression with no binding of its own: a callback, an
+// IIFE, or `inst._zod.parse = (payload, ctx) => ...`. Runtime frames land on
+// these more than on anything else, so they are entities. Their id is the scope
+// prefix their own parameters and locals already carry, unique by construction.
+function isAnonymousFunction(node: any): boolean {
+  if (!Node.isArrowFunction(node) && !Node.isFunctionExpression(node)) return false;
+  const p = node.getParent();
+  if (p && (Node.isVariableDeclaration(p) || Node.isPropertyAssignment(p) || Node.isPropertyDeclaration(p))) return false;
+  return !(isDefaultExport(node) || (p && Node.isExportAssignment(p)));
 }
 
 function declName(node: any): string | null {
@@ -165,7 +211,7 @@ function declName(node: any): string | null {
     if (isDefaultExport(node) || (p && Node.isExportAssignment(p))) {
       return [...scopePath(node), "default"].join(".");
     }
-    return null;
+    return [...scopePath(node), anonSegment(node)].join(".");
   }
   const own = Node.isConstructorDeclaration(node)
     ? "constructor"
@@ -209,6 +255,7 @@ function typeOfNode(node: any): string {
     return init && (Node.isArrowFunction(init) || Node.isFunctionExpression(init))
       ? "function" : "variable";
   }
+  if (isAnonymousFunction(node)) return "anonymous-function";
   // Falling back to a bare "unknown" hid what these actually were: 32 of them,
   // all namespace re-exports (`export * as z from ...`), which the export map
   // yields as nodes none of the branches above match. Naming the syntax kind
@@ -223,6 +270,20 @@ const isCallableContainer = (n: any) =>
   || Node.isSetAccessorDeclaration(n) || Node.isArrowFunction(n)
   || Node.isFunctionExpression(n);
 function slug(s: string) { return s.replace(/\\/g, "/").replace(/[^a-zA-Z0-9_$/@.-]/g, "_"); }
+function rel(p: string) { return path.relative(ROOT, p).replace(/\\/g, "/"); }
+function np(p: string) { return p.replace(/\\/g, "/"); }
+
+// Attribute a node to the nearest enclosing declared entity, falling back to
+// the module. Shared by call and instantiation extraction so both sides of the
+// fact base use one notion of "where did this happen".
+// Attribute a node to the nearest enclosing entity. Prefer a callable
+// container; failing that, the declaration whose initializer the node sits in.
+//
+// `export const parse = core._parse(ZodRealError)` has no callable ancestor, so
+// this previously attributed the call to the module. Nothing calls a module, so
+// every value-flow chain through a top-level initializer dead-ended there — and
+// that is most of what made blast-radius queries shallow. Re-attributing those
+// sites grows the transitive-caller closure of core `_parse` from 4 to 13.
 const isDeclContainer = (n: any) =>
   Node.isVariableDeclaration(n) || Node.isPropertyAssignment(n)
   || Node.isPropertyDeclaration(n) || Node.isPropertySignature(n);
@@ -230,6 +291,8 @@ const isDeclContainer = (n: any) =>
 function callSite(node: any, moduleId: string) {
   let fallback: { callerId: string; callerKind: string } | null = null;
   for (let a = node.getParent(); a; a = a.getParent()) {
+    // Static calls stay attributed to the nearest NAMED entity: nothing calls an anonymous function by name, so attributing to it would dead-end transitive-caller chains, the defect 2026-10-09b fixed for module attribution.
+    if (isAnonymousFunction(a)) continue;
     const callable = isCallableContainer(a);
     if (!callable && !isDeclContainer(a)) continue;
     const id = idOfNode(a);
@@ -242,6 +305,4 @@ function callSite(node: any, moduleId: string) {
   return fallback ?? { callerId: moduleId, callerKind: "module" };
 }
 
-
-export { idOfNode, typeOfNode, callSite, isCallableContainer, declName, mid };
-function np(p: string) { return p.replace(/\\/g, "/"); }
+export { mid, rel, np, eid, isExternalPath, externalOrigin, declName, idOfNode, typeOfNode, isCallableContainer, callSite, isAnonymousFunction };

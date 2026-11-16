@@ -10,13 +10,15 @@ import { SourceMap } from "node:module";
 import * as fs from "fs";
 import * as path from "path";
 import { Project, Node, SyntaxKind } from "ts-morph";
-import { setRoot, idOfNode, callSite, typeOfNode, mid } from "./ids";
+import { setRoot, idOfNode, callSite, typeOfNode, mid } from "./identity";
 
 // Optimizing tiers inline callees and elide their frames; keep the interpreter so every call shows up.
 if (process.env.TRACE_OPT !== "1") for (const f of (process.env.TRACE_FLAGS ?? "--no-opt --no-maglev").split(" ")) v8.setFlagsFromString(f);
-const ROOT = fs.realpathSync(path.resolve(__dirname, "zod-repo/packages/zod/src"));
+// ATLAS_ZOD_REPO points at the corpus checkout when it is not ./zod-repo (a git worktree has none).
+const CORPUS = process.env.ATLAS_ZOD_REPO ?? path.resolve(__dirname, "zod-repo");
+const ROOT = fs.realpathSync(path.join(CORPUS, "packages/zod/src"));
 const ENTRY = path.join(ROOT, "v4/classic/external.ts");
-const TSCONFIG = path.resolve(__dirname, "zod-repo/packages/zod/tsconfig.json");
+const TSCONFIG = path.join(CORPUS, "packages/zod/tsconfig.json");
 const ITERS = Number(process.env.TRACE_ITERS ?? 20000);
 const INTERVAL_US = Number(process.env.TRACE_INTERVAL_US ?? 25);
 const OUT = process.env.TRACE_OUT ?? path.resolve(__dirname, "facts.runtime.json");
@@ -93,7 +95,7 @@ const declared = new Set<string>(facts.filter((f) => f.kind === "declaration").m
 interface Fn { id: string | null; encl: string; start: number; nameStart: number; line: number; kind: string; name: string; }
 const byFile = new Map<string, Fn[]>();
 function indexStatic() {
-  setRoot(path.resolve(__dirname, "zod-repo/packages/zod/src")); // same (un-realpathed) root extract.ts uses
+  setRoot(path.join(CORPUS, "packages/zod/src")); // same (un-realpathed) root extract.ts uses
   const project = new Project({ tsConfigFilePath: TSCONFIG });
   const K = [SyntaxKind.FunctionDeclaration, SyntaxKind.MethodDeclaration, SyntaxKind.Constructor,
     SyntaxKind.GetAccessor, SyntaxKind.SetAccessor, SyntaxKind.ArrowFunction, SyntaxKind.FunctionExpression,
@@ -178,6 +180,32 @@ function edgesOf(profile: any): Map<string, Edge> {
 
 // ── main ──────────────────────────────────────────────────────────────────
 (async () => {
+  // TRACE_RESOLVE=1: re-derive ids and tiers from the frames a previous trace
+  // saved in OUT, so an identity-layer change can be measured without
+  // re-tracing (sampling is nondeterministic). Mirrors the out.push below.
+  if (process.env.TRACE_RESOLVE === "1") {
+    indexStatic();
+    const saved: any[] = JSON.parse(fs.readFileSync(OUT, "utf-8"));
+    const tiers: Record<string, number> = {};
+    const frame = (s: string): Frame => { const [file, line, col, ...fn] = s.split(":"); return { file, line: +line, col: +col, fn: fn.join(":") }; };
+    // Keyed by position like the trace's own cache, so a named frame at 1:0 inherits the module result it got there.
+    const cache = new Map<string, Res>();
+    const res = (f: Frame) => { const k = `${f.file}:${f.line}:${f.col}`; let r = cache.get(k); if (!r) { r = resolve(f); cache.set(k, r); } return r; };
+    for (const e of saved) {
+      const b = frame(e.calleeFrame), rb = res(b);
+      const a = e.callerFrame === "<workload>" ? null : frame(e.callerFrame), ra = a ? res(a) : null;
+      tiers[`callee:${rb.tier}`] = (tiers[`callee:${rb.tier}`] ?? 0) + 1;
+      if (ra) tiers[`caller:${ra.tier}`] = (tiers[`caller:${ra.tier}`] ?? 0) + 1;
+      e.callerId = ra ? (ra.id ?? `runtime:${a!.file}:${a!.line}:${a!.fn || "anon"}`) : "external:workload";
+      e.calleeId = rb.id ?? `runtime:${b.file}:${b.line}:${b.fn || "anon"}`;
+      e.callerKind = ra?.callerKind ?? "external";
+      e.callerResolved = !!ra?.id; e.calleeResolved = !!rb.id;
+      e.callerTier = ra?.tier ?? "external"; e.calleeTier = rb.tier;
+    }
+    fs.writeFileSync(OUT, JSON.stringify(saved));
+    console.log(`re-resolved ${saved.length} edges from saved frames; tiers`, tiers, `-> ${OUT}`);
+    return;
+  }
   const t0 = Date.now();
   const prof = await profile();
   console.log(`profile: ${prof.nodes.length} nodes, ${prof.samples.length} samples, ${((Date.now() - t0) / 1000).toFixed(1)}s, iters=${ITERS}, interval=${INTERVAL_US}us`);

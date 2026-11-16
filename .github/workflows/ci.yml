@@ -1,0 +1,28 @@
+name: ci
+on: [push, pull_request]
+
+jobs:
+  prototype:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: prototype
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+          cache-dependency-path: prototype/package-lock.json
+      - run: npm ci
+      - run: npm run typecheck
+      # The corpus is gitignored; pin it to the commit every published figure was measured on.
+      - name: Fetch Zod corpus
+        run: |
+          git init -q zod-repo
+          git -C zod-repo fetch -q --depth 1 https://github.com/colinhacks/zod e516c3baf22615e20934116abebfed6c000222c2
+          git -C zod-repo checkout -q FETCH_HEAD
+      # Exits non-zero on a failed file or a broken invariant.
+      - run: npm run extract
+      - name: Committed facts match the extractor
+        run: git diff --exit-code facts.json

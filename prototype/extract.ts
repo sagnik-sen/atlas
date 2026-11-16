@@ -2,6 +2,7 @@ import { Project, SyntaxKind, Node, ts, type SourceFile } from "ts-morph";
 import * as path from "path";
 import * as fs from "fs";
 import { fingerprint } from "./fingerprint";
+import { setRoot, mid, rel, np, eid, isExternalPath, externalOrigin, declName, idOfNode, typeOfNode, isCallableContainer, callSite, isAnonymousFunction } from "./identity";
 
 type Fact = DeclFact | ContainsFact | ImportFact | ReexportFact | CallsFact | HeritageFact | InstantiatesFact | ReferencesFact;
 
@@ -16,6 +17,7 @@ interface DeclFact {
   // when the node is not fingerprintable (modules, stubs, namespace re-exports).
   structureId?: string; // structure only: survives rename and move
   contentId?: string;   // name + structure: survives move, not rename
+  ownerId?: string;     // anonymous-function only: the entity its calls are attributed to (identity.ts callSite)
 }
 
 interface ContainsFact {
@@ -87,235 +89,25 @@ interface HeritageFact {
 }
 
 const facts: Fact[] = [];
-let ROOT = "";
 // Files the walk actually visits. Resolution can land outside it — a benchmark
 // instantiating a class from the excluded tests/ tree — and such an entity is
 // real but never declared by the walk.
 const ANALYSED = new Set<string>();
-
-function mid(file: string) { return `module:${slug(path.relative(ROOT, file))}`; }
-
-// A path outside the analysed source root belongs to a dependency, not to this
-// repository. Building a `ts:` id from it produced strings like
-// `ts:../../../../../../node_modules/typescript/lib/lib.es5.d.ts:isArray` —
-// a path-escape artifact, not an identifier.
-function isExternalPath(fp: string) {
-  if (fp.includes("/node_modules/")) return true;
-  const r = path.relative(ROOT, fp);
-  return r.startsWith("..") || path.isAbsolute(r);
+// `id\0entityType` -> the compiler symbols declared under it. Two symbols are
+// two entities sharing an id inside ONE entityType, which the entityType-set
+// check at the bottom cannot see. Overloads and get/set pairs share a symbol.
+const SYMS = new Map<string, Set<unknown>>();
+function track(id: string, type: string, node: any) {
+  const k = `${id}\0${type}`;
+  (SYMS.get(k) ?? SYMS.set(k, new Set()).get(k)!).add(node.getSymbol?.()?.compilerSymbol ?? node.compilerNode);
 }
 
-// Which dependency a path belongs to, for the external id namespace.
-function externalOrigin(fp: string): string {
-  const i = fp.lastIndexOf("/node_modules/");
-  if (i >= 0) {
-    const seg = fp.slice(i + "/node_modules/".length).split("/");
-    return seg[0].startsWith("@") && seg[1] ? `${seg[0]}/${seg[1]}` : seg[0];
-  }
-  if (/\/lib\.[a-z0-9.]*d\.ts$/.test(fp)) return "typescript-lib";
-  return "unknown";
-}
-
-function eid(file: string, name: string) {
-  return isExternalPath(file)
-    ? `external:${slug(externalOrigin(file))}:${name}`
-    : `ts:${slug(path.relative(ROOT, file))}:${name}`;
-}
-
-// The class or interface a member belongs to. Members are qualified by owner
-// because a bare method name is not unique within a file — Zod declares
-// `_parse` on many types in one module.
-const isMember = (node: any) =>
-  Node.isMethodDeclaration(node) || Node.isMethodSignature(node)
-  || Node.isPropertyDeclaration(node) || Node.isPropertySignature(node)
-  || Node.isGetAccessorDeclaration(node) || Node.isSetAccessorDeclaration(node);
-
-// An anonymous function that is not bound to a name — a callback passed
-// straight into a call, as in `$constructor("ZodString", (inst, def) => {...})`.
-// Its parameters and locals need some disambiguator or they collide with every
-// other callback's `inst` in the same file.
-// shortcut: positional index among same-kind siblings of the parent node. Shifts
-// if a sibling callback is inserted before it; a stable scheme would need the
-// enclosing call's callee name, which is not always resolvable at this point.
-// Index among same-kind anonymous nodes under the nearest NAMED ancestor, in
-// document order. Indexing within the immediate parent gave every sibling in a
-// promise chain the same segment: `.then(() => {...}).then((x) => {...})` has
-// two arrows with different parents, each index 0 in its own parent, so a local
-// in the first collided with a parameter of the second.
-// shortcut: still positional, so inserting an earlier sibling shifts it. A
-// stable scheme needs the enclosing call's callee name, which is not always
-// resolvable here.
-function anonSegment(node: any): string {
-  const kindTag = `@${node.getKindName().replace(/Expression$|Declaration$/, "").toLowerCase()}`;
-  let anchor: any = null;
-  for (let a = node.getParent?.(); a; a = a.getParent?.()) {
-    if (Node.isSourceFile(a)) { anchor = a; break; }
-    if (namedSegment(a)) { anchor = a; break; }
-  }
-  if (!anchor) return `${kindTag}0`;
-  const sibs = anchor.getDescendantsOfKind?.(node.getKind()) ?? [];
-  const i = sibs.findIndex((c: any) => c === node);
-  return `${kindTag}${i < 0 ? 0 : i}`;
-}
-
-// One segment of the lexical scope path, for ancestors that introduce a scope.
-// Previously only classes and interfaces were consulted, via an `ownerName`
-// that walked to the NEAREST class or interface. That produced three defects:
-// members of object literals got a bare name, members of nested type literals
-// got the enclosing interface's name (so `interface Foo { x: { y: T } }` yielded
-// `Foo.y`, colliding with a real `Foo.y`), and parameters, bindings and locals
-// were never qualified at all. 438 ids collided within value space as a result.
-// The named half of scopeSegment, factored out so anonSegment can find its
-// anchor without recursing back through the anonymous branch.
-function namedSegment(a: any): string | null {
-  if (Node.isClassDeclaration(a) || Node.isInterfaceDeclaration(a) || Node.isClassExpression(a)
-      || Node.isFunctionDeclaration(a) || Node.isMethodDeclaration(a) || Node.isMethodSignature(a)
-      || Node.isGetAccessorDeclaration(a) || Node.isSetAccessorDeclaration(a)
-      || Node.isTypeAliasDeclaration(a) || Node.isEnumDeclaration(a)
-      || Node.isVariableDeclaration(a) || Node.isPropertyAssignment(a)
-      || Node.isPropertyDeclaration(a) || Node.isPropertySignature(a)
-      || Node.isModuleDeclaration(a)) {
-    return a.getName?.() || null;
-  }
-  if (Node.isConstructorDeclaration(a)) return "constructor";
-  return null;
-}
-
-// A nested block (`if`, `for`, `try`) is a real lexical scope: a parameter and
-// a `const` of the same name can coexist when the const is inside one. A
-// function BODY block is not segmented, because the function already is.
-const isNestedBlock = (a: any) => {
-  if (!Node.isBlock(a)) return false;
-  const p = a.getParent?.();
-  return !!p && !isCallableContainer(p) && !Node.isConstructorDeclaration(p);
-};
-
-function scopeSegment(a: any): string | null {
-  const named = namedSegment(a);
-  if (named) return named;
-  // A bound construct contributes nothing of its own: its binding is the
-  // VariableDeclaration or PropertyAssignment above, already a segment.
-  const bound = (n: any) => {
-    const p = n.getParent?.();
-    return !!p && (Node.isVariableDeclaration(p) || Node.isPropertyAssignment(p)
-      || Node.isPropertyDeclaration(p) || Node.isPropertySignature(p)
-      || Node.isTypeAliasDeclaration(p));
-  };
-  if (Node.isArrowFunction(a) || Node.isFunctionExpression(a)) {
-    return bound(a) ? null : anonSegment(a);
-  }
-  // An unbound type or object literal — a return-type annotation such as
-  // `_getCached(): { shape: T; keys: string[] }`, or a literal in a return
-  // statement. Without a segment its members share the enclosing named scope
-  // with that scope's own locals, so `{ shape: T }` collided with `const shape`.
-  if (Node.isTypeLiteral(a) || Node.isObjectLiteralExpression(a)) {
-    return bound(a) ? null : anonSegment(a);
-  }
-  if (isNestedBlock(a)) return anonSegment(a);
-  // `catch (e)` binds e on the CatchClause, not inside its block, so without
-  // this the binding escapes block segmentation and collides with same-named
-  // locals elsewhere in the function.
-  if (Node.isCatchClause(a)) return anonSegment(a);
-  return null;
-}
-
-function scopePath(node: any): string[] {
-  const out: string[] = [];
-  for (let a = node.getParent?.(); a; a = a.getParent?.()) {
-    if (Node.isSourceFile(a)) break;
-    const seg = scopeSegment(a);
-    if (seg) out.unshift(seg);
-  }
-  return out;
-}
-
-// `export default function () {}` and `export default {...}` have no name.
-// 11 of the 12 remaining flagged imports and 3 unresolved calls traced to this.
-function isDefaultExport(node: any): boolean {
-  try {
-    if (node.hasModifier?.(SyntaxKind.DefaultKeyword)) return true;
-    const p = node.getParent?.();
-    return !!p && Node.isExportAssignment(p);
-  } catch { return false; }
-}
-
-function declName(node: any): string | null {
-  // An arrow or function expression has no name of its own; it borrows the
-  // binding it is assigned to. `const x = () => {}` is the dominant idiom in
-  // this corpus, so without this the call site has no nameable container.
-  if (Node.isArrowFunction(node) || Node.isFunctionExpression(node)) {
-    const p = node.getParent();
-    if (p && (Node.isVariableDeclaration(p) || Node.isPropertyAssignment(p)
-              || Node.isPropertyDeclaration(p))) return declName(p);
-    if (isDefaultExport(node) || (p && Node.isExportAssignment(p))) {
-      return [...scopePath(node), "default"].join(".");
-    }
-    return null;
-  }
-  const own = Node.isConstructorDeclaration(node)
-    ? "constructor"
-    : (node.getName?.() || (isDefaultExport(node) ? "default" : null));
-  if (!own) return null;
-  return [...scopePath(node), own].join(".");
-}
-
-// THE invariant: declaration emission and call resolution both route entity
-// ids through this function, so a resolved endpoint is closed by construction
-// rather than by two code paths happening to agree on a string format.
-function idOfNode(node: any): string | null {
-  const name = declName(node);
-  if (!name) return null;
-  return eid(np(node.getSourceFile().getFilePath()), name);
-}
-
-function typeOfNode(node: any): string {
-  if (Node.isClassDeclaration(node)) return "class";
-  if (Node.isInterfaceDeclaration(node)) return "interface";
-  if (Node.isTypeAliasDeclaration(node)) return "type";
-  if (Node.isEnumDeclaration(node)) return "enum";
-  if (Node.isFunctionDeclaration(node)) return "function";
-  if (Node.isConstructorDeclaration(node)) return "constructor";
-  // A MethodSignature/PropertySignature lives in TYPE space; a
-  // MethodDeclaration/PropertyDeclaration lives in VALUE space. Collapsing both
-  // to "method"/"property" made the declaration-space split misclassify them,
-  // so `type DIRTY = { value: T }`'s member collided with `DIRTY`'s `value`
-  // parameter, and `interface $constructor { init() }` with `function init()`.
-  if (Node.isMethodSignature(node)) return "type-method";
-  if (Node.isMethodDeclaration(node)) return "method";
-  if (Node.isGetAccessorDeclaration(node) || Node.isSetAccessorDeclaration(node)) return "accessor";
-  if (Node.isPropertySignature(node)) return "type-property";
-  if (Node.isPropertyDeclaration(node)) return "property";
-  if (Node.isParameterDeclaration(node)) return "parameter";
-  if (Node.isPropertyAssignment(node) || Node.isShorthandPropertyAssignment(node)) return "property";
-  if (Node.isBindingElement(node)) return "binding";
-  if (Node.isVariableDeclaration(node)) {
-    const init = node.getInitializer?.();
-    // `const f = () => {}` is a function, not a variable holding one.
-    return init && (Node.isArrowFunction(init) || Node.isFunctionExpression(init))
-      ? "function" : "variable";
-  }
-  // Falling back to a bare "unknown" hid what these actually were: 32 of them,
-  // all namespace re-exports (`export * as z from ...`), which the export map
-  // yields as nodes none of the branches above match. Naming the syntax kind
-  // costs nothing and keeps the fallback auditable.
-  const kind = node.getKindName?.();
-  return kind ? kind.replace(/Declaration$|Expression$/, "").toLowerCase() : "unknown";
-}
-
-const isCallableContainer = (n: any) =>
-  Node.isFunctionDeclaration(n) || Node.isMethodDeclaration(n)
-  || Node.isConstructorDeclaration(n) || Node.isGetAccessorDeclaration(n)
-  || Node.isSetAccessorDeclaration(n) || Node.isArrowFunction(n)
-  || Node.isFunctionExpression(n);
-function slug(s: string) { return s.replace(/\\/g, "/").replace(/[^a-zA-Z0-9_$/@.-]/g, "_"); }
-function rel(p: string) { return path.relative(ROOT, p).replace(/\\/g, "/"); }
-function np(p: string) { return p.replace(/\\/g, "/"); }
 function log(level: string, msg: string) {
   if (level !== "debug") process.stderr.write(`[${level}] ${msg}\n`);
 }
 
 // Resolve import specifier to file path
-function resolveImport(fromFile: string, specifier: string): string | null {
+function resolveImport(fromFile: string, specifier: string, decl: any): string | null {
   const dir = path.dirname(fromFile);
   // relative imports
   if (specifier.startsWith(".")) {
@@ -333,20 +125,13 @@ function resolveImport(fromFile: string, specifier: string): string | null {
     }
     return null; // relative but unresolvable
   }
-  // ponytail: bare specifiers are treated as external. tsconfig `paths`
-  // aliases that point back into the repo (zod's own `zod/v3`) land here
-  // wrongly; read compilerOptions.paths if alias-heavy repos matter.
-  return null; // external package — has no path inside this repo
-}
-
-// JSDoc extraction (guarded)
-function jsdoc(node: any): string | undefined {
-  try {
-    if (typeof node.getJsDocs === "function") {
-      return node.getJsDocs().map((d: any) => d.getDescription()).join("\n") || undefined;
-    }
-  } catch {}
-  return undefined;
+  // A bare specifier can still land inside this repo: zod imports itself as
+  // `zod/v3`, which resolves through its own package.json `exports` and the
+  // `@zod/source` custom condition, not tsconfig `paths`. Ask the compiler,
+  // which honours all three; anything it puts outside the source root stays external.
+  const target = decl.getModuleSpecifierSourceFile?.();
+  const p = target ? np(target.getFilePath()) : null;
+  return p && !isExternalPath(p) ? p : null;
 }
 
 function extractCalleeName(expr: any): string | null {
@@ -359,105 +144,72 @@ function extractCalleeName(expr: any): string | null {
 // Emitting them from one call site only silently drops the non-exported half.
 function emitHeritage(node: any, id: string) {
   if (!Node.isClassDeclaration(node) && !Node.isInterfaceDeclaration(node)) return;
-  try {
-    for (const h of node.getHeritageClauses?.() || []) {
-      // `class C extends B implements I` yields two clauses; the token
-      // distinguishes them. Emitting both as "extends" merged two distinct
-      // relations into a single fact type. getToken() returns a SyntaxKind
-      // enum value, not a node — comparing its .getText() silently never matched.
-      const kind = h.getToken() === SyntaxKind.ImplementsKeyword ? "implements" as const : "extends" as const;
-      for (const t of h.getTypeNodes() || []) {
-        // parentName is TEXT — `_ZodString<core.$ZodStringInternals<string>>`.
-        // 62% of heritage parents carry generics or a namespace qualifier, so
-        // matching them back to an entity afterwards needs name parsing plus
-        // import and re-export resolution, and is heuristic at best. Resolve it
-        // here instead, where the checker already has the symbol: take the
-        // bare type expression and route it through the same resolver as calls.
-        const exprNode = Node.isExpressionWithTypeArguments(t) ? t.getExpression() : t;
-        const nameNode = Node.isPropertyAccessExpression(exprNode) ? exprNode.getNameNode()
-          : Node.isTypeReference(exprNode) ? exprNode.getTypeName() : exprNode;
-        const leaf = Node.isQualifiedName(nameNode) ? nameNode.getRight() : nameNode;
-        const parentId = resolveEntity(leaf) ?? undefined;
-        facts.push({ kind, childId: id, parentName: t.getText(), parentId });
-      }
+  for (const h of node.getHeritageClauses?.() || []) {
+    // `class C extends B implements I` yields two clauses; the token
+    // distinguishes them. Emitting both as "extends" merged two distinct
+    // relations into a single fact type. getToken() returns a SyntaxKind
+    // enum value, not a node — comparing its .getText() silently never matched.
+    const kind = h.getToken() === SyntaxKind.ImplementsKeyword ? "implements" as const : "extends" as const;
+    for (const t of h.getTypeNodes() || []) {
+      // parentName is TEXT — `_ZodString<core.$ZodStringInternals<string>>`.
+      // 62% of heritage parents carry generics or a namespace qualifier, so
+      // matching them back to an entity afterwards needs name parsing plus
+      // import and re-export resolution, and is heuristic at best. Resolve it
+      // here instead, where the checker already has the symbol: take the
+      // bare type expression and route it through the same resolver as calls.
+      const exprNode = Node.isExpressionWithTypeArguments(t) ? t.getExpression() : t;
+      const nameNode = Node.isPropertyAccessExpression(exprNode) ? exprNode.getNameNode()
+        : Node.isTypeReference(exprNode) ? exprNode.getTypeName() : exprNode;
+      const leaf = Node.isQualifiedName(nameNode) ? nameNode.getRight() : nameNode;
+      const parentId = resolveEntity(leaf) ?? undefined;
+      facts.push({ kind, childId: id, parentName: t.getText(), parentId });
     }
-  } catch {}
-}
-
-// Attribute a node to the nearest enclosing declared entity, falling back to
-// the module. Shared by call and instantiation extraction so both sides of the
-// fact base use one notion of "where did this happen".
-// Attribute a node to the nearest enclosing entity. Prefer a callable
-// container; failing that, the declaration whose initializer the node sits in.
-//
-// `export const parse = core._parse(ZodRealError)` has no callable ancestor, so
-// this previously attributed the call to the module. Nothing calls a module, so
-// every value-flow chain through a top-level initializer dead-ended there — and
-// that is most of what made blast-radius queries shallow. Re-attributing those
-// sites grows the transitive-caller closure of core `_parse` from 4 to 13.
-const isDeclContainer = (n: any) =>
-  Node.isVariableDeclaration(n) || Node.isPropertyAssignment(n)
-  || Node.isPropertyDeclaration(n) || Node.isPropertySignature(n);
-
-function callSite(node: any, moduleId: string) {
-  let fallback: { callerId: string; callerKind: string } | null = null;
-  for (let a = node.getParent(); a; a = a.getParent()) {
-    const callable = isCallableContainer(a);
-    if (!callable && !isDeclContainer(a)) continue;
-    const id = idOfNode(a);
-    if (!id) continue;
-    const t = typeOfNode(a);
-    const hit = { callerId: id, callerKind: t === "unknown" ? a.getKindName() : t };
-    if (callable) return hit;
-    fallback ??= hit;
   }
-  return fallback ?? { callerId: moduleId, callerKind: "module" };
 }
 
 // Resolve a name node to a declared entity id, declaring dependency entities
 // on first reference since the file walk never visits them.
 function resolveEntity(node: any): string | null {
-  try {
-    const defs = node.getDefinitions();
-    if (!defs.length) return null;
-    // getDeclarationNode() returns undefined for an anonymous `export default`,
-    // so every use of a default-imported binding resolved to nothing. That was
-    // the actual cause of the residual flagged imports — the benchmark modules
-    // and the `en()`/`km()`/`uk()` locale calls — not the missing field-read
-    // edges it was attributed to. Fall back to the default export of the
-    // definition's own file.
-    let defNode = defs[0].getDeclarationNode();
+  const defs = node.getDefinitions();
+  if (!defs.length) return null;
+  // getDeclarationNode() returns undefined for an anonymous `export default`,
+  // so every use of a default-imported binding resolved to nothing. That was
+  // the actual cause of the residual flagged imports — the benchmark modules
+  // and the `en()`/`km()`/`uk()` locale calls — not the missing field-read
+  // edges it was attributed to. Fall back to the default export of the
+  // definition's own file.
+  let defNode = defs[0].getDeclarationNode();
+  if (!defNode) {
+    // The definition's own node is the `default` keyword or the exported
+    // expression; walk out to the nearest construct idOfNode can name.
+    const at = defs[0].getNode?.();
+    for (let a = at; a; a = a.getParent?.()) {
+      if (Node.isSourceFile(a)) break;
+      // Skip anonymous functions: `mapper = (issue) => ...` names the parameter, not its default value.
+      if (declName(a) && !isAnonymousFunction(a)) { defNode = a; break; }
+    }
     if (!defNode) {
-      // The definition's own node is the `default` keyword or the exported
-      // expression; walk out to the nearest construct idOfNode can name.
-      const at = defs[0].getNode?.();
-      for (let a = at; a; a = a.getParent?.()) {
-        if (Node.isSourceFile(a)) break;
-        if (declName(a)) { defNode = a; break; }
-      }
-      if (!defNode) {
-        const sf = defs[0].getSourceFile?.();
-        defNode = sf?.getDefaultExportSymbol?.()?.getDeclarations?.()?.[0] ?? null;
-      }
+      const sf = defs[0].getSourceFile?.();
+      defNode = sf?.getDefaultExportSymbol?.()?.getDeclarations?.()?.[0] ?? null;
     }
-    if (!defNode) return null;
-    const id = idOfNode(defNode);
-    if (!id) return null;
-    // Anything the walk never visits must be declared here or the edge
-    // resolves to an id the fact base does not contain.
-    const defFile = np(defNode.getSourceFile().getFilePath());
-    if (!ANALYSED.has(defFile)) {
-      const external = isExternalPath(defFile);
-      facts.push({
-        kind: "declaration", entityId: id,
-        entityType: external ? "external" : "out_of_scope",
-        name: declName(defNode)!,
-        file: external ? `external:${externalOrigin(defFile)}` : rel(defFile),
-        exported: true,
-      });
-    }
-    return id;
-  } catch { return null; }
+  }
+  if (!defNode) return null;
+  const id = idOfNode(defNode);
+  if (!id) return null;
+  // Anything the walk never visits must be declared here or the edge
+  // resolves to an id the fact base does not contain.
+  const defFile = np(defNode.getSourceFile().getFilePath());
+  if (!ANALYSED.has(defFile)) {
+    const external = isExternalPath(defFile);
+    facts.push({
+      kind: "declaration", entityId: id,
+      entityType: external ? "external" : "out_of_scope",
+      name: declName(defNode)!,
+      file: external ? `external:${externalOrigin(defFile)}` : rel(defFile),
+      exported: true,
+    });
+  }
+  return id;
 }
 
 
@@ -616,24 +368,21 @@ function extractFile(file: SourceFile) {
   const moduleId = mid(fp);
 
   // ── Top-level declarations from export map ──
-  try {
-    const exportedDecls = file.getExportedDeclarations();
-    for (const [name, nodes] of exportedDecls) {
-      for (const node of nodes) {
-        // Use the declaration's actual source file (for re-exports, this is the original file, not the barrel)
-        const defFile = np(node.getSourceFile().getFilePath());
-        if (isExternalPath(defFile)) continue;
-        // The export map keys by exported name; idOfNode keys by declared name.
-        // They differ under `export { a as b }`, so record both when they do.
-        const id = idOfNode(node) ?? eid(defFile, name);
-        const dn = declName(node) ?? name;
-        facts.push({ kind: "declaration", entityId: id, entityType: typeOfNode(node), name: dn, file: rel(defFile), exported: true, ...fingerprint(node, dn) });
-        facts.push({ kind: "contains", containerId: mid(defFile), entityId: id });
-        emitHeritage(node, id);
-      }
+  const exportedDecls = file.getExportedDeclarations();
+  for (const [name, nodes] of exportedDecls) {
+    for (const node of nodes) {
+      // Use the declaration's actual source file (for re-exports, this is the original file, not the barrel)
+      const defFile = np(node.getSourceFile().getFilePath());
+      if (isExternalPath(defFile)) continue;
+      // The export map keys by exported name; idOfNode keys by declared name.
+      // They differ under `export { a as b }`, so record both when they do.
+      const id = idOfNode(node) ?? eid(defFile, name);
+      const dn = declName(node) ?? name;
+      track(id, typeOfNode(node), node);
+      facts.push({ kind: "declaration", entityId: id, entityType: typeOfNode(node), name: dn, file: rel(defFile), exported: true, ...fingerprint(node, dn) });
+      facts.push({ kind: "contains", containerId: mid(defFile), entityId: id });
+      emitHeritage(node, id);
     }
-  } catch (e: any) {
-    log("warn", `Exported declarations failed for ${rel(fp)}: ${e.message}`);
   }
 
   // ── Module entity ──
@@ -657,18 +406,22 @@ function extractFile(file: SourceFile) {
     if (!owner) return false;
     if (Node.isMethodSignature(owner) || Node.isCallSignatureDeclaration(owner)
         || Node.isFunctionTypeNode(owner) || Node.isConstructSignatureDeclaration(owner)) return true;
-    return typeof owner.getBody === "function" && !owner.getBody();
+    return "getBody" in owner && !owner.getBody();
   };
 
   const emitDecl = (node: any) => {
     const declFile = np(node.getSourceFile().getFilePath());
     if (isExternalPath(declFile)) return;
     if (isSignatureParam(node)) return;
+    // A bound arrow is declared by its binding (`const f = () => {}` is `f`).
+    if ((Node.isArrowFunction(node) || Node.isFunctionExpression(node)) && !isAnonymousFunction(node)) return;
     const id = idOfNode(node);
     if (!id) return;
+    track(id, typeOfNode(node), node);
     facts.push({
       kind: "declaration", entityId: id, entityType: typeOfNode(node),
       name: declName(node)!, file: rel(declFile), exported: !!node.isExported?.(),
+      ...(isAnonymousFunction(node) ? { ownerId: callSite(node, mid(declFile)).callerId } : {}),
       ...fingerprint(node, declName(node)!),
     });
     facts.push({ kind: "contains", containerId: mid(declFile), entityId: id });
@@ -693,6 +446,8 @@ function extractFile(file: SourceFile) {
     // a new entity. Declaring it made `const shape` and the shorthand collide on
     // one id in the same scope. The reference pass already covers the use.
     SyntaxKind.BindingElement,
+    // Anonymous functions (callbacks, `x.y = () => ...`): runtime frames land on them.
+    SyntaxKind.ArrowFunction, SyntaxKind.FunctionExpression,
   ];
   for (const k of DECL_KINDS) {
     for (const node of file.getDescendantsOfKind(k)) emitDecl(node);
@@ -765,7 +520,7 @@ function extractFile(file: SourceFile) {
   // ── Imports ──
   const mkImport = (imp: any) => {
     const msv = imp.getModuleSpecifierValue();
-    const resolved = resolveImport(fp, msv);
+    const resolved = resolveImport(fp, msv, imp);
     const isType = imp.isTypeOnly?.() || false;
     const defaultImport = imp.getDefaultImport?.();
     const namespaceImport = imp.getNamespaceImport?.();
@@ -785,14 +540,14 @@ function extractFile(file: SourceFile) {
   };
 
   for (const imp of file.getImportDeclarations()) {
-    try { mkImport(imp); } catch {}
+    mkImport(imp);
   }
 
   // ── Re-exports ──
   for (const exp of file.getExportDeclarations()) {
     const msv = exp.getModuleSpecifierValue?.();
     if (!msv) continue; // export { x } without "from"
-    const resolved = resolveImport(fp, msv);
+    const resolved = resolveImport(fp, msv, exp);
     const source = resolved ? rel(resolved) : `external:${msv}`;
     const named = exp.getNamedExports?.() || [];
     if (named.length > 0) {
@@ -810,7 +565,7 @@ function extractFile(file: SourceFile) {
 // ATLAS_TARGET / ATLAS_TSCONFIG / ATLAS_OUT let history runs point at another checkout
 // without overwriting the committed facts.json; defaults are the baseline run.
 const TARGET = path.resolve(process.env.ATLAS_TARGET ?? path.resolve(__dirname, "zod-repo/packages/zod/src"));
-ROOT = TARGET;
+setRoot(TARGET);
 const TSCONFIG = path.resolve(process.env.ATLAS_TSCONFIG ?? path.resolve(__dirname, "zod-repo/packages/zod/tsconfig.json"));
 
 const project = new Project({
@@ -834,6 +589,8 @@ for (const file of sourceFiles) {
     extractFile(file);
   } catch (e: any) {
     log("error", `FAILED ${rel(file.getFilePath())}: ${e.message}`);
+    // A file that throws is missing from the fact base; that is not a passing run.
+    process.exitCode = 1;
   }
 }
 
@@ -891,7 +648,10 @@ const edges: { callerId: string; targetId?: string; file: string; line: number }
 // calls+instantiations closure figure, which is a tracked metric.
 const refs = unique.filter(f => f.kind === "references") as ReferencesFact[];
 const refEdges = refs.map(r => ({ callerId: r.callerId, targetId: r.targetId, file: r.file, line: r.line }));
-const violations = [...edges, ...refEdges].flatMap(e => {
+// An anonymous function's ownerId is an entity reference too (ADR-0001 decision 1): closed, but not an edge in the closure metric.
+const ownerEdges = (unique.filter(f => f.kind === "declaration" && (f as DeclFact).ownerId) as DeclFact[])
+  .map(d => ({ callerId: d.entityId, targetId: d.ownerId, file: d.file, line: 0 }));
+const violations = [...edges, ...refEdges, ...ownerEdges].flatMap(e => {
   const bad: string[] = [];
   if (!declaredIds.has(e.callerId)) bad.push(`caller ${e.callerId}`);
   if (e.targetId && !declaredIds.has(e.targetId)) bad.push(`target ${e.targetId}`);
@@ -940,6 +700,11 @@ log("info", `Entity ids with multiple entityTypes: ${ambiguous.length} of ${type
 log("info", `  cross-space (declaration merges, expected): ${ambiguous.length - withinSpace.length}`);
 log("info", `  within one space (genuine collisions): ${withinSpace.length}`);
 for (const [id, t] of withinSpace.slice(0, 8)) log("error", `    ${id} -> ${[...t].join(", ")}`);
+// The same defect inside one entityType: the set above has size 1 there, so it
+// reported 0 while two `for (let i ...)` loops shared `handleTupleResults.i`.
+const sameType = [...SYMS].filter(([, syms]) => syms.size > 1);
+log("info", `  within one entityType (distinct symbols, one id): ${sameType.length}`);
+for (const [k, syms] of sameType.slice(0, 8)) log("error", `    ${k.replace("\0", " [")}] x${syms.size}`);
 
 // Collision measure per id scheme. An "entity" is a distinct (file, name,
 // entityType); an id collides when it is shared by 2+ entities. Ids are
@@ -972,8 +737,8 @@ if (violations.length > 0) {
 // Enforced as of 2026-10-09, once scope qualification brought this to zero.
 // Cross-space pairs are NOT violations: a merged TypeScript symbol
 // (`interface X` plus `const X`) is one entity declared twice, per ADR-0001.
-if (withinSpace.length > 0) {
-  log("error", `UNAMBIGUOUS IDENTITY: ${withinSpace.length} ids name more than one entity within a declaration space`);
+if (withinSpace.length + sameType.length > 0) {
+  log("error", `UNAMBIGUOUS IDENTITY: ${withinSpace.length + sameType.length} ids name more than one entity within a declaration space`);
   process.exitCode = 1;
 } else {
   log("info", "Unambiguous identity: OK (no id names two entities in one declaration space)");

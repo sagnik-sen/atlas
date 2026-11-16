@@ -2,12 +2,22 @@
 // Run: cd prototype && npx tsx trace-analyze.ts
 import * as fs from "fs";
 
-const S: any[] = JSON.parse(fs.readFileSync("facts.json", "utf-8"));
-const R: any[] = JSON.parse(fs.readFileSync(process.env.RUNTIME_FACTS ?? "facts.runtime.json", "utf-8"));
+const S: any[] = JSON.parse(fs.readFileSync(`${__dirname}/facts.json`, "utf-8"));
+const R: any[] = JSON.parse(fs.readFileSync(process.env.RUNTIME_FACTS ?? `${__dirname}/facts.runtime.json`, "utf-8"));
 const TOTAL_RUNS = Math.max(...R.map((e) => e.runs ?? 1));
 const pct = (a: number, b: number) => `${a}/${b} (${b ? ((100 * a) / b).toFixed(1) : "-"}%)`;
 
 const declared = new Set<string>(S.filter((f) => f.kind === "declaration").map((f) => f.entityId));
+// A runtime frame inside an anonymous function joins to that function's own id.
+// Static calls are attributed to its owner (identity.ts callSite), so compare on
+// the owner; the tiers still record the exact join.
+const ownerOf = new Map<string, string>(S.filter((f) => f.kind === "declaration" && f.ownerId).map((f) => [f.entityId, f.ownerId]));
+// Keep each endpoint's own id (callerFn/calleeFn) and whether it was rolled up: at owner granularity a rolled-up endpoint is an attribution, so it is not exact downstream.
+for (const e of R) {
+  e.callerFn = e.callerId; e.calleeFn = e.calleeId;
+  e.callerRolled = ownerOf.has(e.callerId); e.calleeRolled = ownerOf.has(e.calleeId);
+  e.callerId = ownerOf.get(e.callerId) ?? e.callerId; e.calleeId = ownerOf.get(e.calleeId) ?? e.calleeId;
+}
 const sCalls = S.filter((f) => f.kind === "calls" && f.calleeId);
 const sPairs = new Set(sCalls.map((f) => `${f.callerId}\u0000${f.calleeId}`));
 
@@ -16,6 +26,8 @@ const internal = R.filter((e) => e.callerTier !== "external");
 const ext = R.length - internal.length;
 const both = (e: any) => e.callerResolved && e.calleeResolved;
 const exactBoth = (e: any) => e.callerTier === "exact" && e.calleeTier === "exact";
+// Exact at owner granularity: the reported endpoint is the frame's own function, not an owner it was rolled up to.
+const exactOwn = (e: any) => exactBoth(e) && !e.callerRolled && !e.calleeRolled;
 const w = (xs: any[]) => xs.reduce((n, e) => n + e.samples, 0);
 console.log(`runtime edges: ${R.length} (${internal.length} zod->zod, ${ext} rooted at the workload driver, outside the corpus)`);
 console.log(`\nJOIN to declared static entities (zod->zod edges only):`);
@@ -24,7 +36,7 @@ console.log(`  both endpoints EXACT (function node itself is a declared entity):
 const tally = (k: string) => { const t: Record<string, number> = {}; for (const e of R) { const v = e[k]; if (v !== "external") t[v] = (t[v] ?? 0) + 1; } return JSON.stringify(t); };
 console.log(`  caller tiers ${tally("callerTier")}`);
 console.log(`  callee tiers ${tally("calleeTier")}`);
-console.log(`  (exact = frame position is a declared function; enclosing = frame is an anonymous function with no id of its own, attributed to the nearest declared enclosing entity as extract.ts's callSite() does; module = top-level code; line = same-line fallback)`);
+console.log(`  (exact = frame position is a declared function, anonymous ones included and compared with static on their owner; enclosing = frame position matched no declared function, attributed to the nearest declared enclosing entity as identity.ts's callSite() does; module = top-level code; line = same-line fallback)`);
 const frames = new Map<string, any>();
 for (const e of R) { frames.set(e.calleeFrame, e.calleeTier); if (e.callerFrame !== "<workload>") frames.set(e.callerFrame, e.callerTier); }
 const ft: Record<string, number> = {}; for (const t of frames.values()) ft[t] = (ft[t] ?? 0) + 1;
@@ -36,7 +48,7 @@ console.log(`  distinct frames: ${frames.size} ${JSON.stringify(ft)}`);
 const joined = internal.filter(both);
 const pk = (e: any) => `${e.callerId}\u0000${e.calleeId}`;
 const distinct = new Map<string, any>();
-for (const e of joined) { const p = distinct.get(pk(e)); if (p) { p.samples += e.samples; p.exact ||= exactBoth(e); p.viaNative ||= e.viaNative; } else distinct.set(pk(e), { ...e, exact: exactBoth(e) }); }
+for (const e of joined) { const p = distinct.get(pk(e)); if (p) { p.samples += e.samples; p.exact ||= exactOwn(e); p.viaNative ||= e.viaNative; } else distinct.set(pk(e), { ...e, exact: exactOwn(e) }); }
 const dj = [...distinct.values()];
 const novel = dj.filter((e) => !sPairs.has(pk(e)));
 const inStatic = dj.length - novel.length;
@@ -84,7 +96,7 @@ function closure(m: Map<string, Set<string>>, seeds: string[]) {
 }
 const mStatic = rev([]);
 const mBoth = rev(R.filter((e) => e.callerTier !== "external" && both(e)));
-const mExact = rev(R.filter((e) => e.callerTier !== "external" && exactBoth(e)));
+const mExact = rev(R.filter((e) => e.callerTier !== "external" && exactOwn(e)));
 // the workload driver is one pseudo-caller, not 70
 const real = dj.filter((e) => !isShortcut(e));            // drop A->B when the runtime graph has A->X->B
 const mReal = rev(real);
@@ -97,7 +109,7 @@ const PUBLIC_PARSE = "ts:v4/classic/parse.ts:parse";
 const factory = sCalls.find((f) => f.callerId === PUBLIC_PARSE && /core\/parse\.ts:_parse$/.test(f.calleeId))?.calleeId;
 const aliases = factory ? [...declared].filter((d) => d.startsWith(factory + ".") && d.split(".").length === factory.split(".").length + 1) : [];
 
-// Implementation endpoints only resolve at the enclosing tier (`inst._zod.parse = ...` has no id), so
+// Implementation endpoints are anonymous functions (`inst._zod.parse = ...`) compared on their owner, so
 // allow ANY joined edge into the seed, then climb over exact-tier, non-shortcut edges only. This avoids the
 // hub that makes the all-joined closure meaningless.
 function scoped(seed: string) {
@@ -108,12 +120,12 @@ function scoped(seed: string) {
 const seeds: [string, string[]][] = [
   ["public parse, classic/parse.ts:parse (the report's 1)", [PUBLIC_PARSE]],
   ["  + factory alias (parse := _parse.fn)", [PUBLIC_PARSE, ...aliases]],
-  ["ZodType.parse wrapper fn (what z.string().parse IS at runtime)", ["ts:v4/classic/schemas.ts:_zodTypeParseProps.@objectliteral0.parse.fn"]],
+  ["ZodType.parse wrapper fn (what z.string().parse IS at runtime)", ["ts:v4/classic/schemas.ts:_zodTypeParseProps.@objectliteral[return]0.parse.fn"]],
   ["_parse.fn (core)", aliases],
   ["$ZodObjectJIT (inst._zod.parse impl, behind _zod.run)", ["ts:v4/core/schemas.ts:$ZodObjectJIT"]],
   ["$ZodString (inst._zod.parse impl, behind _zod.run)", ["ts:v4/core/schemas.ts:$ZodString"]],
   ["$ZodNumber", ["ts:v4/core/schemas.ts:$ZodNumber"]],
-  ["_zodTypeParseProps.parse factory (installed via installLazyProps)", ["ts:v4/classic/schemas.ts:_zodTypeParseProps.@objectliteral0.parse"]],
+  ["_zodTypeParseProps.parse factory (installed via installLazyProps)", ["ts:v4/classic/schemas.ts:_zodTypeParseProps.@objectliteral[return]0.parse"]],
 ];
 console.log(`\nTRANSITIVE CALLERS (distinct entities, seeds excluded): static -> +runtime exact-tier -> +runtime all-joined (hub-inflated) | seed-scoped  [+ workload driver]`);
 for (const [label, s] of seeds) {
@@ -136,7 +148,7 @@ show(/installLazyProps -> .*_zodTypeParseProps$|defineCached.*get -> .*_zodTypeP
 console.log(" ZodType.parse wrapper -> core _parse -> _zod.run -> implementation:");
 show(/parse\.fn -> .*(_parse\.fn|\$Zod)|_parse\.fn -> .*(wrapped|\$Zod)|wrapped -> .*\$Zod/, 12);
 // The static fact base's own best attempt at the same hop:
-const staticFromParseFn = sCalls.filter((f) => /_zodTypeParseProps\.@objectliteral0\.parse\.fn$/.test(f.callerId)).map((f) => f.calleeId);
+const staticFromParseFn = sCalls.filter((f) => /_zodTypeParseProps\.@objectliteral\[return\]0\.parse\.fn$/.test(f.callerId)).map((f) => f.calleeId);
 console.log(` static callees of the wrapper fn: ${JSON.stringify(staticFromParseFn)}`);
 const staticRun = sCalls.filter((f) => /core\/parse\.ts:_parse\.fn$/.test(f.callerId) && /_zod|run/.test(f.calleeName));
 console.log(` static facts for the _zod.run call in _parse.fn: ${JSON.stringify(staticRun.map((f) => [f.calleeName, f.calleeId, f.reason, f.confidence]))}`);
@@ -148,12 +160,24 @@ function path(m: Map<string, Set<string>>, from: string, to: string) {
   if (!par.has(to)) return null;
   const out = []; for (let x = to; x; x = par.get(x)!) out.push(x); return out;
 }
-const PUB = "ts:v4/classic/schemas.ts:_zodTypeParseProps.@objectliteral0.parse.fn";
+const PUB = "ts:v4/classic/schemas.ts:_zodTypeParseProps.@objectliteral[return]0.parse.fn";
 console.log(`\nCALL PATH (user-facing wrapper -> ... -> implementation):`);
-for (const impl of ["ts:v4/core/schemas.ts:$ZodObjectJIT", "ts:v4/core/memoizer.ts:attachMemoizer.@arrowfunction0.wrapped"]) {
+for (const impl of ["ts:v4/core/schemas.ts:$ZodObjectJIT", "ts:v4/core/memoizer.ts:attachMemoizer.@arrowfunction[push]0.wrapped"]) {
   const ps = path(mStatic, impl, PUB), pe = path(mRealExact, impl, PUB), pb = path(mReal, impl, PUB);
   const f = (p: string[] | null) => (p ? `${p.length - 1} hops: ${p.join(" -> ")}` : "NO PATH");
   console.log(`  ${impl}\n    static-only        : ${f(ps)}\n    +runtime exact-only, shortcuts removed: ${f(pe)}\n    +runtime all joined, shortcuts removed: ${f(pb)}`);
+}
+// The same path on the frames' own ids, every hop exact and shortcuts removed: anonymous functions are entities now.
+{
+  const E = R.filter((e) => e.callerTier === "exact" && e.calleeTier === "exact" && e.callerFn !== e.calleeFn);
+  const succ = new Map<string, Set<string>>();
+  for (const e of E) (succ.get(e.callerFn) ?? succ.set(e.callerFn, new Set()).get(e.callerFn)!).add(e.calleeFn);
+  const short = (e: any) => [...(succ.get(e.callerFn) ?? [])].some((x) => x !== e.callerFn && x !== e.calleeFn && succ.get(x)?.has(e.calleeFn));
+  const m = new Map<string, Set<string>>();
+  for (const e of E) if (!short(e)) (m.get(e.calleeFn) ?? m.set(e.calleeFn, new Set()).get(e.calleeFn)!).add(e.callerFn);
+  const impl = "ts:v4/core/schemas.ts:$ZodObjectJIT.@arrowfunction[$constructor]0.@arrowfunction[parse]0";
+  const p = path(m, impl, PUB);
+  console.log(`  ${impl}\n    own ids, every hop exact, shortcuts removed: ${p ? `${p.length - 1} hops: ${p.join(" -> ")}` : "NO PATH"}`);
 }
 const hist: Record<number, number> = {}; for (const e of R) hist[e.runs ?? 1] = (hist[e.runs ?? 1] ?? 0) + 1;
 console.log(`\nSAMPLING RECALL: ${TOTAL_RUNS} merged processes; edges by number of runs that saw them ${JSON.stringify(hist)}`);
