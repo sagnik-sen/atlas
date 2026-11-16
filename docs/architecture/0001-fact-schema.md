@@ -314,8 +314,21 @@ Per-occurrence references grow the fact base ~52%.
   `$constructor` init callbacks were 43% and other callbacks most of the rest.
   With every anonymous function an entity, 342 of 369 runtime edges (92.7%)
   join exactly, against 127 (34.4%) before. The other 27 touch module
-  top-level code and can never be exact. (2) and (3) are untouched, and blast
-  radius for the public `parse` is still 1, so the conditional verdict stands.
+  top-level code and can never be exact. (2) and (3) were untouched then.
+
+  (2) is met as of 2026-11-16: `trace-exact.ts` rewrites the corpus so every
+  call site and function entry reports itself. Two runs are byte-identical,
+  all 488 corpus edges have both ends declared, and each edge carries the
+  file, line and column of its call. Because static `calls` facts are unique
+  on (file, line, callee name), the site joins a runtime edge to the static
+  fact for the same call, and 104 of 469 such edges replace a bodyless or
+  aliased static target with the function that ran. (3) is half met: the
+  workload's call sites are resolved with the same identity layer, which links
+  `ZodType.parse` to `_zodTypeParseProps...parse.fn` and reaches 120 entities
+  from it, so "what happens when a user calls `parse`" is answered for the
+  traced workload. Its functions are still not entities, so who calls `parse`
+  is not, and that half of the verdict stands. The trace covers 7.2% of static
+  call sites: it is evidence for what ran, never for what cannot.
 - **Field reads stay unmodelled, now on evidence.** This ADR previously
   attributed the 12 remaining flagged imports to missing field-read edges.
   Measured, that was wrong twice over: only 8 of the 12 were field reads, and

@@ -14,6 +14,89 @@ no longer exists upstream, and upstream has since force-pushed `main` so
 `e516c3b` is not an ancestor of it. `prototype/zod-repo/` is gitignored, so a
 fresh clone does not reproduce the corpus either.
 
+## Update (2026-11-16b): deterministic runtime capture with call sites
+
+ADR-0001 made runtime ingestion conditional on three things: ids for the
+functions frames land on, capture that is deterministic and carries call-site
+positions, and the traced workload's code being in the fact base. The first
+was met on 2026-10-19c. This builds the second, and the half of the third that
+Q5 needs.
+
+**What was built.** `trace-exact.ts` rewrites a copy of the corpus so every
+call expression and every function entry reports itself, then runs the same
+workload `trace.ts` samples. `f(a)` becomes `__A.f(site, f, [a])`, `a.b(c)`
+becomes `__A.m(site, a, "b", [c])`, and each body starts with `__A.e(fn)`.
+5,950 call sites and 2,335 function bodies are rewritten; 27 calls are left as
+written (21 optional chains, 6 `super()`). An edge is a call site and the
+function entered from it, in one of four kinds:
+
+| kind | edges | meaning |
+|---|---|---|
+| direct | 498 | the function entered is the one the call expression called |
+| lookup | 18 | entered while the site read its callee: `x.parse` is a getter |
+| native | 10 | entered while the site's callee, a builtin, was running (`xs.map(cb)`) |
+| implicit | 8 | no call expression pending: a getter read, or an unrewritten call form |
+
+The caller of the first three is static, taken from the site with the same
+attribution `calls` facts use. Only an implicit edge takes its caller from
+run-time state. Output is `facts.runtime.exact.json`, one edge per line.
+
+**Against the sampler.**
+
+| | `trace.ts` | `trace-exact.ts` |
+|---|---|---|
+| runs needed | 12 processes of 6,000 iterations, union still growing at run 12 | 1 process of 3 iterations; the edge set is the same at 60 |
+| reproducible | no | byte-identical across runs |
+| both ends are declared entities, exactly | 342 of 369 (92.7%) | 488 of 488 |
+| position of an edge | start line of the caller function | file, line and column of the call |
+| weight | samples | entry count |
+
+**A site is a join key.** Static `calls` facts are unique on (file, line,
+callee name), all 5,329 of them, so every runtime edge can be laid against the
+static fact for the same call. Of the 469 direct edges at corpus call sites:
+
+| what the static fact names | edges | what ran |
+|---|---|---|
+| the same entity | 360 | |
+| a parameter | 48 | the function passed in |
+| a type-method (interface member) | 26 | an implementation |
+| a variable | 25 | the function behind an alias or a factory constant |
+| a type-property | 4 | an implementation, or a callback the workload passed in |
+| a class | 1 | its constructor |
+| nothing: the callee is not a name | 5 | |
+
+The 104 in the middle rows are ADR-0001's dead-end edges ("Correctness beyond
+closure"), resolved for what the workload reaches without a points-to pass or
+class-hierarchy analysis. 39 static targets never ran themselves. 10 of them
+dispatched to more than one function: `$constructor.initializer` to 29,
+`_$ZodTypeInternals.run` to 9, `installLazyMethods.methods` to 6.
+
+**Q5 is answered.** `z.string().parse(x)` in the workload resolves statically
+to the bodyless `ZodType.parse`, as before. At the same six sites the trace
+records that reading `.parse` ran the `defineCached` getter (the lazy
+installer), and that the call entered
+`_zodTypeParseProps.@objectliteral[return]0.parse.fn`. 120 entities are
+reached from there; 114 from `safeParse`. `questions.ts` Q5 now reads these
+facts and reports 6 of 6 answered. The static half of its verdict is unchanged:
+no syntactic construct names `parse` on that path.
+
+**Limits.**
+
+- A trace says what ran, not what can run. The workload reaches 422 of 5,886
+  static call and instantiation sites (7.2%).
+- The workload is resolved, not declared. Its call sites carry their static
+  targets, which is what links the public method to its implementation, but
+  its functions are not entities in `facts.json`. Who calls `parse` is still
+  user code outside the fact base, so blast radius upward is unchanged.
+- A getter read inside a native callback is attributed to the native call's
+  site (one edge here). Calls left unrewritten appear as implicit edges with
+  the right caller and no site.
+- The rewrite reads `a.b` after evaluating the arguments, not before.
+- One corpus, one workload.
+
+Run: `cd prototype && npx tsx trace-exact.ts`. CI reruns it and fails if the
+committed edges change.
+
 ## Update (2026-11-15): the identity invariant could not see same-type collisions
 
 "0 within-space collisions, enforced" was wrong. The check grouped each id's

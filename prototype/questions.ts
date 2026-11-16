@@ -56,7 +56,8 @@ const name = (id: string) => {
   return d ? `${d.name} (${d.file})` : id;
 };
 const h1 = (n: number, q: string) => console.log(`\n${"=".repeat(74)}\nQ${n}. ${q}\n${"=".repeat(74)}`);
-const verdict = (ok: boolean, why: string) => console.log(`\n  ${ok ? "ANSWERED" : "CANNOT ANSWER"} — ${why}`);
+let asked = 0, answered = 0;
+const verdict = (ok: boolean, why: string) => { asked++; if (ok) answered++; console.log(`\n  ${ok ? "ANSWERED" : "CANNOT ANSWER"} — ${why}`); };
 
 // ── Q1 ────────────────────────────────────────────────────────────────
 h1(1, "If I change this function's signature, what breaks?");
@@ -139,12 +140,24 @@ h1(5, "What happens when a user calls z.string().parse(x)?");
   const linked = F.some((f) => (f.calleeId === impl || f.targetId === impl) && f.callerId === pub);
   console.log(`  declared public method: ${declById.has(pub) ? "yes" : "no"}`);
   console.log(`  declared implementation: ${declById.has(impl) ? "yes" : "no"}`);
-  console.log(`  any fact linking them: ${linked ? "yes" : "NO"}`);
+  console.log(`  any static fact linking them: ${linked ? "yes" : "NO"}`);
   console.log(`  transitive callers of the classic entry point: ${closure("ts:v4/classic/parse.ts:parse", (id) => callersOf.get(id) ?? []).size}`);
-  verdict(false,
-    "the method is installed at runtime: installLazyProps -> for (const key in built) defineCached(...) -> dispatch through the mutable field _zod.run. " +
-    "No syntactic construct names `parse` on that path, so no static fact can link declaration to implementation. " +
-    "Needs runtime trace facts (thesis §5.1). This is not a defect in the extractor.");
+  // trace-exact.ts records, per call site, the static target and the function
+  // that was entered. A site whose static target is the public method is the link.
+  const RT = path.resolve(__dirname, "facts.runtime.exact.json");
+  const rt: Fact[] = declById.has(pub) && fs.existsSync(RT) ? JSON.parse(fs.readFileSync(RT, "utf-8")) : [];
+  const at = rt.filter((e) => e.staticCalleeId === pub && e.via === "direct");
+  const entered = [...new Set<string>(at.map((e) => e.calleeId))];
+  const ranFrom = new Map<string, Set<string>>();
+  for (const e of rt) { const from = e.callerFn ?? e.callerId; (ranFrom.get(from) ?? ranFrom.set(from, new Set()).get(from)!).add(e.calleeId); }
+  const reached = new Set<string>();
+  for (const s of entered) for (const id of closure(s, (id) => ranFrom.get(id) ?? [])) reached.add(id);
+  console.log(`  runtime: ${at.length} traced call sites of the public method entered ${entered.join(", ") || "nothing"}`);
+  console.log(`  runtime: entities reached from there: ${reached.size}`);
+  verdict(entered.length > 0,
+    "from runtime facts only, and only for what the traced workload executes. " +
+    "The method is installed at runtime: installLazyProps -> for (const key in built) defineCached(...) -> dispatch through the mutable field _zod.run. " +
+    "No syntactic construct names `parse` on that path, so no static fact can link declaration to implementation (thesis §5.1). This is not a defect in the extractor.");
 }
 
 // ── Q6 ────────────────────────────────────────────────────────────────
@@ -175,5 +188,5 @@ h1(6, "Which call edges look trustworthy but lead nowhere?");
 }
 
 console.log(`\n${"=".repeat(74)}`);
-console.log(`Answered 5 of 6. Q5 needs runtime facts; Q6 is a diagnostic, not a capability.`);
+console.log(`Answered ${answered} of ${asked}. Q5 needs runtime facts and holds for the traced workload only; Q6 is a diagnostic, not a capability.`);
 console.log(`${"=".repeat(74)}\n`);

@@ -26,3 +26,6 @@ jobs:
       - run: npm run extract
       - name: Committed facts match the extractor
         run: git diff --exit-code facts.json
+      # Deterministic by construction: a changed edge is a changed tracer or a changed corpus.
+      - name: Exact runtime trace reproduces
+        run: npx tsx trace-exact.ts && git diff --exit-code facts.runtime.exact.json
